@@ -8,15 +8,15 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing;
-	using MGroup.LinearAlgebra.Iterative.GaussSeidel;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
+	using MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel;
 	using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Triangulation;
 	using MGroup.LinearAlgebra.Vectors;
 
-	public class PodAmgAlgorithm : IDisposable
+	public class PodAmgAlgorithm
 	{
 		private const string name = "POD-AMG";
 
@@ -48,11 +48,6 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 			_convergenceTolerance = convergenceTolerance;
 			_convergenceCriterion = convergenceCriterion;
 			_maxIterationsProvider = maxIterationsProvider;
-		}
-
-		public void Dispose() 
-		{ 
-			if (_smoother != null) _smoother.Dispose();
 		}
 
 		public void Initialize(CsrMatrix systemMatrix)

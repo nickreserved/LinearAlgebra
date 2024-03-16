@@ -8,7 +8,7 @@ using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
-namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
+namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 {
 	public class GaussSeidelIterationCsrSerial : IGaussSeidelIteration
 	{
@@ -20,26 +20,20 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		{
 		}
 
-		public void Dispose() 
-		{
-			this.diagonalOffsets = null;
-			inactive = true;
-		}
-
 		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
 		{
 			CheckActive();
 
-			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
+			if (lhsVector is Vector lhsDense && rhsVector is Vector rhsDense)
 			{
 				BackwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
 					rhsDense.RawData, lhsDense.RawData);
 			}
 			else
 			{
-				double[] lhs = lhsVector.CopyToArray();
-				double[] rhs = rhsVector.CopyToArray();
-				BackwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets, 
+				var lhs = lhsVector.CopyToArray();
+				var rhs = rhsVector.CopyToArray();
+				BackwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
 					rhs, lhs);
 				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
 			}
@@ -49,34 +43,34 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		{
 			CheckActive();
 
-			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
+			if (lhsVector is Vector lhsDense && rhsVector is Vector rhsDense)
 			{
 				ForwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
 					rhsDense.RawData, lhsDense.RawData);
 			}
 			else
 			{
-				double[] lhs = lhsVector.CopyToArray();
-				double[] rhs = rhsVector.CopyToArray();
-				ForwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets, 
+				var lhs = lhsVector.CopyToArray();
+				var rhs = rhsVector.CopyToArray();
+				ForwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
 					rhs, lhs);
 				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
 			}
 		}
 
-		public void Initialize(IMatrixView matrix) 
+		public void Initialize(IMatrixView matrix)
 		{
 			if (matrix is CsrMatrix csrMatrix)
 			{
 				Preconditions.CheckSquare(csrMatrix);
 				this.matrix = csrMatrix;
-				this.diagonalOffsets = SparseArrays.LocateDiagonalOffsets(
+				diagonalOffsets = SparseArrays.LocateDiagonalOffsets(
 					matrix.NumRows, csrMatrix.RawRowOffsets, csrMatrix.RawColIndices);
-				this.inactive = false;
+				inactive = false;
 			}
 			else
 			{
-				throw new InvalidSparsityPatternException(this.GetType().Name + " can be used only for matrices in CSR format." +
+				throw new InvalidSparsityPatternException(GetType().Name + " can be used only for matrices in CSR format." +
 					"Consider using the general " + typeof(GaussSeidelIterationGeneral).Name + " or another implementation.");
 			}
 		}
@@ -86,22 +80,22 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		{
 			// Do not read the vector and each matrix row backward. It destroys caching. And in any case, we do csr_row * vector,
 			// thus the order of operations for the dot product do not matter. What does matter is starting from the last row. 
-			int n = matrixOrder;
-			for (int i = n - 1; i >= 0; --i)
+			var n = matrixOrder;
+			for (var i = n - 1; i >= 0; --i)
 			{
-				double sum = rhs[i];
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-				int diagOffset = diagOffsets[i];
+				var sum = rhs[i];
+				var rowStart = csrRowOffsets[i]; // inclusive
+				var rowEnd = csrRowOffsets[i + 1]; // exclusive
+				var diagOffset = diagOffsets[i];
 
-				for (int k = rowStart; k < diagOffset; ++k)
+				for (var k = rowStart; k < diagOffset; ++k)
 				{
 					sum -= csrValues[k] * lhs[csrColIndices[k]];
 				}
 
-				double diagEntry = csrValues[diagOffset];
+				var diagEntry = csrValues[diagOffset];
 
-				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				for (var k = diagOffset + 1; k < rowEnd; ++k)
 				{
 					sum -= csrValues[k] * lhs[csrColIndices[k]];
 				}
@@ -112,17 +106,17 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		private static void BackwardIterationBasic(int matrixOrder, double[] csrValues, int[] csrRowOffsets,
 			int[] csrColIndices, double[] rhs, double[] lhs)
 		{
-			int n = matrixOrder;
-			for (int i = n - 1; i >= 0; --i)
+			var n = matrixOrder;
+			for (var i = n - 1; i >= 0; --i)
 			{
-				double sum = rhs[i];
+				var sum = rhs[i];
 				double diagEntry = 0;
 
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-				for (int k = rowEnd - 1; k >= rowStart; --k)
+				var rowStart = csrRowOffsets[i]; // inclusive
+				var rowEnd = csrRowOffsets[i + 1]; // exclusive
+				for (var k = rowEnd - 1; k >= rowStart; --k)
 				{
-					int j = csrColIndices[k];
+					var j = csrColIndices[k];
 					if (j == i)
 					{
 						diagEntry = csrValues[k];
@@ -139,22 +133,22 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		private static void ForwardIteration(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			int[] diagOffsets, double[] rhs, double[] lhs)
 		{
-			int n = matrixOrder;
-			for (int i = 0; i < n; ++i)
+			var n = matrixOrder;
+			for (var i = 0; i < n; ++i)
 			{
-				double sum = rhs[i];
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-				int diagOffset = diagOffsets[i];
-				
-				for (int k = rowStart; k < diagOffset; ++k)
+				var sum = rhs[i];
+				var rowStart = csrRowOffsets[i]; // inclusive
+				var rowEnd = csrRowOffsets[i + 1]; // exclusive
+				var diagOffset = diagOffsets[i];
+
+				for (var k = rowStart; k < diagOffset; ++k)
 				{
 					sum -= csrValues[k] * lhs[csrColIndices[k]];
 				}
 
-				double diagEntry = csrValues[diagOffset];
+				var diagEntry = csrValues[diagOffset];
 
-				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				for (var k = diagOffset + 1; k < rowEnd; ++k)
 				{
 					sum -= csrValues[k] * lhs[csrColIndices[k]];
 				}
@@ -165,17 +159,17 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		private static void ForwardIterationBasic(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			double[] rhs, double[] lhs)
 		{
-			int n = matrixOrder;
-			for (int i = 0; i < n; ++i)
+			var n = matrixOrder;
+			for (var i = 0; i < n; ++i)
 			{
-				double sum = rhs[i];
+				var sum = rhs[i];
 				double diagEntry = 0;
 
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-				for (int k = rowStart; k < rowEnd; ++k)
+				var rowStart = csrRowOffsets[i]; // inclusive
+				var rowEnd = csrRowOffsets[i + 1]; // exclusive
+				for (var k = rowStart; k < rowEnd; ++k)
 				{
-					int j = csrColIndices[k];
+					var j = csrColIndices[k];
 					if (j == i)
 					{
 						diagEntry = csrValues[k];
@@ -194,7 +188,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		{
 			if (inactive)
 			{
-				throw new ObjectDisposedException(this.GetType().Name);
+				throw new ObjectDisposedException(GetType().Name);
 			}
 		}
 

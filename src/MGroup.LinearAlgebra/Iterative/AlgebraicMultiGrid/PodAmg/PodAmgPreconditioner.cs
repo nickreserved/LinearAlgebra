@@ -7,8 +7,8 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing;
-	using MGroup.LinearAlgebra.Iterative.GaussSeidel;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
+	using MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel;
 	using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;

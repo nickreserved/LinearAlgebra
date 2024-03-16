@@ -7,7 +7,7 @@ using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
-namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
+namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 {
 	public class GaussSeidelIterationGeneral : IGaussSeidelIteration
 	{
@@ -19,30 +19,24 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		}
 
 
-		public void Dispose() 
-		{
-			this.matrix = null;
-			this.inactive = true;
-		}
-
 		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
 		{
 			CheckActive();
 
-			IVector x = lhsVector;
-			IVectorView b = rhsVector;
+			var x = lhsVector;
+			var b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
-			int n = matrix.NumRows;
-			for (int i = n - 1; i >= 0; --i)
+			var n = matrix.NumRows;
+			for (var i = n - 1; i >= 0; --i)
 			{
-				double sum = b[i];
+				var sum = b[i];
 				int j;
 				for (j = 0; j < i; ++j)
 				{
 					sum -= matrix[i, j] * x[j];
 				}
 
-				double diagEntry = matrix[i, i];
+				var diagEntry = matrix[i, i];
 
 				for (j = i + 1; j < n; ++j)
 				{
@@ -57,20 +51,20 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		{
 			CheckActive();
 
-			IVector x = lhsVector;
-			IVectorView b = rhsVector;
+			var x = lhsVector;
+			var b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
-			int n = matrix.NumRows;
-			for (int i = 0; i < n; ++i)
+			var n = matrix.NumRows;
+			for (var i = 0; i < n; ++i)
 			{
-				double sum = b[i];
+				var sum = b[i];
 				int j;
 				for (j = 0; j < i; ++j)
 				{
 					sum -= matrix[i, j] * x[j];
 				}
 
-				double diagEntry = matrix[i, i];
+				var diagEntry = matrix[i, i];
 
 				for (j = i + 1; j < n; ++j)
 				{
@@ -81,11 +75,11 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			}
 		}
 
-		public void Initialize(IMatrixView matrix) 
+		public void Initialize(IMatrixView matrix)
 		{
 			Preconditions.CheckSquare(matrix);
 			this.matrix = matrix;
-			this.inactive = false;
+			inactive = false;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,7 +87,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		{
 			if (inactive)
 			{
-				throw new ObjectDisposedException(this.GetType().Name);
+				throw new ObjectDisposedException(GetType().Name);
 			}
 		}
 

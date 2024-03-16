@@ -7,7 +7,7 @@ using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
 
-namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
+namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 {
 	/// <summary>
 	/// Implements the Gauss-Seidel algorithm for solving linear systems.
@@ -24,10 +24,10 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		private readonly bool forwardGaussSeidel;
 		private readonly IMaxIterationsProvider maxIterationsProvider;
 
-		public GaussSeidelAlgorithm(IGaussSeidelIteration gsKernel, ISolutionConvergenceCriterion convergenceCriterion, 
+		public GaussSeidelAlgorithm(IGaussSeidelIteration gsKernel, ISolutionConvergenceCriterion convergenceCriterion,
 			double convergenceTolerance, bool forwardGaussSeidel, IMaxIterationsProvider maxIterationsProvider)
 		{
-			this.gsIteration = gsKernel;
+			gsIteration = gsKernel;
 			this.convergenceCriterion = convergenceCriterion;
 			this.convergenceTolerance = convergenceTolerance;
 			this.forwardGaussSeidel = forwardGaussSeidel;
@@ -61,10 +61,10 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 
 			gsIteration.Initialize(matrix);
 
-			int maxIterations = maxIterationsProvider.GetMaxIterations(matrix.NumRows);
+			var maxIterations = maxIterationsProvider.GetMaxIterations(matrix.NumRows);
 			var previousSolution = solution.CreateZeroVectorWithSameFormat();
-			double convergenceMetric = double.NaN;
-			int iter = 0;
+			var convergenceMetric = double.NaN;
+			var iter = 0;
 			while (iter < maxIterations)
 			{
 				previousSolution.CopyFrom(solution);
@@ -85,7 +85,6 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 				}
 			}
 
-			gsIteration.Dispose();
 			return new IterativeStatistics
 			{
 				AlgorithmName = name,

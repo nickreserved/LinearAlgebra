@@ -4,7 +4,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 	using System.Collections.Generic;
 	using System.Text;
 
-	using MGroup.LinearAlgebra.Iterative.GaussSeidel;
+	using MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel;
 	using MGroup.LinearAlgebra.Vectors;
 
 	public abstract class GaussSeidelSweepDirection

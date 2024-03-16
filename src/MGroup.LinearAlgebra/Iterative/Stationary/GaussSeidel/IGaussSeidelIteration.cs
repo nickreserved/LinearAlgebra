@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
+namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 {
 	using System;
 	using System.Collections.Generic;
@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;
 
-	public interface IGaussSeidelIteration : IDisposable
+	public interface IGaussSeidelIteration
 	{
 		void Initialize(IMatrixView matrix);
 

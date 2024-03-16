@@ -8,7 +8,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid
 	using DotNumerics.Optimization.LBFGSB;
 
 	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing;
-	using MGroup.LinearAlgebra.Iterative.GaussSeidel;
+	using MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;
 
@@ -26,15 +26,6 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid
 			this._sweep = sweep;
 			this._numIterations = numIterations;
 			this._disposed = false;
-		}
-
-		public void Dispose()
-		{
-			if (!_disposed)
-			{
-				_gaussSeidelIteration.Dispose();
-				_disposed = true;
-			}
 		}
 
 		public void Initialize(IMatrixView matrix)

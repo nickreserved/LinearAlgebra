@@ -4,14 +4,13 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 	using System.Collections.Generic;
 	using System.Text;
 
-	using MGroup.LinearAlgebra.Iterative.GaussSeidel;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
 	/// Multigrid smoothing, also called relaxation.
 	/// </summary>
-	public interface IMultigridSmoother : IDisposable
+	public interface IMultigridSmoother
 	{
 		void Initialize(IMatrixView matrix);
 

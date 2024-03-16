@@ -8,9 +8,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid;
 	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg;
 	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing;
-	using MGroup.LinearAlgebra.Iterative.GaussSeidel;
 	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
+	using MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel;
 	using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;
@@ -39,7 +39,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			solverBuilder.SmootherBuilder = new GaussSeidelSmoother.Builder(
 				new GaussSeidelIterationCsrSerial.Builder(), GaussSeidelSweepDirection.Symmetric, numIterations: 1);
 
-			using PodAmgAlgorithm solver = solverBuilder.Create(samples, numPrincipalComponents);
+			PodAmgAlgorithm solver = solverBuilder.Create(samples, numPrincipalComponents);
 			var solutionComputed = Vector.CreateZero(rhs.Length);
 			solver.Initialize(csr);
 			IterativeStatistics stats = solver.Solve(rhs, solutionComputed);
