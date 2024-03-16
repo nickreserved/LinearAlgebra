@@ -15,8 +15,8 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 		{
 			//TODO: The next can be optimized to not create a new vector (using SubtractIntoThis) in some cases.
 			//		E.g. in Gauss-Seidel the previousSolution vector is no longer necessary and can be overwritten.
-			var num = previousSolution.Subtract(currentSolution).Norm2();
-			var den = currentSolution.Norm2();
+			double num = previousSolution.Subtract(currentSolution).Norm2();
+			double den = currentSolution.Norm2();
 			if (den != 0)
 			{
 				return num / den;
