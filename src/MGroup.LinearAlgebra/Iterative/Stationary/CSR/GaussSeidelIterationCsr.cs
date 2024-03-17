@@ -19,7 +19,7 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 				this.forwardDirection = forwardDirection;
 		}
 
-		public override string Name => "Forward Gauss-Seidel";
+		public override string Name => forwardDirection ? "Forward Gauss-Seidel" : "Back Gauss-Seidel";
 
 		public override IStationaryIteration CopyWithInitialSettings() => new GaussSeidelIterationCsr(forwardDirection);
 

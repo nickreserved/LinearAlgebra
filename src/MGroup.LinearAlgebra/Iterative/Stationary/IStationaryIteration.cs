@@ -13,6 +13,14 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 
 		public void Execute(Vector input, Vector output);
 
+		/// <summary>
+		/// Use this method, so that this <see cref="IStationaryIteration"/> will try to reuse work done by
+		/// <paramref name="other"/> whenever possible.
+		/// </summary>
+		/// <param name="other"></param>
+		public void LinkWith(IStationaryIteration other);
+
 		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified);
+
 	}
 }

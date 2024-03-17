@@ -21,12 +21,14 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 
 		public MultigridLevelSmoothing AddPreSmoother(IStationaryIteration stationaryIteration, int numApplications)
 		{
+			LinkWithExistingSmoothers(stationaryIteration);
 			preSmoothers.Add((stationaryIteration, numApplications));
 			return this;
 		}
 
 		public MultigridLevelSmoothing AddPostSmoother(IStationaryIteration stationaryIteration, int numApplications)
 		{
+			LinkWithExistingSmoothers(stationaryIteration);
 			postSmoothers.Add((stationaryIteration, numApplications));
 			return this;
 		}
@@ -61,12 +63,12 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
 		{
 			CheckSmoothers();
-			foreach ((var stationaryIteration, _) in preSmoothers)
+			foreach ((IStationaryIteration stationaryIteration, _) in preSmoothers)
 			{
 				stationaryIteration.UpdateMatrix(matrix, isPatternModified);
 			}
 
-			foreach ((var stationaryIteration, _) in postSmoothers)
+			foreach ((IStationaryIteration stationaryIteration, _) in postSmoothers)
 			{
 				stationaryIteration.UpdateMatrix(matrix, isPatternModified);
 			}
@@ -77,7 +79,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 		{
 			var inputDense = (Vector)input;
 			var outputDense = (Vector)output;
-			foreach ((var stationaryIteration, var numApplications) in smoothers)
+			foreach ((IStationaryIteration stationaryIteration, int numApplications) in smoothers)
 			{
 				for (var t = 0; t < numApplications; t++)
 				{
@@ -96,6 +98,25 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 			if (postSmoothers.Count == 0)
 			{
 				throw new InvalidOperationException("There are no post-smoothers defined");
+			}
+		}
+
+		private void LinkWithExistingSmoothers(IStationaryIteration newIteration)
+		{
+			foreach ((IStationaryIteration existingIteration, _) in preSmoothers)
+			{
+				if (newIteration != existingIteration)
+				{
+					newIteration.LinkWith(existingIteration);
+				}
+			}
+
+			foreach ((IStationaryIteration existingIteration, _) in postSmoothers)
+			{
+				if (newIteration != existingIteration)
+				{
+					newIteration.LinkWith(existingIteration);
+				}
 			}
 		}
 	}

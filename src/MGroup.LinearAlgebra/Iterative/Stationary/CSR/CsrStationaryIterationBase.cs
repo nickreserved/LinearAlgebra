@@ -12,6 +12,7 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 
 	public abstract class CsrStationaryIterationBase : IStationaryIteration
 	{
+		protected readonly List<IStationaryIteration> linkedIterations = new List<IStationaryIteration>();
 		protected readonly StationaryIterationManagedProvider provider;
 		protected CsrMatrix matrix;
 		protected int[] diagonalOffsets;
@@ -19,6 +20,11 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 		public CsrStationaryIterationBase()
 		{
 			provider = new StationaryIterationManagedProvider();
+		}
+
+		public void LinkWith(IStationaryIteration other)
+		{
+			linkedIterations.Add(other);
 		}
 
 		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
@@ -30,8 +36,20 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 
 				if (isPatternModified || diagonalOffsets == null)
 				{
-					diagonalOffsets = provider.LocateDiagonalOffsetsCsr(
-						matrix.NumRows, csrMatrix.RawRowOffsets, csrMatrix.RawColIndices);
+					foreach (IStationaryIteration iteration in linkedIterations)
+					{
+						if (iteration is CsrStationaryIterationBase csrIteration)
+						{
+							diagonalOffsets = csrIteration.diagonalOffsets;
+							return;
+						}
+					}
+
+					if (diagonalOffsets == null)
+					{
+						diagonalOffsets = provider.LocateDiagonalOffsetsCsr(
+							matrix.NumRows, csrMatrix.RawRowOffsets, csrMatrix.RawColIndices);
+					}
 				}
 			}
 			else
