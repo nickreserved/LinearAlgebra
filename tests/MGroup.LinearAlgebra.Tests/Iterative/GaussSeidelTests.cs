@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
 			IStationaryIteration stationaryIteration = new GaussSeidelIterationCsr(forwardGaussSeidel);
-			var builder = new StationaryIterativeMethod.Builder(stationaryIteration);
+			var builder = new StationaryIterativeMethod.Factory(stationaryIteration);
 			//builder.ConvergenceCriterion = new SolutionNeverConvergesCriterion(); // We would use this, but to test we need to track the convergence rate.
 			builder.ConvergenceCriterion = new AbsoluteSolutionConvergenceCriterion();
 			builder.ConvergenceTolerance = 0.0;

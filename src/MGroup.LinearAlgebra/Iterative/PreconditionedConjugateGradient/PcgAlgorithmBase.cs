@@ -11,12 +11,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
 	/// <summary>
 	/// Base abstract class for Preconditioned Conjugate Gradient implementations.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	public abstract class PcgAlgorithmBase
 	{
 		protected readonly IPcgResidualConvergence convergence;
-		protected readonly IPcgResidualUpdater residualUpdater;
 
 		protected IVector direction;
 		protected int iteration;
@@ -30,12 +28,11 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		protected double stepSize;
 
 		protected PcgAlgorithmBase(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
-			IPcgResidualConvergence convergence, IPcgResidualUpdater residualUpdater)
+			IPcgResidualConvergence convergence)
 		{
 			this.ResidualTolerance = residualTolerance;
 			this.MaxIterationsProvider = maxIterationsProvider;
 			this.convergence = convergence;
-			this.residualUpdater = residualUpdater;
 		}
 
 		public IMaxIterationsProvider MaxIterationsProvider { get; set; }

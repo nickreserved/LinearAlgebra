@@ -21,6 +21,8 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 
 		public override string Name => "Forward Gauss-Seidel";
 
+		public override IStationaryIteration CopyWithInitialSettings() => new GaussSeidelIterationCsr(forwardDirection);
+
 		public override void Execute(Vector input, Vector output)
 		{
 			if (forwardDirection)

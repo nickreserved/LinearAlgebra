@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			int numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
 			int numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
 
-			var solverBuilder = new PodAmgAlgorithm.Builder();
+			var solverBuilder = new PodAmgAlgorithm.Factory();
 			solverBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(30000);
 			solverBuilder.ConvergenceTolerance = 1E-5;
 			solverBuilder.ConvergenceCriterion = new SolutionNeverConvergesCriterion();
@@ -64,10 +64,10 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			int numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
 			
 			// POD-AMG as preconditioner
-			var preconditionerFactory = new PodAmgPreconditioner.Factory();
+			var preconditionerFactory = new PodAmgPreconditioner.Builder();
 			preconditionerFactory.NumIterations = 1;
 			preconditionerFactory.KeepOnlyNonZeroPrincipalComponents = true;
-			preconditionerFactory.CreateSmoothers = () => new MultigridLevelSmoothing()
+			preconditionerFactory.Smoothing = new MultigridLevelSmoothing()
 				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: true), 1)
 				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: false), 1)
 				.SetPostSmoothersSameAsPreSmoothers();
@@ -76,7 +76,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 
 
 			// PCG algorithm as solver
-			var solverBuilder = new PcgAlgorithm.Builder();
+			var solverBuilder = new PcgAlgorithm.Factory();
 			solverBuilder.ResidualTolerance = 1E-6;
 			solverBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(n);
 			var pcg = solverBuilder.Build();

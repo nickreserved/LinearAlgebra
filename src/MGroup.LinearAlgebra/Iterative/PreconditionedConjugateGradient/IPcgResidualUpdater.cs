@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
@@ -8,9 +8,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     /// <summary>
     /// Updates the residual vector r using either the standard operation r = r - α * A*d or the 
     /// exact formula r = b - A*x. 
-    /// Authors: Serafeim Bakalakos
     /// </summary>
-    public interface IPcgResidualUpdater
+    public interface IPcgResidualUpdater : ISettingsCopiable<IPcgResidualUpdater>
     {
         /// <summary>
         /// Update the residual vector r.

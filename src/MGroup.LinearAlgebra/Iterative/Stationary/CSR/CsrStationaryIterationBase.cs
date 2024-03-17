@@ -42,6 +42,8 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 
 		public abstract string Name { get; }
 
+		public abstract IStationaryIteration CopyWithInitialSettings();
+
 		public abstract void Execute(Vector input, Vector output);
 	}
 }

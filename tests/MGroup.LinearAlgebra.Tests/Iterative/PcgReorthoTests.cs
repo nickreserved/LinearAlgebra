@@ -37,19 +37,19 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			//var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
 
 			// Method A: Regular PCG
-			var pcgBuilder = new PcgAlgorithm.Builder();
+			var pcgBuilder = new PcgAlgorithm.Factory();
 			pcgBuilder.ResidualTolerance = 1E-15;
 			pcgBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
 			var pcg = pcgBuilder.Build();
 
 			// Method B: Reorthogonalized PCG, but without keeping direction vectors from previous solutions.
-			var pcgReorthoRestartBuilder = new ReorthogonalizedPcg.Builder();
+			var pcgReorthoRestartBuilder = new ReorthogonalizedPcg.Factory();
 			pcgReorthoRestartBuilder.ResidualTolerance = 1E-15;
 			pcgReorthoRestartBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
 			var pcgReorthoRestart = pcgReorthoRestartBuilder.Build();
 
 			// Method C: Reorthogonalized PCG, where the second solution will reuse direction vectors from the first
-			var pcgReorthoBuilder = new ReorthogonalizedPcg.Builder();
+			var pcgReorthoBuilder = new ReorthogonalizedPcg.Factory();
 			pcgReorthoBuilder.ResidualTolerance = 1E-15;
 			pcgReorthoBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
 			var pcgReortho = pcgReorthoBuilder.Build();
@@ -100,19 +100,19 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			var M = new IdentityPreconditioner();
 
 			// Method A: Regular PCG
-			var pcgBuilder = new PcgAlgorithm.Builder();
+			var pcgBuilder = new PcgAlgorithm.Factory();
 			pcgBuilder.ResidualTolerance = 1E-20;
 			pcgBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
 			var pcg = pcgBuilder.Build();
 
 			// Method B: Reorthogonalized PCG, but without keeping direction vectors from previous solutions.
-			var pcgReorthoRestartBuilder = new ReorthogonalizedPcg.Builder();
+			var pcgReorthoRestartBuilder = new ReorthogonalizedPcg.Factory();
 			pcgReorthoRestartBuilder.ResidualTolerance = 1E-20;
 			pcgReorthoRestartBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
 			var pcgReorthoRestart = pcgReorthoRestartBuilder.Build();
 
 			// Method C: Reorthogonalized PCG, where the second solution will reuse direction vectors from the first
-			var pcgReorthoBuilder = new ReorthogonalizedPcg.Builder();
+			var pcgReorthoBuilder = new ReorthogonalizedPcg.Factory();
 			pcgReorthoBuilder.ResidualTolerance = 1E-20;
 			pcgReorthoBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(50);
 			var pcgReortho = pcgReorthoBuilder.Build();
@@ -164,7 +164,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 		{
 			int order = SymmPosDef10by10.Order;
 			var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
-			var builder = new ReorthogonalizedPcg.Builder();
+			var builder = new ReorthogonalizedPcg.Factory();
 			builder.ResidualTolerance = 1E-6;
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			builder.Convergence = new RhsNormalizedConvergence();
@@ -206,7 +206,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
 			var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
 
-			var builder = new ReorthogonalizedPcg.Builder();
+			var builder = new ReorthogonalizedPcg.Factory();
 			builder.ResidualTolerance = 1E-7;
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();
@@ -223,7 +223,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
 			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
-			var builder = new ReorthogonalizedPcg.Builder();
+			var builder = new ReorthogonalizedPcg.Factory();
 			builder.ResidualTolerance = 1E-7;
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();

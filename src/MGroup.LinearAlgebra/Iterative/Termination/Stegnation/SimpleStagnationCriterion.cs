@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 {
+	using System;
+	using System.Collections.Generic;
+
 	public class SimpleStagnationCriterion : IStagnationCriterion
 	{
 		private readonly int iterationSpan;
@@ -16,6 +15,9 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 			this.relativeImprovementTolerance = relativeImprovementTolerance;
 			residualDotProductsHistory = new List<double>();
 		}
+
+		public IStagnationCriterion CopyWithInitialSettings() 
+			=> new SimpleStagnationCriterion(iterationSpan, relativeImprovementTolerance);
 
 		public bool HasStagnated()
 		{

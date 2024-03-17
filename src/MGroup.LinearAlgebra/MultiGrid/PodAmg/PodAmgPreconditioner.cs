@@ -73,48 +73,50 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			}
 		}
 
-		public class Factory : IPreconditionerFactory
+		public class Builder : IPreconditionerFactory
 		{
-			private Matrix _prolongation;
+			private Matrix prolongation;
+			private bool isUsable = false;
 
-			public Factory()
+			public Builder()
 			{
 				NumIterations = 1;
 				KeepOnlyNonZeroPrincipalComponents = true;
-				CreateSmoothers = () => new MultigridLevelSmoothing()
-				.AddPreSmoother(new GaussSeidelIterationCsr(), 1)
-				.AddPostSmoother(new GaussSeidelIterationCsr(), 1);
+				Smoothing = new MultigridLevelSmoothing()
+					.AddPreSmoother(new GaussSeidelIterationCsr(), 1)
+					.AddPostSmoother(new GaussSeidelIterationCsr(), 1);
 			}
 
 			public bool KeepOnlyNonZeroPrincipalComponents { get; set; }
 
 			public int NumIterations { get; set; }
 
-			public Func<MultigridLevelSmoothing> CreateSmoothers { get; set; }
+			public MultigridLevelSmoothing Smoothing { get; set; }
 
 			public IPreconditioner CreatePreconditionerFor(IMatrixView matrix)
 			{
-				if (_prolongation == null)
+				if (!isUsable)
 				{
 					throw new InvalidOperationException("The preconditioner factory must be initialized first");
 				}
 
-				var fineMatrix = CheckMatrixFormat(matrix);
-				var smoothing = CreateSmoothers();
+				CsrMatrix fineMatrix = CheckMatrixFormat(matrix);
+				MultigridLevelSmoothing smoothing = Smoothing.CopyWithInitialSettings();
 				smoothing.UpdateMatrix(fineMatrix, true);
 
-				var temp = fineMatrix.MultiplyRight(_prolongation);
-				var coarseMatrix = _prolongation.MultiplyRight(temp, transposeThis: true, transposeOther: false);
-
+				Matrix temp = fineMatrix.MultiplyRight(prolongation);
+				Matrix coarseMatrix = prolongation.MultiplyRight(temp, transposeThis: true, transposeOther: false);
 				var coarseMatrixFactorized = CholeskyFull.Factorize(coarseMatrix.NumRows, coarseMatrix.RawData);
+				isUsable = false;
 
-				return new PodAmgPreconditioner(fineMatrix, coarseMatrixFactorized, _prolongation, smoothing, NumIterations);
+				return new PodAmgPreconditioner(fineMatrix, coarseMatrixFactorized, prolongation, smoothing, NumIterations);
 			}
 
 			public void Initialize(Matrix sampleVectors, int numPrincipalComponents)
 			{
 				var pod = new ProperOrthogonalDecomposition(KeepOnlyNonZeroPrincipalComponents);
-				_prolongation = pod.CalculatePrincipalComponents(sampleVectors.NumColumns, sampleVectors, numPrincipalComponents);
+				prolongation = pod.CalculatePrincipalComponents(sampleVectors.NumColumns, sampleVectors, numPrincipalComponents);
+				isUsable = true;
 			}
 
 			private CsrMatrix CheckMatrixFormat(IMatrixView matrix)

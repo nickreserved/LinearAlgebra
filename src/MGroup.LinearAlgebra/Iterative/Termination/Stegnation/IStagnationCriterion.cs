@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-//TODO: Combine this with convergence criterion
 namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 {
-	public interface IStagnationCriterion
+	//TODO: Combine this with convergence criterion
+	public interface IStagnationCriterion : ISettingsCopiable<IStagnationCriterion>
 	{
 		bool HasStagnated();
 

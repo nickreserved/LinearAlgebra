@@ -29,7 +29,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
                 var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
 
-                var builder = new PcgAlgorithm.Builder();
+                var builder = new PcgAlgorithm.Factory();
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var pcg = builder.Build();
@@ -50,7 +50,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
                 var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 
-                var builder = new PcgAlgorithm.Builder();
+                var builder = new PcgAlgorithm.Factory();
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var pcg = builder.Build();

@@ -16,19 +16,20 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	/// Implements the untransformed Preconditioned Conjugate Gradient algorithm for solving linear systems with symmetric 
 	/// positive definite matrices. This implementation is based on the algorithm presented in section B3 of 
 	/// "An Introduction to the Conjugate Gradient Method Without the Agonizing Pain", Jonathan Richard Shewchuk, 1994
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	public class PcgAlgorithm : PcgAlgorithmBase
 	{
 		private const string name = "Preconditioned Conjugate Gradient";
 		private readonly IPcgBetaParameterCalculation betaCalculation;
+		private readonly IPcgResidualUpdater residualUpdater;
 
 		private PcgAlgorithm(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
 			IPcgResidualConvergence pcgConvergence, IPcgResidualUpdater residualUpdater, 
-			IPcgBetaParameterCalculation betaCalculation) : 
-			base(residualTolerance, maxIterationsProvider, pcgConvergence, residualUpdater)
+			IPcgBetaParameterCalculation betaCalculation)
+			: base(residualTolerance, maxIterationsProvider, pcgConvergence)
 		{
 			this.betaCalculation = betaCalculation;
+			this.residualUpdater = residualUpdater;
 		}
 
 		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
@@ -127,9 +128,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// Constructs <see cref="PcgAlgorithm"/> instances, allows the user to specify some or all of the required parameters 
 		/// and provides defaults for the rest.
-		/// Author: Serafeim Bakalakos
 		/// </summary>
-		public class Builder : PcgBuilderBase
+		public class Factory : PcgFactoryBase
 		{
 			/// <summary>
 			/// Specifies how to calculate the beta parameter of PCG, which is used to update the direction vector. 
@@ -137,12 +137,18 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			public IPcgBetaParameterCalculation BetaCalculation { get; set; } = new FletcherReevesBeta();
 
 			/// <summary>
+			/// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
+			/// </summary>
+			public virtual IPcgResidualUpdater ResidualUpdater { get; set; } = new RegularPcgResidualUpdater();
+
+			/// <summary>
 			/// Creates a new instance of <see cref="PcgAlgorithm"/>.
 			/// </summary>
 			public PcgAlgorithm Build()
 			{
-				return new PcgAlgorithm(ResidualTolerance, MaxIterationsProvider, Convergence, ResidualUpdater, 
-					BetaCalculation);
+				return new PcgAlgorithm(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(), 
+					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(), 
+					BetaCalculation.CopyWithInitialSettings());
 			}
 		}
 	}

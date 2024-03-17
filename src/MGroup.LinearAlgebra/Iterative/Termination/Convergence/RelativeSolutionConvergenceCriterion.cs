@@ -1,9 +1,5 @@
 namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
-
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
@@ -26,6 +22,8 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 				return num;
 			}
 		}
+
+		public ISolutionConvergenceCriterion CopyWithInitialSettings() => new RelativeSolutionConvergenceCriterion();
 
 		public string DescribeConvergenceCriterion(double convergenceTolerance) => "norm2(x - x_previous) / norm2(x) < " + convergenceTolerance;
 	}

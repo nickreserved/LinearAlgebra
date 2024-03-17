@@ -137,9 +137,9 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			};
 		}
 
-		public class Builder
+		public class Factory
 		{
-			public Builder()
+			public Factory()
 			{
 				KeepOnlyNonZeroPrincipalComponents = true;
 
@@ -168,7 +168,8 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			public PodAmgAlgorithm Create(Matrix sampleVectors, int numPrincipalComponents)
 			{
 				return new PodAmgAlgorithm(sampleVectors, KeepOnlyNonZeroPrincipalComponents, numPrincipalComponents,
-					Smoothing, ConvergenceTolerance, ConvergenceCriterion, MaxIterationsProvider);
+					Smoothing.CopyWithInitialSettings(), ConvergenceTolerance, ConvergenceCriterion.CopyWithInitialSettings(),
+					MaxIterationsProvider.CopyWithInitialSettings());
 			}
 		}
 

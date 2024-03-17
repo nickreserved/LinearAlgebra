@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;
 
-	public interface IStationaryIteration
+	public interface IStationaryIteration : ISettingsCopiable<IStationaryIteration>
 	{
 		public string Name { get; }
 

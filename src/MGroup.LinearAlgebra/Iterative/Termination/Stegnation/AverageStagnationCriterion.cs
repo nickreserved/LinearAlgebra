@@ -1,14 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using MGroup.LinearAlgebra.Reduction;
-using MGroup.LinearAlgebra.Vectors;
-
 //ERROR: If there is one sharp increase in the error (outlier), followed by decreases then the current approach will incorrectly 
 //       detect it as stagnation.
 namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 {
+	using System;
+	using System.Collections.Generic;
+
+	using MGroup.LinearAlgebra.Reduction;
+	using MGroup.LinearAlgebra.Vectors;
+
 	public class AverageStagnationCriterion : IStagnationCriterion
 	{
 		private readonly int iterationSpan;
@@ -21,6 +20,9 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 			this.relativeImprovementTolerance = relativeImprovementTolerance;
 			residualDotProductsHistory = new List<double>();
 		}
+
+		public IStagnationCriterion CopyWithInitialSettings() 
+			=> new AverageStagnationCriterion(iterationSpan, relativeImprovementTolerance);
 
 		public bool HasStagnated()
 		{

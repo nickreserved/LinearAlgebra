@@ -8,7 +8,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     {
         private double denominator;
 
-        public double EstimateResidualNormRatio(PcgAlgorithmBase pcg) => Math.Sqrt(pcg.ResDotPrecondRes) / denominator;
+		public IPcgResidualConvergence CopyWithInitialSettings() => new RhsNormalizedConvergence();
+
+		public double EstimateResidualNormRatio(PcgAlgorithmBase pcg) => Math.Sqrt(pcg.ResDotPrecondRes) / denominator;
 
         public void Initialize(PcgAlgorithmBase pcg) => denominator = Math.Sqrt(pcg.Rhs.Norm2());
     }

@@ -18,8 +18,8 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 		private readonly IStationaryIteration stationaryIteration;
 		private readonly IMaxIterationsProvider maxIterationsProvider;
 
-		public StationaryIterativeMethod(IStationaryIteration stationaryIteration, ISolutionConvergenceCriterion convergenceCriterion,
-			double convergenceTolerance, IMaxIterationsProvider maxIterationsProvider)
+		public StationaryIterativeMethod(IStationaryIteration stationaryIteration, double convergenceTolerance, 
+			ISolutionConvergenceCriterion convergenceCriterion, IMaxIterationsProvider maxIterationsProvider)
 		{
 			this.stationaryIteration = stationaryIteration;
 			this.convergenceCriterion = convergenceCriterion;
@@ -87,11 +87,11 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 		/// Constructs <see cref="StationaryIterativeMethod"/> instances, allows the user to specify some or all of the required 
 		/// parameters and provides defaults for the rest.
 		/// </summary>
-		public class Builder
+		public class Factory
 		{
 			private readonly IStationaryIteration stationaryIteration;
 
-			public Builder(IStationaryIteration stationaryIteration)
+			public Factory(IStationaryIteration stationaryIteration)
 			{
 				this.stationaryIteration = stationaryIteration;
 			}
@@ -112,8 +112,8 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 			/// </summary>
 			public StationaryIterativeMethod Build()
 			{
-				return new StationaryIterativeMethod(
-					stationaryIteration, ConvergenceCriterion, ConvergenceTolerance, MaxIterationsProvider);
+				return new StationaryIterativeMethod(stationaryIteration.CopyWithInitialSettings(), ConvergenceTolerance,
+					ConvergenceCriterion.CopyWithInitialSettings(), MaxIterationsProvider.CopyWithInitialSettings());
 			}
 		}
 	}

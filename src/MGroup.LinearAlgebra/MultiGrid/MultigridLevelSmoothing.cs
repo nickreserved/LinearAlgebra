@@ -3,11 +3,12 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 	using System;
 	using System.Collections.Generic;
 
+	using MGroup.LinearAlgebra.Iterative;
 	using MGroup.LinearAlgebra.Iterative.Stationary;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Vectors;
 
-	public class MultigridLevelSmoothing
+	public class MultigridLevelSmoothing : ISettingsCopiable<MultigridLevelSmoothing>
 	{
 		private readonly List<(IStationaryIteration stationaryIteration, int numApplications)> preSmoothers;
 		private readonly List<(IStationaryIteration stationaryIteration, int numApplications)> postSmoothers;
@@ -33,6 +34,22 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 		public void ApplyPreSmoothers(IVectorView input, IVector output) => ApplySmoothers(preSmoothers, input, output);
 
 		public void ApplyPostSmoothers(IVectorView input, IVector output) => ApplySmoothers(postSmoothers, input, output);
+
+		public MultigridLevelSmoothing CopyWithInitialSettings()
+		{
+			var clone = new MultigridLevelSmoothing();
+			foreach ((IStationaryIteration stationaryIteration, int numApplications) in preSmoothers)
+			{
+				clone.AddPreSmoother(stationaryIteration.CopyWithInitialSettings(), numApplications);
+			}
+
+			foreach ((IStationaryIteration stationaryIteration, int numApplications) in postSmoothers)
+			{
+				clone.AddPostSmoother(stationaryIteration.CopyWithInitialSettings(), numApplications);
+			}
+
+			return clone;
+		}
 
 		public MultigridLevelSmoothing SetPostSmoothersSameAsPreSmoothers()
 		{
@@ -76,7 +93,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid
 				throw new InvalidOperationException("There are no pre-smoothers defined");
 			}
 
-			if (preSmoothers.Count == 0)
+			if (postSmoothers.Count == 0)
 			{
 				throw new InvalidOperationException("There are no post-smoothers defined");
 			}
