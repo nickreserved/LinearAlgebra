@@ -1,36 +1,29 @@
-using System;
-
-using MGroup.LinearAlgebra.Exceptions;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.LinearAlgebra.Vectors;
-using MGroup.LinearAlgebra.Commons;
-using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
-using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
-
-namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
+namespace MGroup.LinearAlgebra.Iterative.Stationary
 {
+	using MGroup.LinearAlgebra.Commons;
+	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
+	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Vectors;
+
 	/// <summary>
-	/// Implements the Gauss-Seidel algorithm for solving linear systems.
-	/// Convergence is guaranteed only for strictly diagonally dominant or positive definite (symmetric) matrices.
-	/// Might converge in general matrix systems, as well, but with no guarantee.
-	/// Authors: Constantinos Atzarakis, Serafeim Bakalakos
+	/// Implements a general stationary iterative method algorithm for solving linear systems.
+	/// Convergence depends on the specific algorithm used.
 	/// </summary>
-	public class GaussSeidelAlgorithm
+	public class StationaryIterativeMethod
 	{
-		private const string name = "Gauss-Seidel";
-		private readonly IGaussSeidelIteration gsIteration;
 		private readonly ISolutionConvergenceCriterion convergenceCriterion;
 		private readonly double convergenceTolerance;
-		private readonly bool forwardGaussSeidel;
+		private readonly IStationaryIteration stationaryIteration;
 		private readonly IMaxIterationsProvider maxIterationsProvider;
 
-		public GaussSeidelAlgorithm(IGaussSeidelIteration gsKernel, ISolutionConvergenceCriterion convergenceCriterion,
-			double convergenceTolerance, bool forwardGaussSeidel, IMaxIterationsProvider maxIterationsProvider)
+		public StationaryIterativeMethod(IStationaryIteration stationaryIteration, ISolutionConvergenceCriterion convergenceCriterion,
+			double convergenceTolerance, IMaxIterationsProvider maxIterationsProvider)
 		{
-			gsIteration = gsKernel;
+			this.stationaryIteration = stationaryIteration;
 			this.convergenceCriterion = convergenceCriterion;
 			this.convergenceTolerance = convergenceTolerance;
-			this.forwardGaussSeidel = forwardGaussSeidel;
 			this.maxIterationsProvider = maxIterationsProvider;
 		}
 
@@ -59,24 +52,20 @@ namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 		{
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, solution, rhs);
 
-			gsIteration.Initialize(matrix);
+			stationaryIteration.UpdateMatrix(matrix, true);
+			Vector rhsDense = (Vector)rhs;
+			Vector solutionDense = (Vector)solution;
+			Vector previousSolution = solutionDense.Copy();
 
-			var maxIterations = maxIterationsProvider.GetMaxIterations(matrix.NumRows);
-			var previousSolution = solution.CreateZeroVectorWithSameFormat();
-			var convergenceMetric = double.NaN;
-			var iter = 0;
+			double convergenceMetric = double.NaN;
+			int maxIterations = maxIterationsProvider.GetMaxIterations(matrix.NumRows);
+			int iter = 0;
+
 			while (iter < maxIterations)
 			{
 				previousSolution.CopyFrom(solution);
-				if (forwardGaussSeidel)
-				{
-					gsIteration.GaussSeidelForwardIteration(rhs, solution);
-				}
-				else
-				{
-					gsIteration.GaussSeidelBackwardIteration(rhs, solution);
-				}
-				++iter; // Each algorithm iteration corresponds to one matrix-vector multiplication or, in this case, GS iteration
+				stationaryIteration.Execute(rhsDense, solutionDense);
+				++iter;
 
 				convergenceMetric = convergenceCriterion.CalculateConvergenceMetric(solution, previousSolution);
 				if (convergenceMetric < convergenceTolerance)
@@ -87,7 +76,7 @@ namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 
 			return new IterativeStatistics
 			{
-				AlgorithmName = name,
+				AlgorithmName = stationaryIteration.Name,
 				HasConverged = iter < maxIterations,
 				NumIterationsRequired = iter,
 				ConvergenceCriterion = (convergenceCriterion.DescribeConvergenceCriterion(convergenceTolerance), convergenceMetric),
@@ -95,18 +84,21 @@ namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 		}
 
 		/// <summary>
-		/// Constructs <see cref="GaussSeidelAlgorithm"/> instances, allows the user to specify some or all of the required parameters and 
-		/// provides defaults for the rest.
-		/// Author: Constantinos Atzarakis
+		/// Constructs <see cref="StationaryIterativeMethod"/> instances, allows the user to specify some or all of the required 
+		/// parameters and provides defaults for the rest.
 		/// </summary>
 		public class Builder
 		{
+			private readonly IStationaryIteration stationaryIteration;
+
+			public Builder(IStationaryIteration stationaryIteration)
+			{
+				this.stationaryIteration = stationaryIteration;
+			}
+
 			public ISolutionConvergenceCriterion ConvergenceCriterion { get; set; } = new AbsoluteSolutionConvergenceCriterion();
 
 			public double ConvergenceTolerance { get; set; } = 1E-10;
-
-
-			public bool ForwardGaussSeidel { get; set; } = true;
 
 
 			/// <summary>
@@ -116,12 +108,12 @@ namespace MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel
 
 
 			/// <summary>
-			/// Creates a new instance of <see cref="GaussSeidelAlgorithm"/>.
+			/// Creates a new instance of <see cref="StationaryIterativeMethod"/> with the specified parameters.
 			/// </summary>
-			public GaussSeidelAlgorithm Build(IGaussSeidelIteration gsIteration)
+			public StationaryIterativeMethod Build()
 			{
-				return new GaussSeidelAlgorithm(
-					gsIteration, ConvergenceCriterion, ConvergenceTolerance, ForwardGaussSeidel, MaxIterationsProvider);
+				return new StationaryIterativeMethod(
+					stationaryIteration, ConvergenceCriterion, ConvergenceTolerance, MaxIterationsProvider);
 			}
 		}
 	}

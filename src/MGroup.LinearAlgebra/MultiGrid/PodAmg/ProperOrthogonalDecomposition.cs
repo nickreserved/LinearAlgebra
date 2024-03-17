@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
+namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 {
 	using System;
 	using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		private readonly bool _keepOnlyNonZeroEigenvalues;
 		private readonly double _zeroEigenvalueTolerance;
 
-		public ProperOrthogonalDecomposition(bool keepOnlyNonZeroEigenvalues, double zeroEigenvalueTolerance=1E-10)
+		public ProperOrthogonalDecomposition(bool keepOnlyNonZeroEigenvalues, double zeroEigenvalueTolerance = 1E-10)
 		{
 			_keepOnlyNonZeroEigenvalues = keepOnlyNonZeroEigenvalues;
 			_zeroEigenvalueTolerance = zeroEigenvalueTolerance;
@@ -34,14 +34,14 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		/// correspond to zero eigenvalues, they will be discarded and fewer total eigenvectors will be returned.
 		/// </param>
 		/// <returns></returns>
-		public Matrix CalculatePrincipalComponents(int numSampleVectors, Matrix sampleVectors, int numPrincipalComponents) 
-		{ 
+		public Matrix CalculatePrincipalComponents(int numSampleVectors, Matrix sampleVectors, int numPrincipalComponents)
+		{
 			if (sampleVectors.NumColumns != numSampleVectors)
 			{
 				throw new ArgumentException("The matrix containing the sample vectors must have " +
 					$"{numSampleVectors} columns but was ({sampleVectors.NumRows}, {sampleVectors.NumColumns}).");
 			}
-			if (numSampleVectors < 2) 
+			if (numSampleVectors < 2)
 			{
 				throw new ArgumentException("There must be at least 2 vectors (columns) in the input matrix.");
 			}
@@ -55,11 +55,11 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 			// If d <= n: Phi = eigenvectors of U*U^T.
 			if (sampleVectors.NumRows > sampleVectors.NumColumns)
 			{
-				Matrix correlation = sampleVectors.MultiplyRight(sampleVectors, transposeThis: true, transposeOther: false);
+				var correlation = sampleVectors.MultiplyRight(sampleVectors, transposeThis: true, transposeOther: false);
 				var svd = SingularValueDecomposition.Calculate(correlation);
 
-				int numComponentsToKeep = CountPrincipalComponentsToKeep(numPrincipalComponents, svd.SingularValues);
-				Matrix principalComponents = sampleVectors * svd.SingularVectors;
+				var numComponentsToKeep = CountPrincipalComponentsToKeep(numPrincipalComponents, svd.SingularValues);
+				var principalComponents = sampleVectors * svd.SingularVectors;
 				return principalComponents.GetSubmatrix(0, principalComponents.NumRows, 0, numComponentsToKeep); //TODO: discard the unneeded vectors earlier.
 			}
 			else
@@ -76,8 +76,8 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		{
 			if (_keepOnlyNonZeroEigenvalues)
 			{
-				int numComponentsToKeep = 0;
-				for (int i = 0; i < numComponentsRequested; ++i)
+				var numComponentsToKeep = 0;
+				for (var i = 0; i < numComponentsRequested; ++i)
 				{
 					if (Math.Abs(eigenvaluesDescending[i]) <= _zeroEigenvalueTolerance) // Only keep eigenvectors of non-zero eigenvalues
 					{

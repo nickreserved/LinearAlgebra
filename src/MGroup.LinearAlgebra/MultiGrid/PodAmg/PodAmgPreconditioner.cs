@@ -1,82 +1,78 @@
-namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
+namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Text;
 
+	using MGroup.LinearAlgebra.AlgebraicMultiGrid;
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
-	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
-	using MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel;
-	using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
-	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
+	using MGroup.LinearAlgebra.Iterative.Stationary.CSR;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Triangulation;
 	using MGroup.LinearAlgebra.Vectors;
 
 	public class PodAmgPreconditioner : IPreconditioner
 	{
-		private readonly int _numIterations;
-		private readonly IMultigridSmoother _smoother;
+		private readonly int numIterations;
+		private readonly MultigridLevelSmoothing smoothing;
 
-		private CsrMatrix _fineMatrix;
-		private CholeskyFull _coarseMatrixFactorized;
+		private CsrMatrix fineMatrix;
+		private CholeskyFull coarseMatrixFactorized;
 
 		// Restriction is the transpose of this
-		private Matrix _prolongation;
+		private Matrix prolongation;
 
 		public PodAmgPreconditioner(CsrMatrix fineMatrix, CholeskyFull coarseMatrixFactorized, Matrix prolongation,
-			IMultigridSmoother smoother, int numIterations)
+			MultigridLevelSmoothing smoothing, int numIterations)
 		{
-			_fineMatrix = fineMatrix;
-			_coarseMatrixFactorized = coarseMatrixFactorized;
-			_prolongation = prolongation;
-			_smoother = smoother;
-			_numIterations = numIterations;
+			this.fineMatrix = fineMatrix;
+			this.coarseMatrixFactorized = coarseMatrixFactorized;
+			this.prolongation = prolongation;
+			this.smoothing = smoothing;
+			this.numIterations = numIterations;
 		}
 
 		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
 		{
-			Vector rhs = (Vector)rhsVector;
-			Vector solution = (Vector)lhsVector;
+			var rhs = (Vector)rhsVector;
+			var solution = (Vector)lhsVector;
 			solution.Clear();
 
-			Preconditions.CheckSquareLinearSystemDimensions(_fineMatrix, rhs, solution);
-			int n0 = _fineMatrix.NumRows;
+			Preconditions.CheckSquareLinearSystemDimensions(fineMatrix, rhs, solution);
+			var n0 = fineMatrix.NumRows;
 			var r0 = Vector.CreateZero(n0);
 			var e0 = Vector.CreateZero(n0);
-			int n1 = _coarseMatrixFactorized.Order;
+			var n1 = coarseMatrixFactorized.Order;
 			var r1 = Vector.CreateZero(n1);
 			var e1 = Vector.CreateZero(n1);
 
-			for (int i = 0; i < _numIterations; i++)
+			for (var i = 0; i < numIterations; i++)
 			{
 				// Pre-smoothing on lvl 0 to get an estimate of the solution x0. Use the x0 from previous cycles as initial guess.
-				_smoother.Smooth(rhs, solution);
+				smoothing.ApplyPreSmoothers(rhs, solution);
 
 				// Find the residual on lvl 0: r0=b-A0*x0
 				//TODO: Use ExactResidual class for this
-				_fineMatrix.MultiplyIntoResult(solution, r0);
+				fineMatrix.MultiplyIntoResult(solution, r0);
 				r0.LinearCombinationIntoThis(-1.0, rhs, 1.0);
 
 				// Restrict lvl 0 residual to lvl 1: r1 = P^T * r0
-				_prolongation.MultiplyIntoResult(r0, r1, transposeThis: true);
+				prolongation.MultiplyIntoResult(r0, r1, transposeThis: true);
 
 				// Find an estimate of the error on lvl 1 by solving exactly the system: A1*e1=r1.
-				_coarseMatrixFactorized.SolveLinearSystem(r1, e1);
+				coarseMatrixFactorized.SolveLinearSystem(r1, e1);
 
 				// Interpolate the lvl 1 error estimate to lvl 0: e0 = P * e1
-				_prolongation.MultiplyIntoResult(e1, e0, transposeThis: false);
+				prolongation.MultiplyIntoResult(e1, e0, transposeThis: false);
 
 				// Correct the solution estimate on lvl 0 using the interpolated error: x0 = x0 + e0
 				solution.AddIntoThis(e0);
 
 				// Post-smoothing on lvl 0 to further improve the solution estimate x0. Use the corrected x0 as initial guess.
-				_smoother.Smooth(rhs, solution);
+				smoothing.ApplyPostSmoothers(rhs, solution);
 			}
 		}
-		
+
 		public class Factory : IPreconditionerFactory
 		{
 			private Matrix _prolongation;
@@ -85,17 +81,16 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 			{
 				NumIterations = 1;
 				KeepOnlyNonZeroPrincipalComponents = true;
-				SmootherBuilder = new GaussSeidelSmoother.Builder(
-					new GaussSeidelIterationCsrSerial.Builder(),
-					GaussSeidelSweepDirection.Forward,
-					numIterations: 1);
+				CreateSmoothers = () => new MultigridLevelSmoothing()
+				.AddPreSmoother(new GaussSeidelIterationCsr(), 1)
+				.AddPostSmoother(new GaussSeidelIterationCsr(), 1);
 			}
 
 			public bool KeepOnlyNonZeroPrincipalComponents { get; set; }
 
 			public int NumIterations { get; set; }
 
-			public IMultigridSmootherBuilder SmootherBuilder { get; set; }
+			public Func<MultigridLevelSmoothing> CreateSmoothers { get; set; }
 
 			public IPreconditioner CreatePreconditionerFor(IMatrixView matrix)
 			{
@@ -104,16 +99,16 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 					throw new InvalidOperationException("The preconditioner factory must be initialized first");
 				}
 
-				CsrMatrix fineMatrix = CheckMatrixFormat(matrix);
-				IMultigridSmoother smoother = SmootherBuilder.Create();
-				smoother.Initialize(fineMatrix);
+				var fineMatrix = CheckMatrixFormat(matrix);
+				var smoothing = CreateSmoothers();
+				smoothing.UpdateMatrix(fineMatrix, true);
 
-				Matrix temp = fineMatrix.MultiplyRight(_prolongation);
-				Matrix coarseMatrix = _prolongation.MultiplyRight(temp, transposeThis: true, transposeOther: false);
+				var temp = fineMatrix.MultiplyRight(_prolongation);
+				var coarseMatrix = _prolongation.MultiplyRight(temp, transposeThis: true, transposeOther: false);
 
 				var coarseMatrixFactorized = CholeskyFull.Factorize(coarseMatrix.NumRows, coarseMatrix.RawData);
 
-				return new PodAmgPreconditioner(fineMatrix, coarseMatrixFactorized, _prolongation, smoother, NumIterations);
+				return new PodAmgPreconditioner(fineMatrix, coarseMatrixFactorized, _prolongation, smoothing, NumIterations);
 			}
 
 			public void Initialize(Matrix sampleVectors, int numPrincipalComponents)
@@ -121,7 +116,6 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 				var pod = new ProperOrthogonalDecomposition(KeepOnlyNonZeroPrincipalComponents);
 				_prolongation = pod.CalculatePrincipalComponents(sampleVectors.NumColumns, sampleVectors, numPrincipalComponents);
 			}
-			
 
 			private CsrMatrix CheckMatrixFormat(IMatrixView matrix)
 			{

@@ -4,7 +4,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 	using System.Collections.Generic;
 	using System.Text;
 
-	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg;
+	using MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Tests.Utilities;
 

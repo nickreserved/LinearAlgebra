@@ -93,38 +93,5 @@ namespace MGroup.LinearAlgebra.Commons
 
 			return diagonal;
 		}
-
-		internal static int[] LocateDiagonalOffsets(int matrixOrder, int[] csrRowOffsets, int[] csrColIndices)
-		{
-			var diagonalOffsets = new int[matrixOrder];
-			for (int i = 0; i < matrixOrder; ++i)
-			{
-				int rowStart = csrRowOffsets[i]; // inclusive
-				int rowEnd = csrRowOffsets[i + 1]; // exclusive
-
-				//TODO: optimizations: bisection, start from the end of the row if row > n/2, etc.
-				bool isDiagonalZero = true;
-				for (int k = rowStart; k < rowEnd; ++k)
-				{
-					int j = csrColIndices[k];
-					if (j == i)
-					{
-						diagonalOffsets[i] = k;
-						isDiagonalZero = false;
-						break;
-					}
-				}
-
-				if (isDiagonalZero)
-				{
-					//TODO: Should this be necessary for every caller? Or provide another similar method, that works with structural 0s in diagonal?
-					//		Are the offsets defined when there are structural 0s in the diagonal?
-					throw new InvalidSparsityPatternException(
-						$"Found 0 diagonal entry at ({i},{i}). Gauss Seidel cannot be performed");
-				}
-			}
-
-			return diagonalOffsets;
-		}
 	}
 }

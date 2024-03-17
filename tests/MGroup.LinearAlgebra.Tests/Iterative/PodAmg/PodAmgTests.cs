@@ -4,13 +4,12 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 	using System.Collections.Generic;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.AlgebraicMultiGrid;
+	using MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg;
 	using MGroup.LinearAlgebra.Iterative;
-	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid;
-	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg;
-	using MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing;
 	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
-	using MGroup.LinearAlgebra.Iterative.StationaryPoint.GaussSeidel;
+	using MGroup.LinearAlgebra.Iterative.Stationary.CSR;
 	using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;
@@ -36,8 +35,10 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			solverBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(30000);
 			solverBuilder.ConvergenceTolerance = 1E-5;
 			solverBuilder.ConvergenceCriterion = new SolutionNeverConvergesCriterion();
-			solverBuilder.SmootherBuilder = new GaussSeidelSmoother.Builder(
-				new GaussSeidelIterationCsrSerial.Builder(), GaussSeidelSweepDirection.Symmetric, numIterations: 1);
+			solverBuilder.Smoothing = new MultigridLevelSmoothing()
+				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection:true), 1)
+				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection:false), 1)
+				.SetPostSmoothersSameAsPreSmoothers();
 
 			PodAmgAlgorithm solver = solverBuilder.Create(samples, numPrincipalComponents);
 			var solutionComputed = Vector.CreateZero(rhs.Length);
@@ -66,8 +67,10 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			var preconditionerFactory = new PodAmgPreconditioner.Factory();
 			preconditionerFactory.NumIterations = 1;
 			preconditionerFactory.KeepOnlyNonZeroPrincipalComponents = true;
-			preconditionerFactory.SmootherBuilder = new GaussSeidelSmoother.Builder(
-				new GaussSeidelIterationCsrSerial.Builder(), GaussSeidelSweepDirection.Symmetric, numIterations: 1);
+			preconditionerFactory.CreateSmoothers = () => new MultigridLevelSmoothing()
+				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: true), 1)
+				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: false), 1)
+				.SetPostSmoothersSameAsPreSmoothers();
 			preconditionerFactory.Initialize(samples, numPrincipalComponents);
 			IPreconditioner preconditioner = preconditionerFactory.CreatePreconditionerFor(csr);
 
