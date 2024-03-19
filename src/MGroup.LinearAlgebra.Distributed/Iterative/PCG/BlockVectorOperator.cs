@@ -2,7 +2,6 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Text;
 	using MGroup.MSolve.Solution.LinearSystem;
 
 	/// <summary>

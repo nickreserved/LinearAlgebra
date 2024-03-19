@@ -1,9 +1,5 @@
 namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
-
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
@@ -11,7 +7,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 	/// </summary>
 	public class RelativeSolutionConvergenceCriterion : ISolutionConvergenceCriterion
 	{
-		public double CalculateConvergenceMetric(IVectorView currentSolution, IVectorView previousSolution)
+		public double CalculateConvergenceMetric(IImmutableVector currentSolution, IImmutableVector previousSolution)
 		{
 			//TODO: The next can be optimized to not create a new vector (using SubtractIntoThis) in some cases.
 			//		E.g. in Gauss-Seidel the previousSolution vector is no longer necessary and can be overwritten.

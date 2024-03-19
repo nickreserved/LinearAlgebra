@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 {
@@ -22,6 +22,6 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
         /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="rhsVector"/> or <paramref name="lhsVector"/> 
         /// is different than the number of rows of this <see cref="IPreconditioner"/>.
         /// </exception>
-        void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector);
+        void Apply(IImmutableVector rhsVector, IMutableVector lhsVector);
     }
 }

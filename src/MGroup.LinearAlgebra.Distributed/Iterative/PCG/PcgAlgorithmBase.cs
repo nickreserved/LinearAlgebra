@@ -13,7 +13,7 @@ using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 //TODOMPI: make it generic on the type of vector, which will be bounded by IVector or the dedicated interface (see previous TODO)
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG
 {
-	public abstract class PcgAlgorithmBase : IDistributedIterativeMethod
+	public abstract class PcgAlgorithmBase : IIterativeMethod
 	{
 		protected readonly IPcgResidualConvergence convergence;
 		protected readonly IPcgResidualUpdater residualUpdater;

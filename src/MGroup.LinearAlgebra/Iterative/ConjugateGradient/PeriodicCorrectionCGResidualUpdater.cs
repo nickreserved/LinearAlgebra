@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Implement this: "If the tolerance is large, the residual need not be corrected at all" 
@@ -17,15 +15,15 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
     {
         private int numIterationsBeforeCorrection = int.MinValue;
 
-        /// <summary>
-        /// See <see cref="ICGResidualUpdater.UpdateResidual(CGAlgorithm, IVector, out double)"/>
-        /// </summary>
-        public void UpdateResidual(CGAlgorithm cg, IVector residual, out double resDotRes)
+		/// <summary>
+		/// See <see cref="ICGResidualUpdater.UpdateResidual(CGAlgorithm, IMutableVector, out double)"/>
+		/// </summary>
+		public void UpdateResidual(CGAlgorithm cg, IMutableVector residual, out double resDotRes)
         {
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)
             {
-                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(cg.Rhs.Length));
+                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(cg.Rhs.Length()));
             }
 
             if ((cg.Iteration % numIterationsBeforeCorrection == 0) && (cg.Iteration != 0)) //The first iteration uses the correct residual.

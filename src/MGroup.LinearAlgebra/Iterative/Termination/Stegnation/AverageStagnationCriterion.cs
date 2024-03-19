@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-
 using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -26,7 +24,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 		{
 			var errorReductions = CalcRelativeErrorReductions();
 			if (errorReductions == null) return false; // Not enough data yet
-			var relativeImprovement = Vector.CreateFromArray(errorReductions).Average();
+			var relativeImprovement = Vector.CreateFromArray(errorReductions).Average();//Γκέσος Παύλος
 			if (relativeImprovementTolerance == -1)
 			{
 				relativeImprovementTolerance = 1E-3 * CalcInitialErrorReduction();

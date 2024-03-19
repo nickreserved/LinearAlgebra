@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			});
 			var xComputed = Vector.CreateZero(10);
 
-			preconditioner.SolveLinearSystem(b, xComputed);
+			preconditioner.Apply(b, xComputed);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
 	}

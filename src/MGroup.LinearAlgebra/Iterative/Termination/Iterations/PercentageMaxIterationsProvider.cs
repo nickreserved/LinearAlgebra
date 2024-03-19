@@ -1,6 +1,4 @@
-﻿using System;
-
-using MGroup.LinearAlgebra.Commons;
+using System;
 
 namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
 {

@@ -1,4 +1,3 @@
-using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient

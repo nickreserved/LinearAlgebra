@@ -29,8 +29,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		private BlockVectorOperator residualOperator;
 		private int blockSize;
 
-		private IVector[] residualKernels;
-		private IVector[] directionKernels;
+		private IMutableVector[] residualKernels;
+		private IMutableVector[] directionKernels;
 		private double[] residualSandwiches;	// 2n+1 sandwich products (r_i * M * r_j) of n-vector Krylov subspace (A*M, r)
 		private double[] directionSandwiches;	// 2n+3 sandwich products (p_i * M * p_j) of n-vector Krylov subspace (A*M, p)
 		private double[] residualDirectionSandwiches; // 2n+2 sandwich products (r_i * M * p_j) of vector Krylov subspace (A*M, r) with Krylov subspace (A*M, p)
@@ -44,13 +44,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Krylov subspace of (A * M)^n * r
 		/// A is the matrix, M is inverse preconditioner matrix and r is the CG residual vector
 		/// </summary>
-		internal IVector[] ResidualKernels { get => residualKernels; }
+		internal IMutableVector[] ResidualKernels { get => residualKernels; }
   
 		/// <summary>
 		/// Krylov subspace of (A * M)^n * p
 		/// A is the matrix, M is inverse preconditioner matrix and p is the CG conjugate direction vector
 		/// </summary>
-		internal IVector[] DirectionKernels { get => directionKernels; }
+		internal IMutableVector[] DirectionKernels { get => directionKernels; }
 
 		private BlockPcgAlgorithm(int blockSize, double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
 			IPcgResidualConvergence pcgConvergence, IBlockPcgResidualUpdater residualUpdater, 
@@ -59,8 +59,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			this.blockSize = blockSize;
 			this.betaCalculation = betaCalculation;
-			this.residualKernels = new IVector[blockSize];
-			this.directionKernels = new IVector[blockSize + 1];
+			this.residualKernels = new IMutableVector[blockSize];
+			this.directionKernels = new IMutableVector[blockSize + 1];
 			this.residualSandwiches = new double[2 * blockSize - 1];
 			this.directionSandwiches = new double[2 * blockSize + 1];
 			this.residualDirectionSandwiches = new double[2 * blockSize];
@@ -79,13 +79,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <remarks>
 		/// Normally this function must be run in parallel in multiple kernels.
 		/// </remarks>
-		private void EvaluateKernel(IVector vector, IVector[] kernel)
+		private void EvaluateKernel(IMutableVector vector, IMutableVector[] kernel)
 		{
 			kernel[0].CopyFrom(vector);
 			for (int i = 1; i < kernel.Length; ++i)
 			{
-				var v1 = vector.CreateZeroVectorWithSameFormat();
-				Preconditioner.SolveLinearSystem(kernel[i - 1], v1);
+				var v1 = vector.CreateZero();
+				Preconditioner.Apply(kernel[i - 1], v1);
 				Matrix.Multiply(v1, kernel[i]);
 			}
 		}
@@ -101,14 +101,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// If R(i) is the a vector of R Krylov subspace and P(i) a vector of P Krylov subspace,
 		/// this function produces preconditioned dot products R(i) * M * P(i) where M is the inverse preconditioner matrix.
   		/// </remarks>
-		private void EvaluateSandwich(IVector[] kernel1, IVector[] kernel2, double[] sandwich)
+		private void EvaluateSandwich(IMutableVector[] kernel1, IMutableVector[] kernel2, double[] sandwich)
 		{
-			var v = kernel1[0].CreateZeroVectorWithSameFormat();
-			Preconditioner.SolveLinearSystem(kernel1[0], v);
+			var v = kernel1[0].CreateZero();
+			Preconditioner.Apply(kernel1[0], v);
 			for (int i = 0; i < kernel2.Length; ++i)
 				sandwich[i] = v.DotProduct(kernel2[i]);
 
-			Preconditioner.SolveLinearSystem(kernel2[kernel2.Length - 1], v);
+			Preconditioner.Apply(kernel2[kernel2.Length - 1], v);
 			for (int i = 1; i < kernel1.Length; ++i)
 				sandwich[kernel2.Length + i - 1] = v.DotProduct(kernel1[i]);
 		}
@@ -150,14 +150,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Evaluates the solution vector using the supplied block vector linear combination coefficients.
 		/// </summary>
 		/// <param name="solutionCoefficients">The block vector linear combination coefficients to be used for the calculation of the solution vector.</param>
-  		private IVector EvaluateSolutionVector(BlockVectorOperator solutionCoefficients)
+  		private IMutableVector EvaluateSolutionVector(BlockVectorOperator solutionCoefficients)
 		{
-			var x = residualKernels[0].CreateZeroVectorWithSameFormat();
-			Preconditioner.SolveLinearSystem(solutionCoefficients.EvaluateVector(residualKernels, directionKernels), x);
+			var x = residualKernels[0].CreateZero();
+			Preconditioner.Apply(solutionCoefficients.EvaluateVector(residualKernels, directionKernels), x);
 			return x;
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IMutableVector> zeroVectorInitializer)
 		{
 			//CalculateAndPrintExactResidual();
 
@@ -270,7 +270,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		private void CalculateAndPrintExactResidual()
 		{
-			var res = Vector.CreateZero(Rhs.Length);
+			var res = precondResidual.CreateZero();
 			Matrix.Multiply(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();

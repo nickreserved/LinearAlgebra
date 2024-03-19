@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Vectors;
@@ -18,6 +18,6 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <param name="cg">The Conjugate Gradient Aglorithm that uses this object.</param>
         /// <param name="residual">The current residual vector r to modify.</param>
         /// <param name="resDotRes">The current product r*r to modify.</param>
-        void UpdateResidual(CGAlgorithm cg, IVector residual, out double resDotRes);
+        void UpdateResidual(CGAlgorithm cg, IMutableVector residual, out double resDotRes);
     }
 }

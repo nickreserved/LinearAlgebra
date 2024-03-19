@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 {
 	public class NullStagnationCriterion : IStagnationCriterion

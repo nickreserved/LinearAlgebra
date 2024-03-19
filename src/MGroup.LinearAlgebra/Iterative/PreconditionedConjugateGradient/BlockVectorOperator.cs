@@ -2,7 +2,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Text;
+
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
@@ -121,9 +121,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <param name="residualKernels">The r_coefficients.</param>
 		/// <param name="directionKernels">The p_coefficients.</param>
 		/// <returns>The result of x = p_coefficients * P + r_coefficients * R</returns>
-		public IVector EvaluateVector(IVector[] residualKernels, IVector[] directionKernels)
+		public IMutableVector EvaluateVector(IMutableVector[] residualKernels, IMutableVector[] directionKernels)
 		{
-			var x = residualKernels[0].CreateZeroVectorWithSameFormat();
+			var x = residualKernels[0].CreateZero();
 			for (var i = 0; i < r.Count; ++i)
 			{
 				x.AxpyIntoThis(residualKernels[i], r[i]);

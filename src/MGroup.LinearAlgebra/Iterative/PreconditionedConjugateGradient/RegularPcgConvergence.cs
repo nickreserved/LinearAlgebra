@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System;
 
 //TODO: Code duplication between this and the CG version. They could be joined, by adopting the name ResDotPrecondResNew in both.
 //TODO: Checking δnew <= ε^2 * δ0 as proposed by "Painless CG, section B3", is more efficient than normalizing and computing 

@@ -1,6 +1,3 @@
-﻿using System;
-using MGroup.LinearAlgebra.Vectors;
-
 //TODO: This comment is from when corrections were also applied during checking convergence.This strategy can modify(correct) 
 //      r, r*r (CG), s*r (PCG). However that s was computed by preconditioning the uncorrected r. If r is corrected, 
 //      should s also be corrected? This is costly, but s will be used extensively afterwards.

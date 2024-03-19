@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Reduction;
 
 //TODO: perhaps I should return IVectorView instead of IVector. By returning IVectorView I can have classes that only implement
@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// result = sum over all i of this[i] * <paramref name="vector"/>[i]).
         /// </summary>
         /// <param name="vector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
-        double DotProduct(IVectorView vector);
+        double DotProduct(IImmutableVector vector);
 
         /// <summary>
         /// Performs the following operation for all i:

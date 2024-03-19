@@ -71,9 +71,9 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
         /// <summary>
         /// See <see cref="IPreconditioner.SolveLinearSystem(Vector)"/>
         /// </summary>
-        public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
+        public void Apply(IImmutableVector rhsVector, IMutableVector lhsVector)
         {
-            Preconditions.CheckSystemSolutionDimensions(Order, rhsVector.Length);
+            Preconditions.CheckSystemSolutionDimensions(Order, rhsVector.Length());
 			if (isDiagonalInverted)
 			{
 				for (int i = 0; i < Order; ++i)

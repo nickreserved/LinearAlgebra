@@ -1,5 +1,3 @@
-﻿using MGroup.LinearAlgebra.Vectors;
-
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
     /// <summary>

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MGroup.LinearAlgebra.Matrices;
-
-//TODO: working with the matrix itself is not always convenient, especially when abstracted behind IMatrixView. E.g. Jacobi
+//TODO: working with the matrix itself is not always convenient, especially when abstracted behind IImmutableMatrix. E.g. Jacobi
 //      preconditioner needs to access the diagonal which is more efficient with the DOK. IncompleteCholesky may also be more 
 //      effient on other matrix storage formats than the CSR that will be used for multiplications.
 namespace MGroup.LinearAlgebra.Iterative.Preconditioning
@@ -18,6 +13,6 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
         /// Initializes and returns an <see cref="IPreconditioner"/> for the provided <paramref name="matrix"/>.
         /// </summary>
         /// <param name="matrix">The original matrix, whose preconditioner will be created.</param>
-        IPreconditioner CreatePreconditionerFor(IMatrixView matrix);
+        IPreconditioner CreatePreconditionerFor(ILinearTransformation matrix);
     }
 }

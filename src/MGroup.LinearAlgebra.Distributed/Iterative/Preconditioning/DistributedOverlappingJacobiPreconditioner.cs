@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
-using MGroup.MSolve.Solution.LinearSystem;
+using MGroup.LinearAlgebra.Iterative.Preconditioning;
 
 //TODOMPI: Needs testing
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
@@ -19,15 +17,14 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 		/// </summary>
 		/// <param name="environment">
 		/// The computing environment that will be used for the operations during this constructor and during 
-		/// <see cref="Apply(IGlobalVector, IGlobalVector)"/>.
+		/// <see cref="Apply(IImmutableVector, IMutableVector)"/>.
 		/// </param>
 		/// <param name="diagonal">
 		/// A distributed vector that contains the diagonal entries of each local matrix that corresponds to a 
 		/// <see cref="ComputeNode"/> of the <paramref name="environment"/>. If an entry is overlapping, namely if it exists
 		/// in many neighboring local diagonal vectors, then its value must be the same in all these local vectors.
 		/// </param>
-		public DistributedOverlappingJacobiPreconditioner(IComputeEnvironment environment,
-			DistributedOverlappingVector diagonal)
+		public DistributedOverlappingJacobiPreconditioner(IComputeEnvironment environment, DistributedOverlappingVector diagonal)
 		{
 			this.environment = environment;
 			this.Indexer = diagonal.Indexer;
@@ -40,38 +37,28 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 
 		public Dictionary<int, Vector> LocalInverseDiagonals { get; }
 
-		public void Apply(IGlobalVector input, IGlobalVector output)
-		{
-			if ((input is DistributedOverlappingVector lhsCasted) && (output is DistributedOverlappingVector rhsCasted))
-			{
-				Multiply(lhsCasted, rhsCasted);
-			}
-			else
-			{
-				throw new ArgumentException(
-					"This operation is legal only if the left-hand-side and righ-hand-side vectors are distributed" +
-					" with overlapping entries.");
-			}
-		}
 
-		public void Multiply(DistributedOverlappingVector input, DistributedOverlappingVector output)
+		public void Apply(DistributedOverlappingVector rhsVector, DistributedOverlappingVector lhsVector)
 		{
-			//TODOMPI: also check that environment is the same between M,x and M,y
-			Debug.Assert(this.Indexer.IsCompatibleWith(input.Indexer) /*&& (this.environment == lhs.environment)*/);
-			Debug.Assert(this.Indexer.IsCompatibleWith(output.Indexer) /*&& (this.environment == rhs.environment)*/);
+			if (!Indexer.IsCompatibleWith(rhsVector.Indexer) ||
+				!Indexer.IsCompatibleWith(lhsVector.Indexer))
+				throw IDistributedIndexer.IncompatibleIndexersException;
 
 			Action<int> multiplyLocal = nodeID =>
 			{
-				Vector localX = input.LocalVectors[nodeID];
-				Vector localY = output.LocalVectors[nodeID];
+				Vector localX = rhsVector.LocalVectors[nodeID];
+				Vector localY = lhsVector.LocalVectors[nodeID];
 				Vector localDiagonal = this.LocalInverseDiagonals[nodeID];
 				localY.CopyFrom(localX);
 				localY.MultiplyEntrywiseIntoThis(localDiagonal);
 			};
 			environment.DoPerNode(multiplyLocal);
 
-			//TODOMPI: do we need to call output.SumOverlappingEntries() here? Is this need covered by the fact that 
+			//TODOMPI: do we need to call lhsVector.SumOverlappingEntries() here? Is this need covered by the fact that 
 			//      LocalInverseDiagonals already have the total stiffnesses?
 		}
+
+		public void Apply(IImmutableVector rhsVector, IMutableVector lhsVector)
+			=> Apply((DistributedOverlappingVector) rhsVector, (DistributedOverlappingVector) lhsVector);
 	}
 }

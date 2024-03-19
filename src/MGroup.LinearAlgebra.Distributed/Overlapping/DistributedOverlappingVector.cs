@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
-using MGroup.LinearAlgebra.Distributed.LinearAlgebraExtensions;
 using System.Collections.Concurrent;
-using MGroup.MSolve.Solution.LinearSystem;
 
 //TODOMPI: this class will be mainly used for iterative methods. Taking that into account, make optimizations. E.g. work arrays
 //      used as buffers for MPI communication can be reused across vectors, instead of each vector allocating/freeing identical 
@@ -15,7 +11,7 @@ using MGroup.MSolve.Solution.LinearSystem;
 //      it will probably require significant communication. Furthermore, these checks can probably depend on polymorphic methods
 //      exposed by the vectors & matrix classes, which will check matching dimensions between matrix-vector or vector-vector.
 //      E.g. Adding 2 vectors requires that they have the same length. Vector will check exactly that, and possibly expose a 
-//      PatternMatchesForLinearCombo(other) method. DistributedVector however will check that they have the same indexers, 
+//      PatternMatchesForLinearCombo(otherVector) method. DistributedVector however will check that they have the same indexers, 
 //      without any need to communicate, only to find the total length. If I do provide such a property, it should be accessed 
 //      from the indexer (which must be 1 object for all compute nodes). The indexer should lazily calculate it, store it
 //      internally and update it whenever the connectivity changes. Or just prohibit changing the connectivity. Calculating it
@@ -24,7 +20,7 @@ using MGroup.MSolve.Solution.LinearSystem;
 //      round it to the nearest integer (and pray the precision errors are negligible).
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
-	public class DistributedOverlappingVector : IGlobalVector
+	public class DistributedOverlappingVector : IMutableVector
 	{
 		private ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>	cachedBuffers = 
 			new ConcurrentDictionary<int, (ConcurrentDictionary<int, double[]> send, ConcurrentDictionary<int, double[]> recv)>();
@@ -61,26 +57,28 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public bool CheckForCompatibility { get; set; } = true;
 
-		public void AxpyIntoThis(IGlobalVector otherVector, double otherCoefficient)
-		{
-			DistributedOverlappingVector otherDistributed = Indexer.CheckCompatibleVector(otherVector);
-			AxpyIntoThis(otherDistributed, otherCoefficient);
-		}
 
-		public void AxpyIntoThis(DistributedOverlappingVector otherVector, double otherCoefficient)
+
+		public DistributedOverlappingVector AxpyIntoThis(DistributedOverlappingVector otherVector, double otherCoefficient)
 		{
-			Indexer.CheckCompatibleVector(otherVector);
+			if (!Indexer.IsCompatibleWith(otherVector.Indexer)) throw IDistributedIndexer.IncompatibleIndexersException;
 			Environment.DoPerNode(
 				node => this.LocalVectors[node].AxpyIntoThis(otherVector.LocalVectors[node], otherCoefficient)
 			);
+			return this;
 		}
+
+		public DistributedOverlappingVector AxpyIntoThis(IImmutableVector otherVector, double otherCoefficient)
+			=> AxpyIntoThis((DistributedOverlappingVector)otherVector, otherCoefficient);
+
+		IMutableVector IMutableVector.AxpyIntoThis(IImmutableVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient);/*TODO: remove line when C#9*/
+
 
 		public void Clear()
 		{
 			Environment.DoPerNode(node => LocalVectors[node].Clear());
 		}
 
-		IGlobalVector IGlobalVector.Copy() => Copy(); //TODO: Copy can be expressed with CreateZero() and CopyFrom().
 
 		public DistributedOverlappingVector Copy()
 		{
@@ -88,36 +86,32 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				Environment.CalcNodeData(node => LocalVectors[node].Copy());
 			return new DistributedOverlappingVector(Indexer, localVectorsCloned);
 		}
+		
+		IMutableVector IImmutableVector.Copy() => Copy();/*TODO: remove line when C#9*/
 
-		public void CopyFrom(IGlobalVector otherVector)
-		{
-			DistributedOverlappingVector otherDistributed = Indexer.CheckCompatibleVector(otherVector);
-			CopyFrom(otherDistributed);
-		}
 
 		public void CopyFrom(DistributedOverlappingVector otherVector)
 		{
-			Indexer.CheckCompatibleVector(otherVector);
-			Environment.DoPerNode(node => this.LocalVectors[node].CopyFrom(otherVector.LocalVectors[node]));
+			if (!Indexer.IsCompatibleWith(otherVector.Indexer)) throw IDistributedIndexer.IncompatibleIndexersException;
+			Environment.DoPerNode(node => LocalVectors[node].CopyFrom(otherVector.LocalVectors[node]));
 		}
 
-		IGlobalVector IGlobalVector.CreateZero() => CreateZero();
+		public void CopyFrom(IImmutableVector otherVector)
+			=> CopyFrom((DistributedOverlappingVector)otherVector);
+
 
 		public DistributedOverlappingVector CreateZero()
 		{
 			var result = new DistributedOverlappingVector(Indexer);
-			result.CacheSendRecvBuffers = this.CacheSendRecvBuffers;
+			result.CacheSendRecvBuffers = CacheSendRecvBuffers;
 			return result;
 		}
 
-		public double DotProduct(IGlobalVector otherVector)
-		{
-			DistributedOverlappingVector otherDistributed = Indexer.CheckCompatibleVector(otherVector);
-			return DotProduct(otherDistributed);
-		}
+		IMutableVector IImmutableVector.CreateZero() => CreateZero(); /*TODO: remove line when C#9*/
+
 
 		/// <summary>
-		/// See <see cref="IGlobalVector.DotProduct(IGlobalVector)"/>.
+		/// See <see cref="IImmutableVector.DotProduct(IImmutableVector)"/>.
 		/// </summary>
 		/// <remarks>
 		/// Warning: This does not work correctly if 2 local vectors have different values at the same common entry. In such 
@@ -125,7 +119,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		/// </remarks>
 		public double DotProduct(DistributedOverlappingVector otherVector)
 		{
-			Indexer.CheckCompatibleVector(otherVector);
+			if (!Indexer.IsCompatibleWith(otherVector.Indexer)) throw IDistributedIndexer.IncompatibleIndexersException;
 			Func<int, double> calcLocalDot = node =>
 			{
 				Vector thisLocalVector = this.LocalVectors[node];
@@ -146,16 +140,24 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Environment.AllReduceSum(dotPerNode);
 		}
 
-		public bool Equals(DistributedOverlappingVector other, double tolerance = 1E-7)
+		public double DotProduct(IImmutableVector otherVector)
+			=> DotProduct((DistributedOverlappingVector)otherVector);
+
+
+		public bool Equals(DistributedOverlappingVector otherVector, double tolerance = 1E-7)
 		{
-			if (!this.Indexer.IsCompatibleWith(other.Indexer))
+			if (!this.Indexer.IsCompatibleWith(otherVector.Indexer))
 			{
 				return false;
 			}
 			Dictionary<int, bool> flags = Environment.CalcNodeData(
-					node => this.LocalVectors[node].Equals(other.LocalVectors[node], tolerance));
+					node => this.LocalVectors[node].Equals(otherVector.LocalVectors[node], tolerance));
 			return Environment.AllReduceAnd(flags);
 		}
+
+		public bool Equals(IImmutableVector otherVector, double tolerance = 1E-7)
+			=> Equals((DistributedOverlappingVector)otherVector, tolerance);
+
 
 		public int Length()
 		{
@@ -175,22 +177,25 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return (int)Math.Round(Environment.AllReduceSum(localLengths));
 		}
 
-		public void LinearCombinationIntoThis(
-			double thisCoefficient, IGlobalVector otherVector, double otherCoefficient)
-		{
-			DistributedOverlappingVector otherDistributed = Indexer.CheckCompatibleVector(otherVector);
-			LinearCombinationIntoThis(thisCoefficient, otherDistributed, otherCoefficient);
-		}
-
-		public void LinearCombinationIntoThis(
+		public DistributedOverlappingVector LinearCombinationIntoThis(
 			double thisCoefficient, DistributedOverlappingVector otherVector, double otherCoefficient)
 		{
-			Indexer.CheckCompatibleVector(otherVector);
+			if (!Indexer.IsCompatibleWith(otherVector.Indexer)) throw IDistributedIndexer.IncompatibleIndexersException;
 			Environment.DoPerNode(
 				node => this.LocalVectors[node].LinearCombinationIntoThis(
 					thisCoefficient, otherVector.LocalVectors[node], otherCoefficient)
 			);
+			return this;
 		}
+
+		public DistributedOverlappingVector LinearCombinationIntoThis(double thisCoefficient,
+									IImmutableVector otherVector, double otherCoefficient)
+			=> LinearCombinationIntoThis(thisCoefficient, (DistributedOverlappingVector) otherVector, otherCoefficient);
+
+		IMutableVector IMutableVector.LinearCombinationIntoThis(double thisCoefficient,
+				IImmutableVector otherVector, double otherCoefficient)
+			=> LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient); /*TODO: remove line when C#9*/
+
 
 		public double Norm2()
 		{
@@ -212,15 +217,18 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return Math.Sqrt(Environment.AllReduceSum(dotPerNode));
 		}
 
-		public void ScaleIntoThis(double scalar)
+
+		public DistributedOverlappingVector ScaleIntoThis(double scalar)
 		{
 			Environment.DoPerNode(node => LocalVectors[node].ScaleIntoThis(scalar));
+			return this;
 		}
+		IMutableVector IMutableVector.ScaleIntoThis(double scalar)
+			=> ScaleIntoThis(scalar); /*TODO: remove line when C#9*/
+
 
 		public void SetAll(double value)
-		{
-			Environment.DoPerNode(node => LocalVectors[node].SetAll(value));
-		}
+			=> Environment.DoPerNode(node => LocalVectors[node].SetAll(value));
 
 
 		//TODOMPI: A ReduceOverlappingEntries(IReduction), which would cover sum and regularization would be more useful. 
@@ -358,5 +366,44 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				return (sendValues, recvValues);
 			}
 		}
+
+
+
+		public void DoEntrywiseIntoThis(DistributedOverlappingVector otherVector, Func<double, double, double> binaryOperation)
+		{
+			if (!Indexer.IsCompatibleWith(otherVector.Indexer)) throw IDistributedIndexer.IncompatibleIndexersException;
+			Environment.DoPerNode(node => LocalVectors[node].DoEntrywiseIntoThis(otherVector.LocalVectors[node], binaryOperation));
+		}
+
+		public void DoEntrywiseIntoThis(IImmutableVector otherVector, Func<double, double, double> binaryOperation)
+			=> DoEntrywiseIntoThis((DistributedOverlappingVector) otherVector, binaryOperation);
+
+
+		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
+			=> Environment.DoPerNode(node => LocalVectors[node].DoToAllEntriesIntoThis(unaryOperation));
+
+
+		public DistributedOverlappingVector DoEntrywise(DistributedOverlappingVector otherVector, Func<double, double, double> binaryOperation)
+		{
+			DistributedOverlappingVector vector = Copy();
+			vector.DoEntrywiseIntoThis(otherVector, binaryOperation);
+			return vector;
+		}
+
+		public DistributedOverlappingVector DoEntrywise(IImmutableVector otherVector, Func<double, double, double> binaryOperation)
+			=> DoEntrywise((DistributedOverlappingVector) otherVector, binaryOperation);
+
+		IMutableVector IImmutableVector.DoEntrywise(IImmutableVector otherVector, Func<double, double, double> binaryOperation)
+			=> DoEntrywise(otherVector, binaryOperation); /*TODO: remove line when C#9*/
+
+
+		public DistributedOverlappingVector DoToAllEntries(Func<double, double> unaryOperation)
+		{
+			DistributedOverlappingVector vector = Copy();
+			vector.DoToAllEntriesIntoThis(unaryOperation);
+			return vector;
+		}
+
+		IMutableVector IImmutableVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation); /*TODO: remove line when C#9*/
 	}
 }

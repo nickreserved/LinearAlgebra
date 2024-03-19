@@ -125,7 +125,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Thrown if the storage format of <paramref name="rhsVector"/> does not support overwritting the entries that this 
         /// method will try to.
         /// </exception>
-        void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false);
+        void MultiplyIntoResult(IImmutableVector lhsVector, IMutableVector rhsVector, bool transposeThis = false);
         //TODO: this is NOT a specialization of a version with offsets. It is defined only if the vectors have exactly the matching lengths.
 
         /// <summary>

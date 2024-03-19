@@ -1,13 +1,7 @@
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using MGroup.Environments;
-using MGroup.LinearAlgebra.Distributed.LinearAlgebraExtensions;
-using MGroup.LinearAlgebra.Matrices;
-using MGroup.Solvers.DDM.LinearSystem;
-using MGroup.MSolve.Solution.LinearSystem;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
@@ -63,37 +57,6 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public bool IsCompatibleWith(IDistributedIndexer other) => this == other;
 
-		public DistributedOverlappingMatrix<TMatrix> CheckCompatibleMatrix<TMatrix>(IGlobalMatrix matrix)
-			where TMatrix : class, IMatrix
-		{
-			if (matrix is DistributedOverlappingMatrix<TMatrix> distributedMatrix)
-			{
-				if (matrix.CheckForCompatibility == false || distributedMatrix.Indexer == this)
-				{
-					return distributedMatrix;
-				}
-			}
-
-			throw new NonMatchingFormatException("The provided matrix has a different format than this indexer. " +
-				"Their entries correspond to different dofs or they are distributed differently across compute nodes");
-		}
-
-		public DistributedOverlappingVector CheckCompatibleVector(IGlobalVector vector)
-		{
-			if (vector is DistributedOverlappingVector distributedVector)
-			{
-				if (vector.CheckForCompatibility == false || distributedVector.Indexer == this)
-				{
-					return distributedVector;
-				}
-			}
-
-			//TODO: Perhaps the error msg or even the whole check can be injected into the constructor.
-			throw new NonMatchingFormatException("The provided vector has a different format than this indexer. " +
-				"Their entries correspond to different dofs or they are distributed differently across compute nodes");
-		}
-
-		public bool IsCompatibleVector(DistributedOverlappingVector vector) => vector.Indexer == this;
 
 		/// <summary>
 		/// All indexing data and functionality of <see cref="DistributedOverlappingIndexer"/>, but only for the local vector, 

@@ -51,7 +51,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// The initial approximation to the solution vector, which PCG will improve. It will be overwritten by this method.
 		/// </param>
 		/// <exception cref="InvalidOperationException">Thrown if there are no direction vectors stored yet.</exception>
-		public void CalculateInitialSolutionFromStoredDirections(IVectorView rhsNew, IVector initialSolution)
+		public void CalculateInitialSolutionFromStoredDirections(IImmutableVector rhsNew, IMutableVector initialSolution)
 		{
 			//TODO: An implementation by G. Stavroulakis discarded the last stored direction vector at this point. Why?
 			//reorthoCache.RemoveNewDirectionVectorData(1);
@@ -81,12 +81,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			DirectionTimesMatrixTimesDirection = 0.0;
 		}
 
-		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs,
-			IVector solution, bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
+		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IImmutableVector rhs,
+			IMutableVector solution, bool initialGuessIsZero, Func<IMutableVector> zeroVectorInitializer)
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
-			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
-			Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
+			if (solution is IFinite1D solutioN)
+				Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solutioN.Length());
+			if (rhs is IFinite1D rhS)
+				Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhS.Length());
 
 			this.Matrix = matrix;
 			this.Preconditioner = preconditioner;
@@ -117,14 +119,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			return SolveInternal(maxIterations, zeroVectorInitializer);
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IMutableVector> zeroVectorInitializer)
 		{
 			iteration = 0;
-			Preconditioner.SolveLinearSystem(residual, precondResidual);
+			Preconditioner.Apply(residual, precondResidual);
 
 			// d0 = s0 = inv(M) * r0
 			//direction.CopyFrom(precondResidual);
-			//Preconditioner.SolveLinearSystem(residual, direction);
+			//Preconditioner.Apply(residual, direction);
 			UpdateDirectionVector(precondResidual, direction);
 
 			// q0 = A * d0
@@ -156,7 +158,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				residualUpdater.UpdateResidual(this, residual);
 
 				// s = inv(M) * r
-				Preconditioner.SolveLinearSystem(residual, precondResidual);
+				Preconditioner.Apply(residual, precondResidual);
 
 				// δold = δnew
 				resDotPrecondResOld = resDotPrecondRes;
@@ -217,7 +219,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			};
 		}
 
-		private void UpdateDirectionVector(IVectorView preconditionedResidual, IVector direction)
+		private void UpdateDirectionVector(IImmutableVector preconditionedResidual, IMutableVector direction)
 		{
 			// d = s - sum(β_i * d_i), 0 <= i < numStoredDirections
 			// β_i = (s * q_i) / (d_i * q_i)

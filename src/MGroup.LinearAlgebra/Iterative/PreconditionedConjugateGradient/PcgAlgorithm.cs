@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 
-using MGroup.LinearAlgebra.Iterative.ConjugateGradient;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -31,17 +30,17 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			this.betaCalculation = betaCalculation;
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IMutableVector> zeroVectorInitializer)
 		{
-			//CalculateAndPrintExactResidual();
-
 			// In contrast to the source algorithm, we initialize s here. At each iteration it will be overwritten, 
 			// thus avoiding allocating & deallocating a new vector.
 			precondResidual = zeroVectorInitializer();
 
+			//CalculateAndPrintExactResidual();	// must be after init of precondResidual
+
 			// d = inv(M) * r
 			direction = zeroVectorInitializer();
-			Preconditioner.SolveLinearSystem(residual, direction);
+			Preconditioner.Apply(residual, direction);
 
 			// δnew = δ0 = r * d
 			resDotPrecondRes = residual.DotProduct(direction);
@@ -73,7 +72,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				//CalculateAndPrintExactResidual();
 
 				// s = inv(M) * r
-				Preconditioner.SolveLinearSystem(residual, precondResidual);
+				Preconditioner.Apply(residual, precondResidual);
 
 				// δold = δnew
 				resDotPrecondResOld = resDotPrecondRes;
@@ -117,7 +116,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		private void CalculateAndPrintExactResidual()
 		{
-			var res = Vector.CreateZero(Rhs.Length);
+			var res = precondResidual.CreateZero();
 			Matrix.Multiply(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();

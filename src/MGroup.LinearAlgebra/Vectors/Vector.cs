@@ -17,7 +17,7 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
-	public class Vector : IVector, ISliceable1D, IEntrywiseOperableView1D<Vector, Vector>, IEntrywiseOperable1D<Vector>
+	public class Vector : IMutableVector, ISliceable1D, IEntrywiseOperableView1D<Vector, Vector>, IEntrywiseOperable1D<Vector>
 	{
 		private readonly double[] data;
 

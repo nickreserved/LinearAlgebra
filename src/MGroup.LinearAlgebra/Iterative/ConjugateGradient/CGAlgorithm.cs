@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -27,11 +27,11 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         private readonly ICGResidualUpdater residualUpdater;
         private readonly double residualTolerance;
 
-        private IVector direction;
-        private IVector matrixTimesDirection;
+        private IMutableVector direction;
+        private IMutableVector matrixTimesDirection;
         private double resDotRes;
-        private IVector residual;
-        private IVector solution;
+        private IMutableVector residual;
+        private IMutableVector solution;
 
         private CGAlgorithm(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
             ICGResidualConvergence residualConvergence, ICGResidualUpdater residualUpdater)
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <summary>
         /// The direction vector d, used to update the solution vector: x = x + α * d
         /// </summary>
-        public IVectorView Direction => direction;
+        public IImmutableVector Direction => direction;
 
         /// <summary>
         /// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <summary>
         /// The vector that results from <see cref="Matrix"/> * <see cref="Direction"/>.
         /// </summary>
-        public IVectorView MatrixTimesDirection => matrixTimesDirection;
+        public IImmutableVector MatrixTimesDirection => matrixTimesDirection;
 
         /// <summary>
         /// The β parameter of Conjugate Gradient that ensures conjugacy between the direction vectors.
@@ -75,17 +75,17 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <summary>
         /// The residual vector r = b - A * x.
         /// </summary>
-        public IVectorView Residual => residual;
+        public IImmutableVector Residual => residual;
 
         /// <summary>
         /// The right hand side of the linear system b = A * x.
         /// </summary>
-        public IVectorView Rhs { get; private set; }
+        public IImmutableVector Rhs { get; private set; }
 
         /// <summary>
         /// The current approximation to the solution of the linear system A * x = b
         /// </summary>
-        public IVectorView Solution => solution;
+        public IImmutableVector Solution => solution;
 
         /// <summary>
         /// The step α taken along <see cref="Direction"/> to update the solution vector: x = x + α * d
@@ -131,7 +131,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
         /// </exception>
-        public IterativeStatistics Solve(IMatrixView matrix, IVectorView rhs, IVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
+        public IterativeStatistics Solve(IMatrixView matrix, IImmutableVector rhs, IMutableVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
             => Solve(new ExplicitMatrixTransformation(matrix), rhs, solution, initialGuessIsZero);
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
         /// </exception>
-        public IterativeStatistics Solve(ILinearTransformation matrix, IVectorView rhs, IVector solution, 
+        public IterativeStatistics Solve(ILinearTransformation matrix, IImmutableVector rhs, IMutableVector solution, 
             bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
         {
             //TODO: these will also be checked by the matrix vector multiplication.
@@ -191,7 +191,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             direction = residual.Copy();
 
             // Allocate memory for other vectors, which will be reused during each iteration
-            matrixTimesDirection = Rhs.CreateZeroVectorWithSameFormat();
+            matrixTimesDirection = Rhs.CreateZero();
 
             for (Iteration = 0; Iteration < maxIterations; ++Iteration)
             {

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Duplication between this and the CG version
@@ -17,14 +15,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
         private int numIterationsBeforeCorrection = int.MinValue;
 
 		/// <summary>
-		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IVector)"/>
+		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMutableVector)"/>
 		/// </summary>
-		public void UpdateResidual(BlockPcgAlgorithm pcg, IVector residual)
+		public void UpdateResidual(BlockPcgAlgorithm pcg, IMutableVector residual)
 		{
 			//TODO: perhaps this should be done in an Initialize() method
 			if (numIterationsBeforeCorrection == int.MinValue)
 			{
-				numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Rhs.Length));
+				numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.NumRows));
 			}
 
 			if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.
@@ -38,16 +36,16 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				residual.CopyFrom(pcg.ResidualOperator.EvaluateVector(pcg.ResidualKernels, pcg.DirectionKernels));  // It didn't multiplied with M, because it shouldn't be
 			}
 		}
-		
+
 		/// <summary>
-		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IVector)"/>
+		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMutableVector)"/>
 		/// </summary>
-		public void UpdateResidual(PcgAlgorithmBase pcg, IVector residual)
+		public void UpdateResidual(PcgAlgorithmBase pcg, IMutableVector residual)
         {
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)
             {
-                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Rhs.Length));
+                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.NumRows));
             }
 
             if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.
