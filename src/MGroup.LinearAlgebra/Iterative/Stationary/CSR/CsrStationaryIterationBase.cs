@@ -62,6 +62,6 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 
 		public abstract IStationaryIteration CopyWithInitialSettings();
 
-		public abstract void Execute(Vector input, Vector output);
+		public abstract void Execute(Vector rhs, Vector solution);
 	}
 }

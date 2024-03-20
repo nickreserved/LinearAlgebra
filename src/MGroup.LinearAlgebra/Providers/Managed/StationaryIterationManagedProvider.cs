@@ -33,28 +33,28 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 		}
 
 		public void CsrGaussSeidelForward(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			int[] diagOffsets, double[] vIn, double[] vOut)
+			int[] diagOffsets, double[] rhs, double[] solution)
 		{
 			var n = matrixOrder;
 			for (var i = 0; i < n; ++i)
 			{
-				var sum = vIn[i];
+				var sum = rhs[i];
 				var rowStart = csrRowOffsets[i]; // inclusive
 				var rowEnd = csrRowOffsets[i + 1]; // exclusive
 				var diagOffset = diagOffsets[i];
 
 				for (var k = rowStart; k < diagOffset; ++k)
 				{
-					sum -= csrValues[k] * vOut[csrColIndices[k]];
+					sum -= csrValues[k] * solution[csrColIndices[k]];
 				}
 
 				var diagEntry = csrValues[diagOffset];
 
 				for (var k = diagOffset + 1; k < rowEnd; ++k)
 				{
-					sum -= csrValues[k] * vOut[csrColIndices[k]];
+					sum -= csrValues[k] * solution[csrColIndices[k]];
 				}
-				vOut[i] = sum / diagEntry;
+				solution[i] = sum / diagEntry;
 			}
 		}
 

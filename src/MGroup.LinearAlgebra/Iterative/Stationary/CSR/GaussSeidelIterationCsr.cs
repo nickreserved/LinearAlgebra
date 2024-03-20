@@ -23,17 +23,17 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 
 		public override IStationaryIteration CopyWithInitialSettings() => new GaussSeidelIterationCsr(forwardDirection);
 
-		public override void Execute(Vector input, Vector output)
+		public override void Execute(Vector rhs, Vector solution)
 		{
 			if (forwardDirection)
 			{
 				provider.CsrGaussSeidelForward(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices,
-					diagonalOffsets, input.RawData, output.RawData);
+					diagonalOffsets, rhs.RawData, solution.RawData);
 			}
 			else
 			{
 				provider.CsrGaussSeidelBack(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices,
-					diagonalOffsets, input.RawData, output.RawData);
+					diagonalOffsets, rhs.RawData, solution.RawData);
 			}
 		}
 	}

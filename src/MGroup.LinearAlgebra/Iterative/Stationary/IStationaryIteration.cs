@@ -11,7 +11,7 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary
 	{
 		public string Name { get; }
 
-		public void Execute(Vector input, Vector output);
+		public void Execute(Vector rhs, Vector solution);
 
 		/// <summary>
 		/// Use this method, so that this <see cref="IStationaryIteration"/> will try to reuse work done by
