@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
+namespace MGroup.LinearAlgebra.Tests.MultiGrid.PodAmg
 {
 	using System;
 	using System.Collections.Generic;

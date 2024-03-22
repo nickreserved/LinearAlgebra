@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
+namespace MGroup.LinearAlgebra.Tests.MultiGrid.PodAmg
 {
 	using System;
 	using System.Collections.Generic;
@@ -28,22 +28,22 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			var rhs = Vector.CreateFromArray(DataSet2.Rhs);
 			var solutionExpected = Vector.CreateFromArray(DataSet2.Solution);
 			var samples = Matrix.CreateFromArray(DataSet2.Samples);
-			int numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
-			int numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
+			var numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
+			var numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
 
 			var solverBuilder = new PodAmgAlgorithm.Factory();
 			solverBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(30000);
 			solverBuilder.ConvergenceTolerance = 1E-5;
 			solverBuilder.ConvergenceCriterion = new SolutionNeverConvergesCriterion();
 			solverBuilder.Smoothing = new MultigridLevelSmoothing()
-				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection:true), 1)
-				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection:false), 1)
+				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: true), 1)
+				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: false), 1)
 				.SetPostSmoothersSameAsPreSmoothers();
 
-			PodAmgAlgorithm solver = solverBuilder.Create(samples, numPrincipalComponents);
+			var solver = solverBuilder.Create(samples, numPrincipalComponents);
 			var solutionComputed = Vector.CreateZero(rhs.Length);
 			solver.Initialize(csr);
-			IterativeStatistics stats = solver.Solve(rhs, solutionComputed);
+			var stats = solver.Solve(rhs, solutionComputed);
 
 			var comparer = new MatrixComparer(1E-12);
 			comparer.AssertEqual(solutionExpected, solutionComputed);
@@ -58,11 +58,11 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			var csr = CsrMatrix.CreateFromDense(matrix);
 			var rhs = Vector.CreateFromArray(DataSet2.Rhs);
 			var solutionExpected = Vector.CreateFromArray(DataSet2.Solution);
-			int n = matrix.NumRows;
+			var n = matrix.NumRows;
 			var samples = Matrix.CreateFromArray(DataSet2.Samples);
-			int numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
-			int numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
-			
+			var numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
+			var numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
+
 			// POD-AMG as preconditioner
 			var preconditionerFactory = new PodAmgPreconditioner.Builder();
 			preconditionerFactory.NumIterations = 1;
@@ -72,7 +72,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: false), 1)
 				.SetPostSmoothersSameAsPreSmoothers();
 			preconditionerFactory.Initialize(samples, numPrincipalComponents);
-			IPreconditioner preconditioner = preconditionerFactory.CreatePreconditionerFor(csr);
+			var preconditioner = preconditionerFactory.CreatePreconditionerFor(csr);
 
 
 			// PCG algorithm as solver
@@ -83,7 +83,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 
 			// Solve
 			var solutionComputed = Vector.CreateZero(n);
-			IterativeStatistics stats = pcg.Solve(matrix, preconditioner, rhs, solutionComputed, true, () => Vector.CreateZero(n));
+			var stats = pcg.Solve(matrix, preconditioner, rhs, solutionComputed, true, () => Vector.CreateZero(n));
 
 			var comparer = new MatrixComparer(1E-6);
 			comparer.AssertEqual(solutionExpected, solutionComputed);

@@ -6,7 +6,7 @@ namespace MGroup.LinearAlgebra.Tests.MultiGrid
 	using MGroup.LinearAlgebra.Iterative.Termination.Convergence;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;
-	using MGroup.LinearAlgebra.Tests.Iterative.PodAmg;
+	using MGroup.LinearAlgebra.Tests.MultiGrid.PodAmg;
 	using MGroup.LinearAlgebra.Tests.Utilities;
 	using MGroup.LinearAlgebra.Vectors;
 

@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
+namespace MGroup.LinearAlgebra.Tests.MultiGrid.PodAmg
 {
 	using System;
 	using System.Collections.Generic;
@@ -42,11 +42,11 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 				}
 			}
 
-			int numSamples = samples.NumColumns;
-			int numPrincipalComponents = principalComponentsExpected.NumColumns;
+			var numSamples = samples.NumColumns;
+			var numPrincipalComponents = principalComponentsExpected.NumColumns;
 
 			var pod = new ProperOrthogonalDecomposition(keepOnlyNonZeroEigenvalues);
-			Matrix principalComponentsComputed = pod.CalculatePrincipalComponents(numSamples, samples, numPrincipalComponents);
+			var principalComponentsComputed = pod.CalculatePrincipalComponents(numSamples, samples, numPrincipalComponents);
 
 			var comparer = new MatrixComparer(tol);
 			comparer.AssertEqual(principalComponentsExpected, principalComponentsComputed);
