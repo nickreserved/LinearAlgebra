@@ -1,5 +1,7 @@
 namespace MGroup.LinearAlgebra.Providers.Managed
 {
+	using System;
+
 	using MGroup.LinearAlgebra.Exceptions;
 
 	public class StationaryIterationManagedProvider
@@ -9,25 +11,26 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 		{
 			// Do not read the vector and each matrix row backward. It destroys caching. And in any case, we do csr_row * vector,
 			// thus the order of operations for the dot product do not matter. What does matter is starting from the last row. 
-			var n = matrixOrder;
-			for (var i = n - 1; i >= 0; --i)
+			int n = matrixOrder;
+			for (int i = n - 1; i >= 0; --i)
 			{
-				var sum = vIn[i];
-				var rowStart = csrRowOffsets[i]; // inclusive
-				var rowEnd = csrRowOffsets[i + 1]; // exclusive
-				var diagOffset = diagOffsets[i];
+				double sum = vIn[i];
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
 
-				for (var k = rowStart; k < diagOffset; ++k)
+				for (int k = rowStart; k < diagOffset; ++k)
 				{
 					sum -= csrValues[k] * vOut[csrColIndices[k]];
 				}
 
-				var diagEntry = csrValues[diagOffset];
+				double diagEntry = csrValues[diagOffset];
 
-				for (var k = diagOffset + 1; k < rowEnd; ++k)
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
 				{
 					sum -= csrValues[k] * vOut[csrColIndices[k]];
 				}
+
 				vOut[i] = sum / diagEntry;
 			}
 		}
@@ -35,25 +38,54 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 		public void CsrGaussSeidelForward(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			int[] diagOffsets, double[] rhs, double[] solution)
 		{
-			var n = matrixOrder;
-			for (var i = 0; i < n; ++i)
+			int n = matrixOrder;
+			for (int i = 0; i < n; ++i)
 			{
-				var sum = rhs[i];
-				var rowStart = csrRowOffsets[i]; // inclusive
-				var rowEnd = csrRowOffsets[i + 1]; // exclusive
-				var diagOffset = diagOffsets[i];
+				double sum = rhs[i];
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
 
-				for (var k = rowStart; k < diagOffset; ++k)
+				for (int k = rowStart; k < diagOffset; ++k)
 				{
 					sum -= csrValues[k] * solution[csrColIndices[k]];
 				}
 
-				var diagEntry = csrValues[diagOffset];
+				double diagEntry = csrValues[diagOffset];
 
-				for (var k = diagOffset + 1; k < rowEnd; ++k)
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
 				{
 					sum -= csrValues[k] * solution[csrColIndices[k]];
 				}
+
+				solution[i] = sum / diagEntry;
+			}
+		}
+
+		public void CsrJacobi(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution, double[] work)
+		{
+			int n = matrixOrder;
+			Array.Copy(solution, work, n);
+			for (int i = 0; i < n; ++i)
+			{
+				double sum = rhs[i];
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = rowStart; k < diagOffset; ++k)
+				{
+					sum -= csrValues[k] * work[csrColIndices[k]];
+				}
+
+				double diagEntry = csrValues[diagOffset];
+
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				{
+					sum -= csrValues[k] * work[csrColIndices[k]];
+				}
+
 				solution[i] = sum / diagEntry;
 			}
 		}

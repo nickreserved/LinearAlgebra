@@ -68,6 +68,12 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return result;
 		}
 
+		public static SparseMatrix operator +(SparseMatrix matrix1, SparseMatrix matrix2) 
+			=> matrix1.LinearCombination(1.0, matrix2, 1.0);
+
+		public static SparseMatrix operator -(SparseMatrix matrix1, SparseMatrix matrix2)
+			=> matrix1.LinearCombination(1.0, matrix2, -1.0);
+
 		public SparseMatrix Copy()
 		{
 			var clone = new SparseMatrix(NumRows, NumColumns);
