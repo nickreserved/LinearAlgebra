@@ -3,7 +3,8 @@ namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
-	/// Represents the forward Gauss-Seidel (D+L) * x(t+1) = -U*x(t) + b or back Gauss-Seidel (D+U) * x(t+1) = -L*x(t) + b. 
+	/// Represents a) the forward Gauss-Seidel (D+L) * x(t+1) = b -U*x(t)
+	/// or b) the back Gauss-Seidel (D+U) * x(t+1) = b -L*x(t).
 	/// The matrix A = D+L+U must be given in CSR format, where the entries of each row are sorted in ascending column order.
 	/// </summary>
 	/// <remarks>

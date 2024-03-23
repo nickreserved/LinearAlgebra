@@ -1,5 +1,7 @@
 namespace MGroup.LinearAlgebra.Tests.MultiGrid
 {
+	using System.Diagnostics;
+
 	using MGroup.LinearAlgebra.AlgebraicMultiGrid;
 	using MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg;
 	using MGroup.LinearAlgebra.Iterative.Stationary.CSR;
@@ -14,16 +16,6 @@ namespace MGroup.LinearAlgebra.Tests.MultiGrid
 
 	public static class SmootherTests
 	{
-		//[Fact] Jacobi smoother causes POD-2G to diverge
-		public static void TestJacobiSmoother()
-		{
-			MultigridLevelSmoothing smoothing = new MultigridLevelSmoothing()
-				.AddPreSmoother(new JacobiIterationCsr(), 1)
-				.AddPostSmoother(new JacobiIterationCsr(), 1);
-
-			TestPod2gSolver(smoothing, 1000, 1E-12);
-		}
-
 		[Fact]
 		public static void TestGaussSeidelSmoother()
 		{
@@ -33,6 +25,18 @@ namespace MGroup.LinearAlgebra.Tests.MultiGrid
 				.SetPostSmoothersSameAsPreSmoothers();
 
 			TestPod2gSolver(smoothing, 119, 1E-12);
+		}
+
+		[Fact]
+		public static void TestSorSmoother()
+		{
+			double omega = 1.1;
+			MultigridLevelSmoothing smoothing = new MultigridLevelSmoothing()
+				.AddPreSmoother(new SorIterationCsr(omega, forwardDirection: true), 1)
+				.AddPreSmoother(new SorIterationCsr(omega, forwardDirection: false), 1)
+				.SetPostSmoothersSameAsPreSmoothers();
+
+			TestPod2gSolver(smoothing, 123, 1E-7);
 		}
 
 		private static void TestPod2gSolver(MultigridLevelSmoothing smoothing, int numAmgCycles, double entrywiseTol)

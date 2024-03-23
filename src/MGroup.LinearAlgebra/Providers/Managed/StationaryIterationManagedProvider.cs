@@ -7,31 +7,31 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 	public class StationaryIterationManagedProvider
 	{
 		public void CsrGaussSeidelBack(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			int[] diagOffsets, double[] vIn, double[] vOut)
+			int[] diagOffsets, double[] rhs, double[] solution)
 		{
 			// Do not read the vector and each matrix row backward. It destroys caching. And in any case, we do csr_row * vector,
 			// thus the order of operations for the dot product do not matter. What does matter is starting from the last row. 
 			int n = matrixOrder;
 			for (int i = n - 1; i >= 0; --i)
 			{
-				double sum = vIn[i];
+				double sum = rhs[i];
 				int rowStart = csrRowOffsets[i]; // inclusive
 				int rowEnd = csrRowOffsets[i + 1]; // exclusive
 				int diagOffset = diagOffsets[i];
 
 				for (int k = rowStart; k < diagOffset; ++k)
 				{
-					sum -= csrValues[k] * vOut[csrColIndices[k]];
+					sum -= csrValues[k] * solution[csrColIndices[k]];
 				}
 
 				double diagEntry = csrValues[diagOffset];
 
 				for (int k = diagOffset + 1; k < rowEnd; ++k)
 				{
-					sum -= csrValues[k] * vOut[csrColIndices[k]];
+					sum -= csrValues[k] * solution[csrColIndices[k]];
 				}
 
-				vOut[i] = sum / diagEntry;
+				solution[i] = sum / diagEntry;
 			}
 		}
 
@@ -59,6 +59,64 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 				}
 
 				solution[i] = sum / diagEntry;
+			}
+		}
+
+		public void CsrSorBack(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution, double omega)
+		{
+			// Do not read the vector and each matrix row backward. It destroys caching. And in any case, we do csr_row * vector,
+			// thus the order of operations for the dot product do not matter. What does matter is starting from the last row. 
+			double oneMinusOmega = 1.0 - omega;
+			int n = matrixOrder;
+			for (int i = n - 1; i >= 0; --i)
+			{
+				double sum = rhs[i];
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = rowStart; k < diagOffset; ++k)
+				{
+					sum -= csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				double diagEntry = csrValues[diagOffset];
+
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				{
+					sum -= csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				solution[i] = oneMinusOmega * solution[i] + omega * sum / diagEntry;
+			}
+		}
+
+		public void CsrSorForward(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution, double omega)
+		{
+			double oneMinusOmega = 1.0 - omega;
+			int n = matrixOrder;
+			for (int i = 0; i < n; ++i)
+			{
+				double sum = rhs[i];
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = rowStart; k < diagOffset; ++k)
+				{
+					sum -= csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				double diagEntry = csrValues[diagOffset];
+
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				{
+					sum -= csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				solution[i] = oneMinusOmega * solution[i] + omega * sum / diagEntry;
 			}
 		}
 

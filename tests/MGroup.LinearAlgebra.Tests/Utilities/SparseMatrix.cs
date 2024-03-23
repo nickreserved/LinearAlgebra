@@ -12,7 +12,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 
 	public class SparseMatrix
 	{
-        private Dictionary<int, double>[] rows;
+		private Dictionary<int, double>[] rows;
 
 		public SparseMatrix(int numRows, int numColumns)
 		{
@@ -68,11 +68,17 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return result;
 		}
 
-		public static SparseMatrix operator +(SparseMatrix matrix1, SparseMatrix matrix2) 
+		public static SparseMatrix operator +(SparseMatrix matrix1, SparseMatrix matrix2)
 			=> matrix1.LinearCombination(1.0, matrix2, 1.0);
 
 		public static SparseMatrix operator -(SparseMatrix matrix1, SparseMatrix matrix2)
 			=> matrix1.LinearCombination(1.0, matrix2, -1.0);
+
+		public static SparseMatrix operator *(double scalar, SparseMatrix matrix) => matrix.Scale(scalar);
+
+		public static SparseMatrix operator *(SparseMatrix matrix, double scalar) => matrix.Scale(scalar);
+
+		public static Vector operator *(SparseMatrix matrix, Vector vector) => matrix.Multiply(vector);
 
 		public SparseMatrix Copy()
 		{
@@ -175,7 +181,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return result;
 		}
 
-		public SparseMatrix LinearCombination(double thisCoeff, SparseMatrix other, double otherCoeff) 
+		public SparseMatrix LinearCombination(double thisCoeff, SparseMatrix other, double otherCoeff)
 		{
 			CheckSameDimensions(other);
 			SparseMatrix result = this.Copy();
@@ -230,14 +236,29 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return Vector.CreateFromArray(result, false);
 		}
 
+		public SparseMatrix Scale(double scalar)
+		{
+			var result = new SparseMatrix(NumRows, NumColumns);
+			for (int i = 0; i < NumRows; ++i)
+			{
+				foreach (KeyValuePair<int, double> colValPair in rows[i])
+				{
+					int j = colValPair.Key;
+					double val = colValPair.Value;
+					result[i, j] = scalar * val;
+				}
+			}
+			return result;
+		}
+
 		public Vector SolveDiagonal(Vector rhs)
 		{
 			CheckSystemSolution(rhs);
 			int n = rhs.Length;
-			var solution = new double[n]; 
-			for (int i = 0; i <  rhs.Length; ++i) 
+			var solution = new double[n];
+			for (int i = 0; i < rhs.Length; ++i)
 			{
-				solution[i] = rhs[i] / this[i,i];
+				solution[i] = rhs[i] / this[i, i];
 			}
 			return Vector.CreateFromArray(solution);
 		}

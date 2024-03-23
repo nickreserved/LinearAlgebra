@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Stationary
 			IStationaryIteration stationaryIteration = new GaussSeidelIterationCsr(forwardDirection: false);
 			int numIterations = 11;
 			double convergenceTolerance = 1E-9;
-			double entrywiseTolerance = 1E-5;
+			double entrywiseTolerance = 1E-11;
 			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
 		}
 
@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Stationary
 			IStationaryIteration stationaryIteration = new GaussSeidelIterationCsr(forwardDirection: true);
 			int numIterations = 10;
 			double convergenceTolerance = 1E-9;
-			double entrywiseTolerance = 1E-5;
+			double entrywiseTolerance = 1E-10;
 			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
 		}
 
@@ -46,6 +46,28 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Stationary
 			IStationaryIteration stationaryIteration = new JacobiIterationCsr();
 			int numIterations = 27;
 			double convergenceTolerance = 1E-9;
+			double entrywiseTolerance = 1E-9;
+			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
+		}
+
+		[Fact]
+		private static void TestSorBackSolution()
+		{
+			double omega = 1.01;
+			IStationaryIteration stationaryIteration = new SorIterationCsr(omega, forwardDirection: false);
+			int numIterations = 10;
+			double convergenceTolerance = 1E-9;
+			double entrywiseTolerance = 1E-5;
+			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
+		}
+
+		[Fact]
+		private static void TestSorForwardSolution()
+		{
+			double omega = 1.01;
+			IStationaryIteration stationaryIteration = new SorIterationCsr(omega, forwardDirection: true);
+			int numIterations = 10;
+			double convergenceTolerance = 5.5E-10;
 			double entrywiseTolerance = 1E-5;
 			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
 		}
