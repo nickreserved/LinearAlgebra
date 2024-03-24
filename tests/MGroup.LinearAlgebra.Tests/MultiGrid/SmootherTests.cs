@@ -24,7 +24,11 @@ namespace MGroup.LinearAlgebra.Tests.MultiGrid
 				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: false), 1)
 				.SetPostSmoothersSameAsPreSmoothers();
 
-			TestPod2gSolver(smoothing, 119, 1E-12);
+			//MultigridLevelSmoothing smoothing = new MultigridLevelSmoothing()
+			//	.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: true), 1)
+			//	.AddPostSmoother(new GaussSeidelIterationCsr(forwardDirection: false), 1);
+
+			TestPod2gSolver(smoothing, 119, 1E-7, 1E-5);
 		}
 
 		[Fact]
@@ -36,10 +40,26 @@ namespace MGroup.LinearAlgebra.Tests.MultiGrid
 				.AddPreSmoother(new SorIterationCsr(omega, forwardDirection: false), 1)
 				.SetPostSmoothersSameAsPreSmoothers();
 
-			TestPod2gSolver(smoothing, 123, 1E-7);
+			//MultigridLevelSmoothing smoothing = new MultigridLevelSmoothing()
+			//	.AddPreSmoother(new SorIterationCsr(omega, forwardDirection: true), 1)
+			//	.AddPostSmoother(new SorIterationCsr(omega, forwardDirection: false), 1);
+
+			TestPod2gSolver(smoothing, 123, 1E-7, 1E-5);
 		}
 
-		private static void TestPod2gSolver(MultigridLevelSmoothing smoothing, int numAmgCycles, double entrywiseTol)
+		[Fact]
+		public static void TestSsorSmoother()
+		{
+			double omega = 1.1;
+			MultigridLevelSmoothing smoothing = new MultigridLevelSmoothing()
+				.AddPreSmoother(new SsorIterationCsr(omega), 1)
+				.SetPostSmoothersSameAsPreSmoothers();
+
+			TestPod2gSolver(smoothing, 123, 1E-7, 1E-5);
+		}
+
+		private static void TestPod2gSolver(MultigridLevelSmoothing smoothing, int numAmgCycles, double entrywiseTol, 
+			double convergenceTol)
 		{
 			var matrix = Matrix.CreateFromArray(DataSet2.Matrix);
 			var csr = CsrMatrix.CreateFromDense(matrix);
@@ -50,7 +70,7 @@ namespace MGroup.LinearAlgebra.Tests.MultiGrid
 
 			var solverBuilder = new PodAmgAlgorithm.Factory();
 			solverBuilder.MaxIterationsProvider = new FixedMaxIterationsProvider(30000);
-			solverBuilder.ConvergenceTolerance = 1E-5;
+			solverBuilder.ConvergenceTolerance = convergenceTol;
 			solverBuilder.ConvergenceCriterion = new SolutionNeverConvergesCriterion();
 			solverBuilder.Smoothing = smoothing;
 

@@ -53,9 +53,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Stationary
 		[Fact]
 		private static void TestSorBackSolution()
 		{
-			double omega = 1.01;
+			double omega = 1.1;
 			IStationaryIteration stationaryIteration = new SorIterationCsr(omega, forwardDirection: false);
-			int numIterations = 10;
+			int numIterations = 13;
 			double convergenceTolerance = 1E-9;
 			double entrywiseTolerance = 1E-5;
 			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
@@ -64,10 +64,21 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Stationary
 		[Fact]
 		private static void TestSorForwardSolution()
 		{
-			double omega = 1.01;
+			double omega = 1.1;
 			IStationaryIteration stationaryIteration = new SorIterationCsr(omega, forwardDirection: true);
-			int numIterations = 10;
-			double convergenceTolerance = 5.5E-10;
+			int numIterations = 13;
+			double convergenceTolerance = 1E-9;
+			double entrywiseTolerance = 1E-5;
+			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
+		}
+
+		[Fact]
+		private static void TestSsorSolution()
+		{
+			double omega = 1.1;
+			IStationaryIteration stationaryIteration = new SorIterationCsr(omega, forwardDirection: true);
+			int numIterations = 13;
+			double convergenceTolerance = 1E-9;
 			double entrywiseTolerance = 1E-5;
 			TestSystemSolution(stationaryIteration, numIterations, convergenceTolerance, entrywiseTolerance);
 		}

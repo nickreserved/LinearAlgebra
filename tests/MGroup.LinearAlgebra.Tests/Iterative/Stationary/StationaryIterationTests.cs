@@ -192,5 +192,46 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Stationary
 			stationaryIteration.Execute(b, xComputed);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
+
+		[Fact]
+		private static void TestSsorIteration()
+		{
+			// Setup comparison code
+			double entrywiseTolerance = 1E-15;
+			var comparer = new MatrixComparer(entrywiseTolerance);
+
+			// Initialize matrices and vectors
+			var csrMatrix = CsrMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.Order,
+					SparsePosDef10by10.CsrValues, SparsePosDef10by10.CsrColIndices, SparsePosDef10by10.CsrRowOffsets, true);
+			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+			var xExpected = Vector.CreateZero(b.Length);
+			var xComputed = Vector.CreateZero(b.Length);
+
+			// Prepare test iteration
+			// (D+ωL) * x(t+1/2) = ω*(b -U*x(t)) +(1-ω)D*x(t), (D+ωU) * x(t+1) = ω*(b -L*x(t+1/2)) +(1-ω)D*x(t+1/2)
+			double omega = 1.2;
+			var A = SparseMatrix.CreateFromMatrix(csrMatrix);
+			SparseMatrix L = A.ExtractLowerTriangle();
+			SparseMatrix U = A.ExtractUpperTriangle();
+			SparseMatrix D = A.ExtractDiagonal();
+			SparseMatrix DplusWL = D + omega * L;
+			SparseMatrix DplusWU = D + omega * U;
+
+			// Prepare actual iteration
+			IStationaryIteration stationaryIteration = new SsorIterationCsr(omega);
+			stationaryIteration.UpdateMatrix(csrMatrix, true);
+
+			// i = 0: x = 0
+			xExpected = DplusWL.SolveForwardSubstitution(omega * (b - U * xExpected) + (1 - omega) * (D * xExpected));
+			xExpected = DplusWU.SolveBackSubstitution(omega * (b - L * xExpected) + (1 - omega) * (D * xExpected));
+			stationaryIteration.Execute(b, xComputed);
+			comparer.AssertEqual(xExpected, xComputed);
+
+			// i = 1: x = x1
+			xExpected = DplusWL.SolveForwardSubstitution(omega * (b - U * xExpected) + (1 - omega) * (D * xExpected));
+			xExpected = DplusWU.SolveBackSubstitution(omega * (b - L * xExpected) + (1 - omega) * (D * xExpected));
+			stationaryIteration.Execute(b, xComputed);
+			comparer.AssertEqual(xExpected, xComputed);
+		}
 	}
 }
