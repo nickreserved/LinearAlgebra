@@ -5,6 +5,7 @@ using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Iterative.Termination.Stegnation;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: I would rather implement reorthogonalization as an alternative strategy, rather than a different class.
@@ -51,7 +52,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// The initial approximation to the solution vector, which PCG will improve. It will be overwritten by this method.
 		/// </param>
 		/// <exception cref="InvalidOperationException">Thrown if there are no direction vectors stored yet.</exception>
-		public void CalculateInitialSolutionFromStoredDirections(IImmutableVector rhsNew, IMutableVector initialSolution)
+		public void CalculateInitialSolutionFromStoredDirections(IMinimalImmutableVector rhsNew, IMinimalMutableVector initialSolution)
 		{
 			//TODO: An implementation by G. Stavroulakis discarded the last stored direction vector at this point. Why?
 			//reorthoCache.RemoveNewDirectionVectorData(1);
@@ -81,14 +82,12 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			DirectionTimesMatrixTimesDirection = 0.0;
 		}
 
-		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IImmutableVector rhs,
-			IMutableVector solution, bool initialGuessIsZero, Func<IMutableVector> zeroVectorInitializer)
+		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalImmutableVector rhs,
+			IMinimalMutableVector solution, bool initialGuessIsZero)
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
-			if (solution is IFinite1D solutioN)
-				Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solutioN.Length());
-			if (rhs is IFinite1D rhS)
-				Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhS.Length());
+			Preconditions.CheckMultiplicationDimensions(matrix.Columns(), solution.Length());
+			Preconditions.CheckSystemSolutionDimensions(matrix.Rows(), rhs.Length());
 
 			this.Matrix = matrix;
 			this.Preconditioner = preconditioner;
@@ -111,15 +110,15 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 			// Initialize vectors 
 			//TODO: Pehaps I can just clear them from previous iterations 
-			precondResidual = zeroVectorInitializer();
-			direction = zeroVectorInitializer();
-			matrixTimesDirection = zeroVectorInitializer();
+			precondResidual = Rhs.CreateZero();
+			direction = Rhs.CreateZero();
+			matrixTimesDirection = Rhs.CreateZero();
 
-			int maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.NumColumns);
-			return SolveInternal(maxIterations, zeroVectorInitializer);
+			int maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.Columns());
+			return SolveInternal(maxIterations);
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IMutableVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations)
 		{
 			iteration = 0;
 			Preconditioner.Apply(residual, precondResidual);
@@ -219,7 +218,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			};
 		}
 
-		private void UpdateDirectionVector(IImmutableVector preconditionedResidual, IMutableVector direction)
+		private void UpdateDirectionVector(IMinimalImmutableVector preconditionedResidual, IMinimalMutableVector direction)
 		{
 			// d = s - sum(β_i * d_i), 0 <= i < numStoredDirections
 			// β_i = (s * q_i) / (d_i * q_i)

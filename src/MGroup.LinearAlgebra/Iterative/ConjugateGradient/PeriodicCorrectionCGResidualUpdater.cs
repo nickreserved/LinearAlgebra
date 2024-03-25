@@ -16,9 +16,9 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         private int numIterationsBeforeCorrection = int.MinValue;
 
 		/// <summary>
-		/// See <see cref="ICGResidualUpdater.UpdateResidual(CGAlgorithm, IMutableVector, out double)"/>
+		/// See <see cref="ICGResidualUpdater.UpdateResidual(CGAlgorithm, IMinimalMutableVector, out double)"/>
 		/// </summary>
-		public void UpdateResidual(CGAlgorithm cg, IMutableVector residual, out double resDotRes)
+		public void UpdateResidual(CGAlgorithm cg, IMinimalMutableVector residual, out double resDotRes)
         {
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)

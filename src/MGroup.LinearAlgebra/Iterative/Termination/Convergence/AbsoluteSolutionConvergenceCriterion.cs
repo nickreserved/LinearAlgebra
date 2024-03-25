@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 	/// </summary>
 	public class AbsoluteSolutionConvergenceCriterion : ISolutionConvergenceCriterion
 	{
-		public double CalculateConvergenceMetric(IImmutableVector currentSolution, IImmutableVector previousSolution)
+		public double CalculateConvergenceMetric(IMinimalImmutableVector currentSolution, IMinimalImmutableVector previousSolution)
 		{
 			//TODO: The next can be optimized to not create a new vector (using SubtractIntoThis) in some cases.
 			//		E.g. in Gauss-Seidel the previousSolution vector is no longer necessary and can be overwritten.

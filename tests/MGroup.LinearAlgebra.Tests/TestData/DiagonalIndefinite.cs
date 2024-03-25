@@ -44,7 +44,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
             // The usual Jacobi preconditioner worsens convergence. Modifications are needed.
             var positiveDiagonal = new double[n];
             for (int i = 0; i < n; ++i) positiveDiagonal[i] = Math.Abs(A[i, i]);
-            var M = new JacobiPreconditioner(positiveDiagonal);
+            var M = new JacobiPreconditionerDeprecated(positiveDiagonal);
             return (A, b, x, M);
         }
     }

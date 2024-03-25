@@ -14,6 +14,6 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
         /// </summary>
         ///<param name="pcg">The Preconditioned Conjugate Gradient algorithm that uses this object.</param>
         /// <param name="residual">The current residual vector r to modify.</param>
-        void UpdateResidual(PcgAlgorithmBase pcg, IMutableVector residual);
+        void UpdateResidual(PcgAlgorithmBase pcg, IMinimalMutableVector residual);
     }
 }

@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// result = sum over all i of this[i] * <paramref name="vector"/>[i]).
         /// </summary>
         /// <param name="vector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
-        double DotProduct(IImmutableVector vector);
+        double DotProduct(IMinimalImmutableVector vector);
 
         /// <summary>
         /// Performs the following operation for all i:

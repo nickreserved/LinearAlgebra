@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 
 using MGroup.Environments;
-using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -170,10 +169,10 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			outputVector.SumOverlappingEntries();
 		}
 
-		public void Multiply(IImmutableVector inputVector, IMutableVector outputVector)
+		public void Multiply(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
 			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
 
-		void ILinearTransformation.Multiply(IImmutableVector inputVector, IMutableVector outputVector)
+		void ILinearTransformation.Multiply(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
 			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);/*TODO: remove line when C#9*/
 
 

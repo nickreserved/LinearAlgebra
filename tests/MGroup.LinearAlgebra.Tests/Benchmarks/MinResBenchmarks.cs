@@ -44,7 +44,7 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
             var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
             var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
             var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
-            var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+            var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
             var minres = new MinRes(A.NumRows, 1e-10, 0, true, false);
 
             // Without preconditioning
@@ -66,7 +66,7 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
             var A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
             var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
             var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-            var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+            var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
             var minres = new MinRes(A.NumRows, 1e-10, 0, true, false);
 
             // Without preconditioning

@@ -3,11 +3,13 @@
 //      effient on other matrix storage formats than the CSR that will be used for multiplications.
 namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 {
-    /// <summary>
-    /// Classes implementing this interface are responsible for the creation of <see cref="IPreconditioner"/> instances.
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    public interface IPreconditionerFactory
+	using MGroup.LinearAlgebra.Matrices;
+
+	/// <summary>
+	/// Classes implementing this interface are responsible for the creation of <see cref="IPreconditioner"/> instances.
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	public interface IPreconditionerFactory
     {
         /// <summary>
         /// Initializes and returns an <see cref="IPreconditioner"/> for the provided <paramref name="matrix"/>.

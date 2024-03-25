@@ -2,7 +2,7 @@ namespace MGroup.LinearAlgebra.Vectors
 {
 	using System;
 
-	public interface IMutableVector : IImmutableVector
+	public interface IMinimalMutableVector : IMinimalImmutableVector
 	{
 		/// <summary>
 		/// A row operation from Gauss elimination.
@@ -11,15 +11,15 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="otherVector">A vector with the same number of elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns><c>thisVector += <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></c></returns>
-		IMutableVector AxpyIntoThis(IImmutableVector otherVector, double otherCoefficient);
+		IMinimalMutableVector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient);
 
-		IMutableVector AddIntoThis(IImmutableVector otherVector)
+		IMinimalMutableVector AddIntoThis(IMinimalImmutableVector otherVector)
 			=> AxpyIntoThis(otherVector, +1.0);
 
-		IMutableVector SubtractIntoThis(IImmutableVector otherVector)
+		IMinimalMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector)
 			=> AxpyIntoThis(otherVector, -1.0);
 
-		IMutableVector ScaleIntoThis(double coefficient);
+		IMinimalMutableVector ScaleIntoThis(double coefficient);
 
 		/// <summary>
 		/// A linear combination between this and another one vector.
@@ -28,9 +28,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="otherVector">A vector with the same number of elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns><c>thisVector * <paramref name="thisCoefficient"/> + <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></c></returns>
-		IMutableVector LinearCombinationIntoThis(double thisCoefficient, IImmutableVector otherVector, double otherCoefficient);
+		IMinimalMutableVector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient);
 
-		void CopyFrom(IImmutableVector otherVector);
+		void CopyFrom(IMinimalImmutableVector otherVector);
 
 		/// <summary>
 		/// Set all elements of vector to zero.
@@ -57,7 +57,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception> 
-		void DoEntrywiseIntoThis(IImmutableVector otherVector, Func<double, double, double> binaryOperation);
+		void DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation);
 
 		/// <summary>
 		/// Performs a unary operation on each entry: this[i] = <paramref name="unaryOperation"/>(this[i]).
@@ -72,8 +72,8 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		// -------- OPERATORS: implied by C# because of +, - and *
 
-		// static IMutableVector operator +=(IImmutableVector otherVector) => AddIntoThis(otherVector);
-		// static IMutableVector operator -=(IImmutableVector otherVector) => SubtractIntoThis(otherVector);
-		// static IMutableVector operator *=(double coefficient) => ScaleIntoThis(coefficient);
+		// static IMinimalMutableVector operator +=(IMinimalImmutableVector otherVector) => AddIntoThis(otherVector);
+		// static IMinimalMutableVector operator -=(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector);
+		// static IMinimalMutableVector operator *=(double coefficient) => ScaleIntoThis(coefficient);
 	}
 }

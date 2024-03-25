@@ -33,7 +33,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var pcg = builder.Build();
-                var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+                var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
                 Vector xComputed = Vector.CreateZero(A.NumRows);
                 IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
                 comparer.AssertEqual(xExpected, xComputed);
@@ -54,7 +54,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var pcg = builder.Build();
-                var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+                var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
                 Vector xComputed = Vector.CreateZero(A.NumRows);
                 IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
                 comparer.AssertEqual(xExpected, xComputed);

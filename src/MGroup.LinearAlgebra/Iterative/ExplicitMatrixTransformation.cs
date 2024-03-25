@@ -5,12 +5,12 @@ using MGroup.LinearAlgebra.Vectors;
 //      that casting by using generics
 namespace MGroup.LinearAlgebra.Iterative
 {
-    /// <summary>
-    /// Wrapper for a matrix class so that it can be used by iterative algorithms, which operate on 
-    /// <see cref="ILinearTransformation"/>
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    public class ExplicitMatrixTransformation : ILinearTransformation
+	/// <summary>
+	/// Wrapper for a matrix class so that it can be used by iterative algorithms, which operate on 
+	/// <see cref="ILinearTransformation"/>
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	public class ExplicitMatrixTransformation : ILinearTransformation
     {
         private readonly IMatrixView matrix;
 
@@ -31,8 +31,8 @@ namespace MGroup.LinearAlgebra.Iterative
         public int NumRows => matrix.NumRows;
 
 		/// <summary>
-		/// See <see cref="ILinearTransformation.Multiply(IImmutableVector, IMutableVector)"/>
+		/// See <see cref="ILinearTransformation.Multiply(IMinimalImmutableVector, IMinimalMutableVector)"/>
 		/// </summary>
-		public void Multiply(IImmutableVector lhsVector, IMutableVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
+		public void Multiply(IMinimalImmutableVector lhsVector, IMinimalMutableVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
     }
 }

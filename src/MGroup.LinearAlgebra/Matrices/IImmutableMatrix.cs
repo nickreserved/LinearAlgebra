@@ -2,7 +2,6 @@ namespace MGroup.LinearAlgebra.Matrices
 {
 	using System;
 
-	using MGroup.LinearAlgebra.Iterative;
 	using MGroup.LinearAlgebra.Vectors;
 
 	public interface IImmutableMatrix : ILinearTransformation
@@ -90,5 +89,4 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static IMutableMatrix operator *(IImmutableMatrix x, double y) => x.Scale(y);
 		public static IMutableMatrix operator *(double y, IImmutableMatrix x) => x.Scale(y);
 	}
-}
 }

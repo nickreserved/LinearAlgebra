@@ -17,20 +17,16 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
-	public class Vector : IMutableVector, ISliceable1D, IEntrywiseOperableView1D<Vector, Vector>, IEntrywiseOperable1D<Vector>
+	public class Vector : IFullyPopulatedVector
 	{
 		private readonly double[] data;
 
 		private Vector(double[] data)
 		{
 			this.data = data;
-			this.Length = data.Length;
 		}
 
-		/// <summary>
-		/// See <see cref="IIndexable1D.Length"/>.
-		/// </summary>
-		public int Length { get; }
+		public int Length { get { return data.Length; } }
 
 		/// <summary>
 		/// The internal array that stores the entries of the vector. 

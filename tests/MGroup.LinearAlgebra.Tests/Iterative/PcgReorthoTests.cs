@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			valueOfEachDiagonal[5] = 3.0;
 			var A = Matrix.CreateFromArray(MultiDiagonalMatrices.CreateSymmetric(order, valueOfEachDiagonal));
 			var M = new IdentityPreconditioner();
-			//var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+			//var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
 
 			// Method A: Regular PCG
 			var pcgBuilder = new PcgAlgorithm.Builder();
@@ -169,7 +169,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			builder.Convergence = new RhsNormalizedConvergence();
 			var pcg = builder.Build();
-			var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+			var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
 
 			// Initial run
 			Vector x0 = Vector.CreateWithValue(order, 1);
@@ -210,7 +210,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.ResidualTolerance = 1E-7;
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();
-			var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+			var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
 			Vector xComputed = Vector.CreateZero(A.NumRows);
 			IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
 			comparer.AssertEqual(xExpected, xComputed);
@@ -227,7 +227,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.ResidualTolerance = 1E-7;
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();
-			var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+			var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
 			Vector xComputed = Vector.CreateZero(A.NumRows);
 			IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
 			comparer.AssertEqual(xExpected, xComputed);

@@ -18,15 +18,15 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		protected readonly IPcgResidualConvergence convergence;
 		protected readonly IPcgResidualUpdater residualUpdater;
 
-		protected IMutableVector direction;
+		protected IMinimalMutableVector direction;
 		protected int iteration;
-		protected IMutableVector matrixTimesDirection;
+		protected IMinimalMutableVector matrixTimesDirection;
 		protected double paramBeta;
-		protected IMutableVector precondResidual;
+		protected IMinimalMutableVector precondResidual;
 		protected double resDotPrecondRes;
 		protected double resDotPrecondResOld;
-		protected IMutableVector residual;
-		protected IMutableVector solution;
+		protected IMinimalMutableVector residual;
+		protected IMinimalMutableVector solution;
 		protected double stepSize;
 
 		protected PcgAlgorithmBase(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The direction vector d, used to update the solution vector: x = x + α * d
 		/// </summary>
-		public IImmutableVector Direction => direction;
+		public IMinimalImmutableVector Direction => direction;
 
 		/// <summary>
 		/// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The vector that results from <see cref="Matrix"/> * <see cref="Direction"/>.
 		/// </summary>
-		public IImmutableVector MatrixTimesDirection => matrixTimesDirection;
+		public IMinimalImmutableVector MatrixTimesDirection => matrixTimesDirection;
 
 		/// <summary>
 		/// The β parameter of Conjugate Gradient that ensures conjugacy between the direction vectors.
@@ -75,7 +75,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The vector s = inv(M) * r
 		/// </summary>
-		public IImmutableVector PrecondResidual => precondResidual;
+		public IMinimalImmutableVector PrecondResidual => precondResidual;
 
 		/// <summary>
 		/// The dot product r(t) * (inv(M) * r(t)) of the current iteration t.
@@ -90,17 +90,17 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The residual vector r = b - A * x.
 		/// </summary>
-		public IImmutableVector Residual => residual;
+		public IMinimalImmutableVector Residual => residual;
 
 		/// <summary>
 		/// The right hand side of the linear system b = A * x.
 		/// </summary>
-		public IImmutableVector Rhs { get; protected set; }
+		public IMinimalImmutableVector Rhs { get; protected set; }
 
 		/// <summary>
 		/// The current approximation to the solution of the linear system A * x = b
 		/// </summary>
-		public IImmutableVector Solution => solution;
+		public IMinimalImmutableVector Solution => solution;
 
 		/// <summary>
 		/// The step α taken along <see cref="Direction"/> to update the solution vector: x = x + α * d
@@ -129,59 +129,23 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		/// <summary>
 		/// Solves the linear system A * x = b by solving the preconditioned system inv(P) * A * inv(P)^T * y = inv(P) * b, 
-		/// where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/>, x is the solution, y = P^T * x,
+		/// where A = <paramref name="matrix"/>, b = <paramref name="rhs"/>, x is the solution, y = P^T * x,
 		/// P*P^T = <paramref name="preconditioner"/>.
-		/// Initially x = <paramref name="initialGuess"/> and then it converges to the solution.
-		/// </summary>
-		/// <param name="matrix">The matrix A of the linear system A * x = b. It must be symmetric positive definite.</param>
-		/// <param name="rhs">
-		/// The right hand side vector b of the linear system A * x = b. Constraints:
-		/// <paramref name="rhs"/>.<see cref="IIndexable1D.Length"/> 
-		/// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.
-		/// </param>
-		/// <param name="preconditioner">
-		/// A preconditioner matrix that is also symmetric positive definite and has the same dimensions as A.
-		/// </param>
-		/// <param name="solution">
-		/// The vector from which to start refining the solution vector x. Constraints:
-		/// <paramref name="solution"/>.<see cref="IFinite1D.Length()"/>
-		/// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumColumns"/>.
-		/// </param>
-		/// <param name="initialGuessIsZero">
-		/// If <paramref name="solution"/> is 0, then set <paramref name="initialGuessIsZero"/> to true to avoid performing the
-		/// operation b-A*0 before starting.
-		/// </param>
-		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
-		/// </exception>
-		public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IImmutableVector rhs, IMutableVector solution,
-			bool initialGuessIsZero, Func<IMutableVector> zeroVectorInitializer) //TODO: find a better way to handle the case x0=0 --- Why not solution = null -> x0 = 0?
-		{
-			return Solve(new ExplicitMatrixTransformation(matrix), preconditioner, rhs, solution, initialGuessIsZero,
-				zeroVectorInitializer);
-		}
-
-		/// <summary>
-		/// Solves the linear system A * x = b by solving the preconditioned system inv(P) * A * inv(P)^T * y = inv(P) * b, 
-		/// where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/>, x is the solution, y = P^T * x,
-		/// P*P^T = <paramref name="preconditioner"/>.
-		/// Initially x = <paramref name="initialGuess"/> and then it converges to the solution.
+		/// Initially x = <paramref name="solution"/> which is the initial guess and then it converges to the solution.
 		/// </summary>
 		/// <param name="matrix">
 		/// Represents the matrix A of the linear system A * x = b, which must be symmetric positive definite.
 		/// </param>
 		/// <param name="rhs">
 		/// The right hand side vector b of the linear system A * x = b. Constraints:
-		/// <paramref name="rhs"/>.<see cref="IIndexable1D.Length"/> 
-		/// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.
+		/// Length of <paramref name="rhs"/> must be equal to <paramref name="matrix"/> rows.
 		/// </param>
 		/// <param name="preconditioner">
 		/// A preconditioner matrix that is also symmetric positive definite and has the same dimensions as A.
 		/// </param>
 		/// <param name="solution">
 		/// The vector from which to start refining the solution vector x. Constraints:
-		/// <paramref name="solution"/>.<see cref="IIndexable1D.Length"/>
-		/// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumColumns"/>.
+		/// Length of <paramref name="solution"/> must be equal to <paramref name="matrix"/> columns.
 		/// </param>
 		/// <param name="initialGuessIsZero">
 		/// If <paramref name="solution"/> is 0, then set <paramref name="initialGuessIsZero"/> to true to avoid performing the
@@ -190,15 +154,13 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IImmutableVector rhs,
-			IMutableVector solution, bool initialGuessIsZero, Func<IMutableVector> zeroVectorInitializer)
+		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalImmutableVector rhs,
+			IMinimalMutableVector solution, bool initialGuessIsZero)
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
 
-			if (solution is IFinite1D solutioN)
-				Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solutioN.Length());
-			if (rhs is IFinite1D rhS)
-				Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhS.Length());
+			Preconditions.CheckMultiplicationDimensions(matrix.Columns(), solution.Length());
+			Preconditions.CheckSystemSolutionDimensions(matrix.Rows(), rhs.Length());
 
 			this.Matrix = matrix;
 			this.Preconditioner = preconditioner;
@@ -208,9 +170,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			// r = b - A * x
 			if (initialGuessIsZero) residual = rhs.Copy();
 			else residual = ExactResidual.Calculate(matrix, rhs, solution);
-			return SolveInternal(MaxIterationsProvider.GetMaxIterations(matrix.NumColumns), zeroVectorInitializer);
+			return SolveInternal(MaxIterationsProvider.GetMaxIterations(matrix.Columns()));
 		}
 
-		protected abstract IterativeStatistics SolveInternal(int maxIterations, Func<IMutableVector> zeroVectorInitializer);
+		protected abstract IterativeStatistics SolveInternal(int maxIterations);
 	}
 }

@@ -12,7 +12,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The conjugate direction vectors stored so far.
 		/// </summary>
-		public List<IImmutableVector> Directions { get; } = new List<IImmutableVector>();
+		public List<IMinimalImmutableVector> Directions { get; } = new List<IMinimalImmutableVector>();
 
 		/// <summary>
 		/// The products <see cref="Directions"/> * systemMatrix * <see cref="Directions"/> stored so far.
@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The products systemMatrix * <see cref="Directions"/> stored so far.
 		/// </summary>
-		public List<IImmutableVector> MatrixTimesDirections { get; } = new List<IImmutableVector>();
+		public List<IMinimalImmutableVector> MatrixTimesDirections { get; } = new List<IMinimalImmutableVector>();
 
 		public void Clear()
 		{
@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// Discards the direction vectors and any corresponding data of the newest PCG iterations.
 		/// </summary>
-		/// <param name="numOldVectorsToRemove">
+		/// <param name="numNewVectorsToRemove">
 		/// The number of the newest entries (direction vectors and corresponding data) to discard. If it exceeds the number of
 		/// entries currently stored, they will all be discarded without throwing any exceptions.
 		/// </param>

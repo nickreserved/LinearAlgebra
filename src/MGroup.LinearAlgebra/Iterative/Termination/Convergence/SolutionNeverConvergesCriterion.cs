@@ -8,7 +8,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 	/// </summary>
 	public class SolutionNeverConvergesCriterion : ISolutionConvergenceCriterion
 	{
-		public double CalculateConvergenceMetric(IImmutableVector currentSolution, IImmutableVector previousSolution) => double.MaxValue;
+		public double CalculateConvergenceMetric(IMinimalImmutableVector currentSolution, IMinimalImmutableVector previousSolution) => double.MaxValue;
 
 		public string DescribeConvergenceCriterion(double tolerance)
 			=> "No convergence criterion specified. Iterative solution algorithm stops, when max iterations are reached.";

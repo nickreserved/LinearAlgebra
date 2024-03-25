@@ -9,18 +9,18 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     public class RegularBlockPcgResidualUpdater : IBlockPcgResidualUpdater
     {
 		/// <summary>
-		/// See <see cref="IBlockPcgResidualUpdater.UpdateResidual(BlockPcgAlgorithm, IMutableVector)"/>
+		/// See <see cref="IBlockPcgResidualUpdater.UpdateResidual(BlockPcgAlgorithm, IMinimalMutableVector)"/>
 		/// </summary>
-		public void UpdateResidual(BlockPcgAlgorithm pcg, IMutableVector residual)
+		public void UpdateResidual(BlockPcgAlgorithm pcg, IMinimalMutableVector residual)
         {
             // Normally the residual vector is updated as: r = r - α * A*d
 			residual.CopyFrom(pcg.ResidualOperator.EvaluateVector(pcg.ResidualKernels, pcg.DirectionKernels));  // It didn't multiplied with M, because it shouldn't be
 		}
 
 		/// <summary>
-		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMutableVector)"/>
+		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalMutableVector)"/>
 		/// </summary>
-		public void UpdateResidual(PcgAlgorithmBase pcg, IMutableVector residual)
+		public void UpdateResidual(PcgAlgorithmBase pcg, IMinimalMutableVector residual)
 		{
 			// Normally the residual vector is updated as: r = r - α * A*d
 			residual.AxpyIntoThis(pcg.MatrixTimesDirection, -pcg.StepSize);

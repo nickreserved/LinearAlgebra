@@ -4,7 +4,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 
 	public interface ISolutionConvergenceCriterion
 	{
-		double CalculateConvergenceMetric(IImmutableVector currentSolution, IImmutableVector previousSolution);
+		double CalculateConvergenceMetric(IMinimalImmutableVector currentSolution, IMinimalImmutableVector previousSolution);
 		string DescribeConvergenceCriterion(double tolerance);
 	}
 }

@@ -25,7 +25,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		public static void TestSingleIteration(bool preinvert)
 		{
 			var matrix = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
-			var factory = new JacobiPreconditioner.Factory();
+			var factory = new JacobiPreconditionerDeprecated.Factory();
 			factory.PreInvert = preinvert;
 			var preconditioner = factory.CreatePreconditionerFor(matrix);
 

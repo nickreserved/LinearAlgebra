@@ -30,16 +30,16 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			this.betaCalculation = betaCalculation;
 		}
 
-		protected override IterativeStatistics SolveInternal(int maxIterations, Func<IMutableVector> zeroVectorInitializer)
+		protected override IterativeStatistics SolveInternal(int maxIterations)
 		{
 			// In contrast to the source algorithm, we initialize s here. At each iteration it will be overwritten, 
 			// thus avoiding allocating & deallocating a new vector.
-			precondResidual = zeroVectorInitializer();
+			precondResidual = Rhs.CreateZero();
 
 			//CalculateAndPrintExactResidual();	// must be after init of precondResidual
 
 			// d = inv(M) * r
-			direction = zeroVectorInitializer();
+			direction = Rhs.CreateZero();
 			Preconditioner.Apply(residual, direction);
 
 			// δnew = δ0 = r * d
@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			double residualNormRatio = double.NaN;
 
 			// Allocate memory for other vectors, which will be reused during each iteration
-			matrixTimesDirection = zeroVectorInitializer();
+			matrixTimesDirection = Rhs.CreateZero();
 
 			for (iteration = 0; iteration < maxIterations; ++iteration)
 			{
@@ -116,7 +116,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		private void CalculateAndPrintExactResidual()
 		{
-			var res = precondResidual.CreateZero();
+			var res = Rhs.CreateZero();
 			Matrix.Multiply(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();

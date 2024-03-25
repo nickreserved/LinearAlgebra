@@ -1,7 +1,7 @@
 using System;
-using MGroup.LinearAlgebra.Iterative;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
+using MGroup.LinearAlgebra.Matrices;
 
 namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
@@ -41,7 +41,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public DistributedOverlappingIndexer Indexer { get; }
 
-		public void Multiply(IImmutableVector inputVector, IMutableVector outputVector)
+		public void Multiply(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
 			=> Multiply((DistributedOverlappingVector) inputVector, (DistributedOverlappingVector) outputVector);
 
 		public void Multiply(DistributedOverlappingVector inputVector, DistributedOverlappingVector outputVector)

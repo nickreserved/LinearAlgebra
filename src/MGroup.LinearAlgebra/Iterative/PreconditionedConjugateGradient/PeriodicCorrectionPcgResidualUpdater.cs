@@ -15,14 +15,14 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
         private int numIterationsBeforeCorrection = int.MinValue;
 
         /// <summary>
-        /// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMutableVector)"/>
+        /// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalMutableVector)"/>
         /// </summary>
-        public void UpdateResidual(PcgAlgorithmBase pcg, IMutableVector residual)
+        public void UpdateResidual(PcgAlgorithmBase pcg, IMinimalMutableVector residual)
         {
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)
             {
-                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.NumRows));
+                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.Rows()));
             }
 
             if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.
