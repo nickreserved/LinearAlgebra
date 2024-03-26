@@ -1,8 +1,6 @@
 namespace MGroup.LinearAlgebra.Iterative.Stationary.CSR
 {
-	using System;
 	using System.Collections.Generic;
-	using System.Text;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;

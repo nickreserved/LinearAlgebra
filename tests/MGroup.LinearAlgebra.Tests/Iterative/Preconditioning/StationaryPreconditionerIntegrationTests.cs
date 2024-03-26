@@ -18,7 +18,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		[InlineData(false)]
 		private static void TestGaussSeidelGmres(bool forwardDirection)
 		{
-			RunGmres(new GaussSeidelPreconditioner(forwardDirection));
+			RunGmres(new GaussSeidelPreconditionerCsr(forwardDirection));
 		}
 
 		[Fact]

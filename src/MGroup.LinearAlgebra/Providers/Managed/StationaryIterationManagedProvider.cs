@@ -162,6 +162,26 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 			}
 		}
 
+		public void CsrSorBackPrecond(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution, double omega)
+		{
+			// Do not read the vector and each matrix row backward. It destroys caching. And in any case, we do csr_row * vector,
+			// thus the order of operations for the dot product do not matter. What does matter is starting from the last row. 
+			for (int i = matrixOrder - 1; i >= 0; --i)
+			{
+				double sum = 0;
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				{
+					sum += csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				solution[i] = omega * (rhs[i] - sum) / csrValues[diagOffset];
+			}
+		}
+
 		public void CsrSorForward(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			int[] diagOffsets, double[] rhs, double[] solution, double omega)
 		{
@@ -186,6 +206,24 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 				}
 
 				solution[i] = oneMinusOmega * solution[i] + omega * sum / diagEntry;
+			}
+		}
+
+		public void CsrSorForwardPrecond(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution, double omega)
+		{
+			for (int i = 0; i < matrixOrder; ++i)
+			{
+				double sum = 0;
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = rowStart; k < diagOffset; ++k)
+				{
+					sum += csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				solution[i] = omega * (rhs[i] - sum) / csrValues[diagOffset];
 			}
 		}
 

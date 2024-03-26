@@ -17,7 +17,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		[Fact]
 		private static void TestGaussSeidelBackPreconditioner()
 		{
-			var preconditioner = new GaussSeidelPreconditioner(forwardDirection: false);
+			var preconditioner = new GaussSeidelPreconditionerCsr(forwardDirection: false);
 			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
 			{
 				SparseMatrix UplusD = decomp.GetCombination("U+D", 0, 1, 1);
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		[Fact]
 		private static void TestGaussSeidelForwardPreconditioner()
 		{
-			var preconditioner = new GaussSeidelPreconditioner(forwardDirection: true);
+			var preconditioner = new GaussSeidelPreconditionerCsr(forwardDirection: true);
 			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
 			{
 				SparseMatrix LplusD = decomp.GetCombination("L+D", 1, 1, 0);
@@ -84,10 +84,8 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			var xExpected = Vector.CreateZero(y1.Length);
 			var xComputed = Vector.CreateZero(y1.Length);
 
-			// Prepare test preconditioner
+			// Prepare preconditioner
 			var decomp = new StationaryAlgorithmDecomposition(SparseMatrix.CreateFromMatrix(csrMatrix));
-
-			// Prepare actual preconditioner
 			preconditioner.UpdateMatrix(csrMatrix, true);
 
 			// First try
@@ -100,6 +98,5 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			preconditioner.SolveLinearSystem(y2, xComputed);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
-
 	}
 }
