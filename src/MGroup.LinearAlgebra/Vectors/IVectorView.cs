@@ -7,11 +7,12 @@ using MGroup.LinearAlgebra.Reduction;
 //      still be IVector, since there wouldn't be a point in getting an immutable copy of an immutable class. Same for IMatrixView
 namespace MGroup.LinearAlgebra.Vectors
 {
-    /// <summary>
-    /// It supports common operations that do not mutate the underlying vector. If you need to store a vector and then pass it
-    /// around or allow acceess to it, consider using this interface instead of <see cref="Vector"/> for extra safety.
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
+	/// <summary>
+	/// It supports common operations that do not mutate the underlying vector. If you need to store a vector and then pass it
+	/// around or allow acceess to it, consider using this interface instead of <see cref="Vector"/> for extra safety.
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	[Obsolete("Use IMinimalImmutableVector or IExtendedImmutableVector or INotFullyPopulatedImmutableVector or IFullyPopulatedImmutableVector")]
     public interface IVectorView: IIndexable1D, IReducible, IEntrywiseOperableView1D<IVectorView, IVector>
     {
         /// <summary>

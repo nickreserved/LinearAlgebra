@@ -4,12 +4,13 @@ using System;
 //TODO: perhaps the NonContiguously where one of the two vectors is contiguous, must be bidirectional by setting a flag.
 namespace MGroup.LinearAlgebra.Vectors
 {
-    /// <summary>
-    /// Operations specified by this interface modify the vector. Therefore it is possible that they may throw exceptions if they 
-    /// are used on sparse vector formats and the zero entries are overwritten.
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    public interface IVector: IVectorView, IEntrywiseOperable1D<IVectorView>
+	/// <summary>
+	/// Operations specified by this interface modify the vector. Therefore it is possible that they may throw exceptions if they 
+	/// are used on sparse vector formats and the zero entries are overwritten.
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	[Obsolete("Use IMinimalMutableVector or IExtendedMutableVector or INotFullyPopulatedMutableVector or IFullyPopulatedMutableVector")]
+	public interface IVector: IVectorView, IEntrywiseOperable1D<IVectorView>
     {
         /// <summary>
         /// Adds selected entries from <paramref name="otherVector"/> to this vector:

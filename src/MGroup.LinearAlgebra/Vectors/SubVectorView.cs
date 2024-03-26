@@ -33,6 +33,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().AxpyIntoThis(otherVector, otherCoefficient);
 		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().AxpyIntoThis(otherVector, otherCoefficient); /*TODO: remove line when C#9*/
 
+		public SubVectorView AxpyIntoThis(Vector otherVector, double otherCoefficient)
+		{
+			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, Elements, FromIndex, 1);
+			return this;
+		}
 		public SubVectorView AxpyIntoThis(SubVectorView otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
@@ -42,16 +48,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public SubVectorView AxpyIntoThis(SparseVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			//Blas my ass
-			if (otherCoefficient == 1)
-				for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-					this[otherVector.RawIndices[i]] += otherVector.RawValues[i];
-			else if (otherCoefficient == -1)
-				for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-					this[otherVector.RawIndices[i]] -= otherVector.RawValues[i];
-			else if (otherCoefficient != 0)
-				for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-					this[otherVector.RawIndices[i]] += otherCoefficient * otherVector.RawValues[i];
+			SparseBlas.Daxpyi(otherVector.RawIndices.Length, otherCoefficient, otherVector.RawValues, otherVector.RawIndices, 0, Elements, FromIndex);
 			return this;
 		}
 		public SubVectorView AxpyIntoThis(INotFullyPopulatedImmutableVector otherVector, double otherCoefficient)
@@ -69,26 +66,20 @@ namespace MGroup.LinearAlgebra.Vectors
 					this[i] += otherCoefficient * otherVector[i];
 			return this;
 		}
-		public SubVectorView AxpyIntoThis(Vector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, Elements, FromIndex, 1);
-			return this;
-		}
 		public SubVectorView AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient)
 		{
 			// Runtime Identification is_a_bad_thing™
 			// Another (better) solution is otherVector.Scale(otherCoefficient).Add(this); because 'this' is already identified
 			// but it needs an implementation for any type of vector
-			if (otherVector is SubVectorView subVectorView) return AxpyIntoThis(subVectorView, otherCoefficient);
 			if (otherVector is Vector vector) return AxpyIntoThis(vector, otherCoefficient);
+			if (otherVector is SubVectorView subVectorView) return AxpyIntoThis(subVectorView, otherCoefficient);
 			if (otherVector is SparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
 			if (otherVector is INotFullyPopulatedImmutableVector notFullyPopulatedVector) return AxpyIntoThis(notFullyPopulatedVector, otherCoefficient);
 			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
 		}
 		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient); /*TODO: remove line when C#9*/
 
-		public void Clear() => SetAll(0);
+		public void Clear() => Array.Clear(Elements, FromIndex, Length);
 
 		public Vector Copy(int fromIndex, int toIndex) => new Vector(CopyToArray(fromIndex, toIndex));
 		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex); /*TODO: remove line when C#9*/
@@ -199,10 +190,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public double DotProduct(SparseVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			double result = 0;
-			for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-				result += this[otherVector.RawIndices[i]] * otherVector.RawValues[i];
-			return result;
+			return SparseBlas.Ddoti(Length, otherVector.RawValues, otherVector.RawIndices, 0, Elements, FromIndex);
 		}
 		public double DotProduct(INotFullyPopulatedImmutableVector otherVector)
 		{
