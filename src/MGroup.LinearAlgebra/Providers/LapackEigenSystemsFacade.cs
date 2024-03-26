@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra.Providers
 
 			if (info > 0)
 			{
-				throw new LapackException($"The algorithm failed to converge. There were {info} elements of an intermediate"
+				throw new LapackException($"The algorithm failed to converge. There were {info} Elements of an intermediate"
 					+ " tridiagonal form which did not converge to zero");
 			}
 			else if (info < 0) ProcessNegativeInfo(info);

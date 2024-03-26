@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// returned.
         /// </summary>
         /// <param name="copyIndexingData">
-        /// If true, all data of this object will be copied. If false, only the array(s) containing the values of the stored 
+        /// If true, all Elements of this object will be copied. If false, only the array(s) containing the values of the stored 
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         IMatrix Copy(bool copyIndexingData = false);

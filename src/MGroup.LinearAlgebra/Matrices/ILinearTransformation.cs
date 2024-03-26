@@ -10,13 +10,13 @@ namespace MGroup.LinearAlgebra.Matrices
 	public interface ILinearTransformation
 	{
 		/// <summary>
-		/// The number of elements of result vector.
+		/// The number of Elements of result vector.
 		/// </summary>
 		/// Generalized linear transformation is actually a matrix. This is the number of rows in matrix.
 		int Rows();
 
 		/// <summary>
-		/// The number of elements of input vector.
+		/// The number of Elements of input vector.
 		/// </summary>
 		/// Generalized linear transformation is actually a matrix. This is the number of columns in matrix.
 		int Columns();

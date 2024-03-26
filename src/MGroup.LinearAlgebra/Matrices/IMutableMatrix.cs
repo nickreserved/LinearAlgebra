@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		IMutableMatrix ScaleIntoThis(double coefficient);
 
 		/// <summary>
-		/// Set all matrix elements to zero.
+		/// Set all matrix Elements to zero.
 		/// </summary>
 		void Clear();
 

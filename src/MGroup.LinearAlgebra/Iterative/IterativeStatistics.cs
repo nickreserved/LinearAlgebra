@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Iterative
 		public (string title, double value) ConvergenceCriterion { get; set; } = ("No convergence criterion", double.NaN);
 
 		/// <summary>
-		/// Reports the accumulated data of this <see cref="CGStatistics"/> instance. 
+		/// Reports the accumulated Elements of this <see cref="CGStatistics"/> instance. 
 		/// </summary>
 		public override string ToString()
 		{

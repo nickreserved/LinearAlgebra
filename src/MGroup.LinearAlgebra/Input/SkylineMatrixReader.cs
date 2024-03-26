@@ -74,8 +74,8 @@ namespace MGroup.LinearAlgebra.Input
             //for (int i = 0; i < lines.Length; i++) rowIndex[i] = Int32.Parse(lines[i]);
 
             //lines = File.ReadAllLines(path + "\\" + nameOnly + "-Data" + ext);
-            //data = new T[lines.Length];
-            //double[] mData = data as double[];
+            //Elements = new T[lines.Length];
+            //double[] mData = Elements as double[];
             //for (int i = 0; i < lines.Length; i++) mData[i] = Convert.ToDouble(lines[i]);
         }
     }

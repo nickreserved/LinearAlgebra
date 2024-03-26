@@ -19,7 +19,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 		public bool HasStagnated()
 		{
 			var numIterations = residualDotProductsHistory.Count;
-			if (numIterations < iterationSpan) return false; // Not enough data yet
+			if (numIterations < iterationSpan) return false; // Not enough Elements yet
 			var oldError = residualDotProductsHistory[numIterations - iterationSpan];
 			var newError = residualDotProductsHistory[numIterations - 1];
 			var relativeReduction = (oldError - newError) / oldError;

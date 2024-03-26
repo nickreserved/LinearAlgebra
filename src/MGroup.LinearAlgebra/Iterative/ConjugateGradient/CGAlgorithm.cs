@@ -9,7 +9,7 @@ using MGroup.LinearAlgebra.Vectors;
 
 //TODO: needs to throw exceptions or at least report indefinite, nonsymmetric and singular matrices.
 //TODO: zero vector initialization should be done by a vector factory
-//TODO: Exposing properties is more flexible than pushing data to the strategies, but how can I ensure that the properties are
+//TODO: Exposing properties is more flexible than pushing Elements to the strategies, but how can I ensure that the properties are
 //      initialized when the strategies will access them?
 namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
 {

@@ -453,7 +453,7 @@ namespace MGroup.LinearAlgebra.Commons
 			int n = matrix.NumColumns;
 			double[,] u = matrix.CopyToArray2D();
 			//double[,] u = new double[m, n];
-			//double[,] a = data as double[,];
+			//double[,] a = Elements as double[,];
 			//Array.Copy(a, u, a.GetLength(0) * a.GetLength(1));
 
 			bool matu = false;

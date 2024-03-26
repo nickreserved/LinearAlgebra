@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Tests.RawLibraries
 			int n = A.ColumnCount;
 			Assert.True(m == n);
 
-			// Create test data.
+			// Create test Elements.
 			var xExpected = CSparse.Double.Vector.Create(n, 1.0);
 			var b = new double[m];
 
@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Tests.RawLibraries
 			int m = A.RowCount;
 			int n = A.ColumnCount;
 
-			// Create test data.
+			// Create test Elements.
 			var x = CSparse.Double.Vector.Create(n, 1.0);
 			var b = new double[m];
 

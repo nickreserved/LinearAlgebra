@@ -11,7 +11,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
 {
     /// <summary>
     /// Sparse matrix with the non-zero entries being 1. Its main use is in domain decomposition solvers. 
-    /// The internal data structures that store the non-zero entries are row major.
+    /// The internal Elements structures that store the non-zero entries are row major.
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public class UnsignedBooleanMatrix : IIndexable2D, IMappingMatrix

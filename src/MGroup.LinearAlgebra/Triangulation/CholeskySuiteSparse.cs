@@ -61,7 +61,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <paramref name="cscValues"/>, <paramref name="cscRowIndices"/> and <paramref name="cscColOffsets"/>. 
         /// The user may choose between supernodal or simplicial factorization. It is also possible to automatically reorder 
         /// the matrix, using the algorithms provided by SuiteSparse.
-        /// The factorized data, which may be sufficiently larger than the original matrix due to fill-in, will be written to 
+        /// The factorized Elements, which may be sufficiently larger than the original matrix due to fill-in, will be written to 
         /// unmanaged memory.
         /// </summary>
         /// <param name="order">The number of rows/columns of the square matrix.</param>
@@ -120,7 +120,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// Only the upper triangle of the original matrix is required and is provided in symmetric CSC format. 
         /// The user may choose between supernodal or simplicial factorization. It is also possible to automatically reorder 
         /// the matrix, using the algorithms provided by SuiteSparse.
-        /// The factorized data, which may be sufficiently larger than the original matrix due to fill-in, will be written to 
+        /// The factorized Elements, which may be sufficiently larger than the original matrix due to fill-in, will be written to 
         /// unmanaged memory.
         /// </summary>
         /// <param name="matrix">The matrix in symmetric (only upper triangle) CSC format.</param>
@@ -186,7 +186,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVector"/> violates the described 
         ///     constraints.</exception>
-        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been 
+        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Elements has been 
         ///     released.</exception>
         /// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
         public Vector BackSubstitution(Vector rhsVector)
@@ -204,7 +204,7 @@ namespace MGroup.LinearAlgebra.Triangulation
     ///     <paramref name="rhsVectors"/>.<see cref="IIndexable2D.NumRows"/> == this.<see cref="Order"/>.</param>
     /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVectors"/> violates the described 
     ///     constraints.</exception>
-    /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been 
+    /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Elements has been 
     ///     released.</exception>
     /// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
     public Matrix BackSubstitutions(Matrix rhsVectors) => SolveInternal(SystemType.BackSubstitution, rhsVectors);
@@ -212,7 +212,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// See <see cref="ITriangulation.CalcDeterminant"/>.
         /// </summary>
-        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been 
+        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Elements has been 
         ///     released.</exception>
         public double CalcDeterminant()
         {
@@ -267,7 +267,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVector"/> violates the described 
         ///     constraints.</exception>
-        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been 
+        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Elements has been 
         ///     released.</exception>
         /// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
         public Vector ForwardSubstitution(Vector rhsVector)
@@ -285,7 +285,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         ///     <paramref name="rhsVectors"/>.<see cref="IIndexable2D.NumRows"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVectors"/> violates the described 
         ///     constraints.</exception>
-        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been 
+        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Elements has been 
         ///     released.</exception>
         /// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
         public Matrix ForwardSubstitutions(Matrix rhsVectors) => SolveInternal(SystemType.ForwardSubstitution, rhsVectors);
@@ -298,7 +298,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </remarks>
         /// 
-        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been 
+        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Elements has been 
         ///     released.</exception>
         /// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
         public void SolveLinearSystem(Vector rhsVector, Vector solution)
@@ -315,7 +315,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         ///     <paramref name="rhsVectors"/>.<see cref="IIndexable2D.NumRows"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVectors"/> violates the described 
         ///     constraints.</exception>
-        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization data has been 
+        /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Elements has been 
         ///     released.</exception>
         /// <exception cref="SuiteSparseException">Thrown if the call to SuiteSparse library fails.</exception>
         public Matrix SolveLinearSystems(Matrix rhsVectors) => SolveInternal(SystemType.Regular, rhsVectors);

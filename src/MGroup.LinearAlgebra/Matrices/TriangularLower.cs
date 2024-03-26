@@ -19,7 +19,7 @@ namespace MGroup.LinearAlgebra.Matrices
     public class TriangularLower: IMatrix
     {
         /// <summary>
-        /// Packed storage, row major order: L[i, j] = data[j + (i+1)*i/2] for 0 &lt;= j &lt;= i &lt; n.
+        /// Packed storage, row major order: L[i, j] = Elements[j + (i+1)*i/2] for 0 &lt;= j &lt;= i &lt; n.
         /// </summary>
         private readonly double[] data;
 
@@ -81,7 +81,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <summary>
         /// Initializes a new instance of <see cref="TriangularLower"/> by copying the lower triangle of the provided 2D array.
         /// </summary>
-        /// <param name="array2D">A 2-dimensional array containing the elements of the matrix. Constraints: 
+        /// <param name="array2D">A 2-dimensional array containing the Elements of the matrix. Constraints: 
         ///     <paramref name="array2D"/>.GetLength(0) == <paramref name="array2D"/>.GetLength(1).</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="array2D"/>.GetLength(0) != 
         ///     <paramref name="array2D"/>.GetLength(1).</exception>
@@ -102,7 +102,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// internal array.
         /// </summary>
         /// <param name="order">The number of rows/columns of the new square matrix.</param>
-        /// <param name="array1D">An 1-dimensional array containing the elements of the lower triangle of the matrix in row 
+        /// <param name="array1D">An 1-dimensional array containing the Elements of the lower triangle of the matrix in row 
         ///     major order.</param>
         /// <param name="copyArray">If true, <paramref name="array1D"/> will be copied and the new <see cref="TriangularLower"/>  
         ///     instance will have a reference to the copy, which is safer. If false, the new matrix will have a reference to 

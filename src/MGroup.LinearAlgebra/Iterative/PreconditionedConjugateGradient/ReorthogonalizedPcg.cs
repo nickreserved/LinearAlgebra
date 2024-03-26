@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	/// <summary>
 	/// Implements the untransformed Preconditioned Conjugate Gradient algorithm for solving linear systems with symmetric 
 	/// positive definite matrices. The implementation is based on the algorithm presented in pages 51-54 of the PhD dissertation 
-	/// "Seismic soil-structure interaction with finite elements and the method of substructures", George Stavroulakis, 2014
+	/// "Seismic soil-structure interaction with finite Elements and the method of substructures", George Stavroulakis, 2014
 	/// Authors: Serafeim Bakalakos, George Stavroulakis 
 	/// </summary>
 	public class ReorthogonalizedPcg : PcgAlgorithmBase

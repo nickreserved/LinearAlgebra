@@ -65,7 +65,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// Explicitly creates the upper triangular matrix U that resulted from the Cholesky factorization: A = transpose(U) * U,
         /// where A and U are n-by-n. 
-        /// This method is safe to use as the factorization data are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public TriangularUpper GetFactorU()

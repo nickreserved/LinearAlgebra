@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Vectors
     /// and thus handled as non-zero entries.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    public class SparseVector: IVector
+    public class SparseVector: INotFullyPopulatedMutableVector
     {
         private readonly double[] values;
 
@@ -64,7 +64,7 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SparseVector"/> with the provided arrays as its internal data.
+        /// Creates a new instance of <see cref="SparseVector"/> with the provided arrays as its internal Elements.
         /// </summary>
         /// <param name="length">The number of zero and non-zero entries of the new <see cref="SparseVector"/>.</param>
         /// <param name="values">The internal array that stores the values of the non-zero entries of the vector. Constraints: 

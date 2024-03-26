@@ -32,7 +32,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// returned.
         /// </summary>
         /// <param name="copyIndexingData">
-        /// If true, all data of this object will be copied. If false, only the array(s) containing the values of the stored 
+        /// If true, all Elements of this object will be copied. If false, only the array(s) containing the values of the stored 
         /// vector entries will be copied. The new vector will reference the same indexing arrays as this one.
         /// </param>
         IVector Copy(bool copyIndexingData = false);

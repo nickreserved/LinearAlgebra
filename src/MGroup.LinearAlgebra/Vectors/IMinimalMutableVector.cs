@@ -8,37 +8,54 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// A row operation from Gauss elimination.
 		/// Adds to this vector the <paramref name="otherVector"/> * <paramref name="otherCoefficient"/> and returns the this vector after that.
 		/// </summary>
-		/// <param name="otherVector">A vector with the same number of elements with this vector</param>
+		/// <param name="otherVector">A vector with the same number of Elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns><c>thisVector += <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></c></returns>
 		IMinimalMutableVector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient);
 
-		IMinimalMutableVector AddIntoThis(IMinimalImmutableVector otherVector)
-			=> AxpyIntoThis(otherVector, +1.0);
+		/// <summary>
+		/// Add <paramref name="otherVector"/> to this vector and return this vector.
+		/// </summary>
+		/// <param name="otherVector">A vector to add to this vector</param>
+		/// <returns>This vector</returns>
+		IMinimalMutableVector AddIntoThis(IMinimalImmutableVector otherVector); // => AxpyIntoThis(otherVector, +1.0);
 
-		IMinimalMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector)
-			=> AxpyIntoThis(otherVector, -1.0);
+		/// <summary>
+		/// Subtract <paramref name="otherVector"/> from this vector and return this vector.
+		/// </summary>
+		/// <param name="otherVector">A vector to subtract from this vector</param>
+		/// <returns>This vector</returns>
+		IMinimalMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector); // => AxpyIntoThis(otherVector, -1.0);
 
+		/// <summary>
+		/// Multiply this vector with scalar <paramref name="coefficient"/> and return this vector.
+		/// </summary>
+		/// <param name="coefficient">A scalar to multiply this vector</param>
+		/// <returns>This vector</returns>
 		IMinimalMutableVector ScaleIntoThis(double coefficient);
 
 		/// <summary>
 		/// A linear combination between this and another one vector.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar as coefficient to this vector</param>
-		/// <param name="otherVector">A vector with the same number of elements with this vector</param>
+		/// <param name="otherVector">A vector with the same number of Elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns><c>thisVector * <paramref name="thisCoefficient"/> + <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></c></returns>
 		IMinimalMutableVector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient);
 
+		/// <summary>
+		/// Copy Elements from <paramref name="otherVector"/>
+		/// </summary>
+		/// <param name="otherVector">The source vector from where the Elements will by copied to this vector</param>
 		void CopyFrom(IMinimalImmutableVector otherVector);
 
 		/// <summary>
-		/// Set all elements of vector to zero.
+		/// Set all Elements of vector to zero.
 		/// </summary>
 		void Clear();
 
 		/// <summary>
-		/// Set all elements of vector to <paramref name="value"/>.
+		/// Set all Elements of vector to <paramref name="value"/>.
 		/// </summary>
 		void SetAll(double value);
 

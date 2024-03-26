@@ -10,7 +10,7 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 using MGroup.LinearAlgebra.Orthogonalization;
 using MGroup.LinearAlgebra.Eigensystems;
 
-//TODO: align data using mkl_malloc
+//TODO: align Elements using mkl_malloc
 //TODO: add inplace option for factorizations and leave all subsequent operations (determinant, system solution, etc.) to them
 //TODO: remove legacy matrix conversions
 //TODO: SetSubrow, SetSubcolumn, SetSubmatrix only need to check the stricter upper bounds.
@@ -102,7 +102,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// Initializes a new instance of <see cref="Matrix"/> with <paramref name="array1D"/> or a clone as its internal array.
 		/// </summary>
-		/// <param name="array1D">A 1-dimensional array containing the elements of the matrix in column major order. Its length 
+		/// <param name="array1D">A 1-dimensional array containing the Elements of the matrix in column major order. Its length 
 		///     must be equal to <see cref="numRows"/> * <see cref="NumColumns"/>. It will not be checked.</param>
 		/// <param name="numRows">The number of rows of the new matrix.</param>
 		/// <param name="numColumns">The number of columns of the new matrix.</param>
@@ -534,7 +534,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// is symmetric positive definite. Requires extra available memory n^2 entries. 
 		/// </summary>
 		/// <param name="inPlace">
-		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized data, thus saving 
+		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Elements, thus saving 
 		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
@@ -561,7 +561,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// memory form * n + min(m, n) entries.
 		/// </summary>
 		/// <param name="inPlace">
-		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized data, thus saving 
+		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Elements, thus saving 
 		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
 		/// </param>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
@@ -585,7 +585,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// permutation matrix. Requires extra available memory n^2 + n entries. 
 		/// </summary>
 		/// <param name="inPlace">
-		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized data, thus saving 
+		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Elements, thus saving 
 		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
@@ -611,7 +611,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// available memory for m * n + min(m, n) entries. 
 		/// </summary>
 		/// <param name="inPlace">
-		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized data, thus saving 
+		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Elements, thus saving 
 		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
 		/// </param>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>

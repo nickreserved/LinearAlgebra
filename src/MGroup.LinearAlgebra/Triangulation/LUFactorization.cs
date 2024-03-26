@@ -50,8 +50,8 @@ namespace MGroup.LinearAlgebra.Triangulation
         }
 
         /// <summary>
-        /// If true, the internal data of this object are overwritten and used by another object. No property or method of
-        /// this object must be called as it would throw exceptions or lead to data corruption. If false, this object can be 
+        /// If true, the internal Elements of this object are overwritten and used by another object. No property or method of
+        /// this object must be called as it would throw exceptions or lead to Elements corruption. If false, this object can be 
         /// used normally.
         /// </summary>
         public bool IsOverwritten { get; private set; }
@@ -72,12 +72,12 @@ namespace MGroup.LinearAlgebra.Triangulation
         public int Order { get; }
 
 		/// <summary>
-		/// The internal data containing the factorization of a matrix in FULL column major format.
+		/// The internal Elements containing the factorization of a matrix in FULL column major format.
 		/// </summary>
 		public double[] RawData => lowerUpper;
 
 		/// <summary>
-		/// The internal data containing the row exchanges performed during pivoting. Its entries are in 1-based indexing. 
+		/// The internal Elements containing the row exchanges performed during pivoting. Its entries are in 1-based indexing. 
 		/// This is not the actual permutation vector. Instead it records the row exchanges: 
 		/// E.g. { 4, 4, 4, 4} means that rows 0, 1, 2 have been switched with the last row (the last row doesn't change).
 		/// </summary>
@@ -130,7 +130,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// Explicitly creates the lower triangular matrix L that resulted from the LU factorization: A = P * L * U,
         /// where A, L, U and P are n-by-n. 
-        /// This method is safe to use as the factorization data are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public Matrix GetFactorL()
@@ -143,7 +143,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// Explicitly creates the upper triangular matrix U that resulted from the LU factorization: A = P * L * U,
         /// where A, L, U and P are n-by-n. 
-        /// This method is safe to use as the factorization data are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public Matrix GetFactorU()
@@ -159,7 +159,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// WARNING: If <paramref name="inPlace"/> is set to true, this object must not be used again, otherwise a 
         /// <see cref="InvalidOperationException"/> will be thrown.
         /// </summary>
-        /// <param name="inPlace">False, to copy the internal factorization data before inversion. True, to overwrite it with
+        /// <param name="inPlace">False, to copy the internal factorization Elements before inversion. True, to overwrite it with
         ///     the inverse matrix, thus saving memory and time. However, that will make this object unusable, so you MUST NOT 
         ///     call any other members afterwards.</param>
         /// <exception cref="SingularMatrixException">Thrown if the original matrix is not invertible.</exception>

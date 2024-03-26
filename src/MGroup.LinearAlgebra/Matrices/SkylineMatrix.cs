@@ -157,7 +157,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
         /// <summary>
         /// Initializes a new <see cref="SkylineMatrix"/> with the specified dimensions and the provided arrays 
-        /// (<paramref name="values"/> and <paramref name="diagOffsets"/>) as its internal data.
+        /// (<paramref name="values"/> and <paramref name="diagOffsets"/>) as its internal Elements.
         /// </summary>
         /// <param name="order">The number of rows/columns of the new matrix.</param>
         /// <param name="values">Contains the non zero superdiagonal entries of the matrix in column major order, starting from 
@@ -393,7 +393,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Copies the entries of this matrix.
         /// </summary>
         /// <param name="copyIndexingData">
-        /// If true, all data of this object will be copied. If false, only the array containing the values of the stored 
+        /// If true, all Elements of this object will be copied. If false, only the array containing the values of the stored 
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         public SkylineMatrix Copy(bool copyIndexingData)
@@ -622,7 +622,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// must not be used again, otherwise a <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized data, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>
@@ -661,7 +661,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized data, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>
@@ -700,7 +700,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// must not be used again, otherwise a <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized data, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>
@@ -742,7 +742,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// must not be used again, otherwise a <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized data, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>

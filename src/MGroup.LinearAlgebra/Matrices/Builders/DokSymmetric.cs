@@ -24,7 +24,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
     {
         /// <summary>
         /// An array of dictionaries is more efficent and perhaps easier to work with than a dictionary of dictionaries. There 
-        /// is usually at least 1 non zero entry in each column. Otherwise this data structure wastes space, but if there were  
+        /// is usually at least 1 non zero entry in each column. Otherwise this Elements structure wastes space, but if there were  
         /// many empty rows, perhaps another matrix format is more appropriate.
         /// To get the value: columns[colIdx][rowIdx] = value. 
         /// To get the row-value subdictionary: columns[colIdx] = Dictionary[int, double]
@@ -521,7 +521,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="colIdx"/> or <paramref name="tabooRows"/> 
         ///     violate the described constraints.</exception>
         public SparseVector GetColumn(int colIdx)
-        { //TODO: implement another data structure that only holds some sparse columns, but is efficient in returning them whole
+        { //TODO: implement another Elements structure that only holds some sparse columns, but is efficient in returning them whole
             // The super-diagonal part is readily available.
             var wholeColumn = new SortedDictionary<int, double>(columns[colIdx]);
 

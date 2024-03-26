@@ -6,7 +6,7 @@ using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Reduction;
 using static MGroup.LinearAlgebra.LibrarySettings;
 
-//TODO: align data using mkl_malloc
+//TODO: align Elements using mkl_malloc
 //TODO: tensor product, vector2D, vector3D
 //TODO: remove legacy vector conversions
 //TODO: add complete error checking for CopyNonContiguouslyFrom and AddNonContiguouslyFrom. Also update the documentation.
@@ -17,31 +17,24 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
-	public class Vector : IFullyPopulatedVector
+	public class Vector : IFullyPopulatedMutableVector
 	{
-		private readonly double[] data;
-
-		private Vector(double[] data)
+		public Vector(double[] elements)
 		{
-			this.data = data;
+			Elements = elements;
 		}
 
-		public int Length { get { return data.Length; } }
+		public double[] Elements { get; }
+
+		public int Length { get { return Elements.Length; } }
 
 		/// <summary>
 		/// The internal array that stores the entries of the vector. 
 		/// It should only be used for passing the raw array to linear algebra libraries.
 		/// </summary>
-		public double[] RawData => data;
+		public double[] RawData => Elements;
 
-		/// <summary>
-		/// See <see cref="IIndexable1D.this[int]"/>.
-		/// </summary>
-		public double this[int index]
-		{
-			get { return data[index]; }
-			set { data[index] = value; }
-		}
+		ref double this[int index] => ref Elements[index];
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Vector"/> with <paramref name="data"/> or a clone as its internal array.
@@ -162,12 +155,12 @@ namespace MGroup.LinearAlgebra.Vectors
 			{
 				for (int i = 0; i < thisIndices.Length; ++i)
 				{
-					this.data[thisIndices[i]] += casted.data[otherIndices[i]];
+					this.Elements[thisIndices[i]] += casted.Elements[otherIndices[i]];
 				}
 			}
 			else
 			{
-				for (int i = 0; i < thisIndices.Length; ++i) data[thisIndices[i]] += otherVector[otherIndices[i]];
+				for (int i = 0; i < thisIndices.Length; ++i) Elements[thisIndices[i]] += otherVector[otherIndices[i]];
 			}
 		}
 
@@ -180,11 +173,11 @@ namespace MGroup.LinearAlgebra.Vectors
 				"thisIndices and otherVector must have the same length.");
 			if (otherVector is Vector casted)
 			{
-				for (int i = 0; i < casted.Length; ++i) this.data[thisIndices[i]] += casted.data[i];
+				for (int i = 0; i < casted.Length; ++i) this.Elements[thisIndices[i]] += casted.Elements[i];
 			}
 			else
 			{
-				for (int i = 0; i < otherVector.Length; ++i) data[thisIndices[i]] += otherVector[i];
+				for (int i = 0; i < otherVector.Length; ++i) Elements[thisIndices[i]] += otherVector[i];
 			}
 		}
 
@@ -214,7 +207,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				"The entries to set exceed this vector's length");
 			if (sourceVector is Vector subvectorDense)
 			{
-				Blas.Daxpy(length, 1.0, subvectorDense.data, sourceIdx, 1, this.data, destinationIdx, 1);
+				Blas.Daxpy(length, 1.0, subvectorDense.Elements, sourceIdx, 1, this.Elements, destinationIdx, 1);
 			}
 			else this.AddSubvectorIntoThis(destinationIdx, sourceVector, 0, sourceVector.Length);
 		}
@@ -222,7 +215,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// See <see cref="IVector.AddToIndex(int, double)"/>.
 		/// </summary>
-		public void AddToIndex(int index, double value) => data[index] += value;
+		public void AddToIndex(int index, double value) => Elements[index] += value;
 
 		/// <summary>
 		/// Creates a new <see cref="Vector"/> that contains all entries of this followed by all entries of 
@@ -232,11 +225,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector Append(Vector last)
 		{
 			//TODO: Move this to an ArrayManipulations utility class.
-			int n1 = this.data.Length;
-			int n2 = last.data.Length;
+			int n1 = this.Elements.Length;
+			int n2 = last.Elements.Length;
 			var result = new double[n1 + n2];
-			Array.Copy(this.data, result, n1);
-			Array.Copy(last.data, 0, result, n1, n2);
+			Array.Copy(this.Elements, result, n1);
+			Array.Copy(last.Elements, 0, result, n1, n2);
 			return new Vector(result);
 		}
 
@@ -249,8 +242,8 @@ namespace MGroup.LinearAlgebra.Vectors
 			else if (otherVector is SparseVector sparse)
 			{
 				Preconditions.CheckVectorDimensions(this, otherVector);
-				double[] result = new double[data.Length];
-				Array.Copy(data, result, data.Length);
+				double[] result = new double[Elements.Length];
+				Array.Copy(Elements, result, Elements.Length);
 				SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
 					sparse.RawIndices, 0, result, 0);
 				return Vector.CreateFromArray(result, false);
@@ -271,9 +264,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[data.Length];
-			Array.Copy(data, result, data.Length);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, result, 0, 1);
+			double[] result = new double[Elements.Length];
+			Array.Copy(Elements, result, Elements.Length);
+			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, result, 0, 1);
 			return new Vector(result);
 		}
 
@@ -291,12 +284,12 @@ namespace MGroup.LinearAlgebra.Vectors
 					if (sparse.RawIndices.Length != 0)
 					{
 						SparseBlas.Daxpyi(sparse.RawIndices.Length, otherCoefficient, sparse.RawValues,
-							sparse.RawIndices, 0, data, 0);
+							sparse.RawIndices, 0, Elements, 0);
 					}
 				}
 				else
 				{
-					for (int i = 0; i < Length; ++i) this.data[i] += otherCoefficient * otherVector[i];
+					for (int i = 0; i < Length; ++i) this.Elements[i] += otherCoefficient * otherVector[i];
 				}
 			}
 		}
@@ -313,7 +306,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public void AxpyIntoThis(Vector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, this.data, 0, 1);
+			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, this.Elements, 0, 1);
 		}
 
 		/// <summary>
@@ -327,18 +320,18 @@ namespace MGroup.LinearAlgebra.Vectors
 
 			if (sourceVector is Vector casted)
 			{
-				Blas.Daxpy(Length, sourceCoefficient, casted.data, sourceIndex, 1, this.data, destinationIndex, 1);
+				Blas.Daxpy(Length, sourceCoefficient, casted.Elements, sourceIndex, 1, this.Elements, destinationIndex, 1);
 			}
 			else
 			{
-				for (int i = 0; i < length; ++i) data[i + destinationIndex] += sourceCoefficient * sourceVector[i + sourceIndex];
+				for (int i = 0; i < length; ++i) Elements[i + destinationIndex] += sourceCoefficient * sourceVector[i + sourceIndex];
 			}
 		}
 
 		/// <summary>
 		/// See <see cref="IVector.Clear"/>.
 		/// </summary>
-		public void Clear() => Array.Clear(data, 0, Length);
+		public void Clear() => Array.Clear(Elements, 0, Length);
 
 		/// <summary>
 		/// See <see cref="IVector.Copy(bool)"/>.
@@ -348,15 +341,15 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// Initializes a new instance of <see cref="Vector"/> by copying the entries of this instance.
 		/// </summary>
-		public Vector Copy() => Vector.CreateFromArray(data, true); //TODO: Perhaps this should use BLAS
+		public Vector Copy() => Vector.CreateFromArray(Elements, true); //TODO: Perhaps this should use BLAS
 
 		/// <summary>
 		/// See <see cref="IVectorView.CopyToArray"/>.
 		/// </summary>
 		public double[] CopyToArray() //Perhaps this should use BLAS
 		{
-			double[] clone = new double[data.Length];
-			Array.Copy(data, clone, data.Length);
+			double[] clone = new double[Elements.Length];
+			Array.Copy(Elements, clone, Elements.Length);
 			return clone;
 		}
 
@@ -371,7 +364,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="length">The number of entries to copy.</param>
 		public void CopyToArray(int sourceIndex, double[] destinationArray, int destinationIndex, int length)
 		{
-			Array.Copy(data, sourceIndex, destinationArray, destinationIndex, length);
+			Array.Copy(Elements, sourceIndex, destinationArray, destinationIndex, length);
 		}
 
 		/// <summary>
@@ -380,10 +373,10 @@ namespace MGroup.LinearAlgebra.Vectors
 		public void CopyFrom(IVectorView sourceVector)
 		{
 			Preconditions.CheckVectorDimensions(this, sourceVector);
-			if (sourceVector is Vector casted) Array.Copy(casted.data, this.data, this.Length);
+			if (sourceVector is Vector casted) Array.Copy(casted.Elements, this.Elements, this.Length);
 			else
 			{
-				for (int i = 0; i < Length; ++i) data[i] = sourceVector[i];
+				for (int i = 0; i < Length; ++i) Elements[i] = sourceVector[i];
 			}
 		}
 
@@ -397,7 +390,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public void CopyFrom(Vector sourceVector)
 		{
 			Preconditions.CheckVectorDimensions(this, sourceVector);
-			Array.Copy(sourceVector.data, this.data, this.Length);
+			Array.Copy(sourceVector.Elements, this.Elements, this.Length);
 		}
 
 		/// <summary>
@@ -411,12 +404,12 @@ namespace MGroup.LinearAlgebra.Vectors
 			{
 				for (int i = 0; i < thisIndices.Length; ++i)
 				{
-					this.data[thisIndices[i]] = casted.data[otherIndices[i]];
+					this.Elements[thisIndices[i]] = casted.Elements[otherIndices[i]];
 				}
 			}
 			else
 			{
-				for (int i = 0; i < thisIndices.Length; ++i) data[thisIndices[i]] = otherVector[otherIndices[i]];
+				for (int i = 0; i < thisIndices.Length; ++i) Elements[thisIndices[i]] = otherVector[otherIndices[i]];
 			}
 		}
 
@@ -435,7 +428,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </exception>
 		public void CopyNonContiguouslyFrom(int[] thisIndices, Vector otherVector)
 		{
-			for (int i = 0; i < thisIndices.Length; ++i) this.data[thisIndices[i]] = otherVector.data[i];
+			for (int i = 0; i < thisIndices.Length; ++i) this.Elements[thisIndices[i]] = otherVector.Elements[i];
 		}
 
 		/// <summary>
@@ -447,11 +440,11 @@ namespace MGroup.LinearAlgebra.Vectors
 				"otherIndices and this vector must have the same length.");
 			if (otherVector is Vector casted)
 			{
-				for (int i = 0; i < this.Length; ++i) this.data[i] = casted.data[otherIndices[i]];
+				for (int i = 0; i < this.Length; ++i) this.Elements[i] = casted.Elements[otherIndices[i]];
 			}
 			else
 			{
-				for (int i = 0; i < this.Length; ++i) data[i] = otherVector[otherIndices[i]];
+				for (int i = 0; i < this.Length; ++i) Elements[i] = otherVector[otherIndices[i]];
 			}
 		}
 
@@ -465,10 +458,10 @@ namespace MGroup.LinearAlgebra.Vectors
 
 			Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
 			Preconditions.CheckSubvectorDimensions(sourceVector, sourceIndex, length);
-			if (sourceVector is Vector casted) Array.Copy(casted.data, sourceIndex, this.data, destinationIndex, length);
+			if (sourceVector is Vector casted) Array.Copy(casted.Elements, sourceIndex, this.Elements, destinationIndex, length);
 			else
 			{
-				for (int i = 0; i < length; ++i) data[i + destinationIndex] = sourceVector[i + sourceIndex];
+				for (int i = 0; i < length; ++i) Elements[i + destinationIndex] = sourceVector[i + sourceIndex];
 			}
 		}
 
@@ -492,8 +485,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector DoEntrywise(Vector vector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
-			double[] result = new double[data.Length];
-			for (int i = 0; i < data.Length; ++i) result[i] = binaryOperation(this.data[i], vector.data[i]);
+			double[] result = new double[Elements.Length];
+			for (int i = 0; i < Elements.Length; ++i) result[i] = binaryOperation(this.Elements[i], vector.Elements[i]);
 			return new Vector(result);
 		}
 
@@ -506,7 +499,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			else
 			{
 				Preconditions.CheckVectorDimensions(this, vector);
-				for (int i = 0; i < data.Length; ++i) data[i] = binaryOperation(data[i], vector[i]);
+				for (int i = 0; i < Elements.Length; ++i) Elements[i] = binaryOperation(Elements[i], vector[i]);
 			}
 		}
 
@@ -516,7 +509,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public void DoEntrywiseIntoThis(Vector vector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
-			for (int i = 0; i < data.Length; ++i) data[i] = binaryOperation(data[i], vector.data[i]);
+			for (int i = 0; i < Elements.Length; ++i) Elements[i] = binaryOperation(Elements[i], vector.Elements[i]);
 		}
 
 		/// <summary>
@@ -530,8 +523,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		public Vector DoToAllEntries(Func<double, double> unaryOperation)
 		{
-			double[] result = new double[data.Length];
-			for (int i = 0; i < data.Length; ++i) result[i] = unaryOperation(data[i]);
+			double[] result = new double[Elements.Length];
+			for (int i = 0; i < Elements.Length; ++i) result[i] = unaryOperation(Elements[i]);
 			return new Vector(result);
 		}
 
@@ -540,7 +533,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
-			for (int i = 0; i < data.Length; ++i) data[i] = unaryOperation(data[i]);
+			for (int i = 0; i < Elements.Length; ++i) Elements[i] = unaryOperation(Elements[i]);
 		}
 
 		/// <summary>
@@ -560,7 +553,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public double DotProduct(Vector vector)
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
-			return Blas.Ddot(Length, this.data, 0, 1, vector.data, 0, 1);
+			return Blas.Ddot(Length, this.Elements, 0, 1, vector.Elements, 0, 1);
 		}
 
 		/// <summary>
@@ -574,7 +567,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				var comparer = new ValueComparer(tolerance);
 				for (int i = 0; i < Length; ++i)
 				{
-					if (!comparer.AreEqual(this.data[i], casted.data[i]))
+					if (!comparer.AreEqual(this.Elements[i], casted.Elements[i]))
 					{
 						return false;
 					}
@@ -590,7 +583,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector GetSubvector(int[] indices)
 		{
 			double[] subvector = new double[indices.Length];
-			for (int i = 0; i < indices.Length; ++i) subvector[i] = data[indices[i]];
+			for (int i = 0; i < indices.Length; ++i) subvector[i] = Elements[indices[i]];
 			return new Vector(subvector);
 		}
 
@@ -606,7 +599,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 			int subvectorLength = endExclusive - startInclusive;
 			double[] subvector = new double[subvectorLength];
-			Array.Copy(this.data, startInclusive, subvector, 0, subvectorLength);
+			Array.Copy(this.Elements, startInclusive, subvector, 0, subvectorLength);
 			return new Vector(subvector);
 		}
 
@@ -616,7 +609,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="tolerance">The tolerance under which a vector entry is considered to be 0. It can be set to 0, to check 
 		///     if the entries are exactly 0.</param>
-		public bool IsZero(double tolerance) => DenseStrategies.IsZero(data, tolerance);
+		public bool IsZero(double tolerance) => DenseStrategies.IsZero(Elements, tolerance);
 
 		/// <summary>
 		/// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
@@ -641,21 +634,21 @@ namespace MGroup.LinearAlgebra.Vectors
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[data.Length];
+			double[] result = new double[Elements.Length];
 			if (thisCoefficient == 1.0)
 			{
-				Array.Copy(data, result, data.Length);
-				Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, result, 0, 1);
+				Array.Copy(Elements, result, Elements.Length);
+				Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, result, 0, 1);
 			}
 			else if (otherCoefficient == 1.0)
 			{
-				Array.Copy(otherVector.data, result, data.Length);
-				Blas.Daxpy(data.Length, thisCoefficient, this.data, 0, 1, result, 0, 1);
+				Array.Copy(otherVector.Elements, result, Elements.Length);
+				Blas.Daxpy(Elements.Length, thisCoefficient, this.Elements, 0, 1, result, 0, 1);
 			}
 			else
 			{
-				Array.Copy(data, result, data.Length);
-				BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, result, 0, 1);
+				Array.Copy(Elements, result, Elements.Length);
+				BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Elements, 0, 1, thisCoefficient, result, 0, 1);
 			}
 			return new Vector(result);
 		}
@@ -663,7 +656,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// See <see cref="IVector.LinearCombinationIntoThis(double, IVectorView, double)"/>.
 		/// </summary>
-		public void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+		public Vector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is Vector casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
 			else
@@ -671,9 +664,10 @@ namespace MGroup.LinearAlgebra.Vectors
 				Preconditions.CheckVectorDimensions(this, otherVector);
 				for (int i = 0; i < Length; ++i)
 				{
-					this.data[i] = thisCoefficient * this.data[i] + otherCoefficient * otherVector[i];
+					this.Elements[i] = thisCoefficient * this.Elements[i] + otherCoefficient * otherVector[i];
 				}
 			}
+			return this;
 		}
 
 		/// <summary>
@@ -691,11 +685,11 @@ namespace MGroup.LinearAlgebra.Vectors
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (thisCoefficient == 1.0)
 			{
-				Blas.Daxpy(Length, otherCoefficient, otherVector.data, 0, 1, this.data, 0, 1);
+				Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, this.Elements, 0, 1);
 			}
 			else
 			{
-				BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.data, 0, 1, thisCoefficient, this.data, 0, 1);
+				BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Elements, 0, 1, thisCoefficient, this.Elements, 0, 1);
 			}
 		}
 
@@ -708,8 +702,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector MultiplyEntrywise(Vector vector) //TODO: use MKL's vector math
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
-			double[] result = new double[data.Length];
-			for (int i = 0; i < data.Length; ++i) result[i] = this.data[i] * vector.data[i];
+			double[] result = new double[Elements.Length];
+			for (int i = 0; i < Elements.Length; ++i) result[i] = this.Elements[i] * vector.Elements[i];
 			return new Vector(result);
 		}
 
@@ -722,14 +716,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		public void MultiplyEntrywiseIntoThis(Vector vector) //TODO: use MKL's vector math
 		{
 			Preconditions.CheckVectorDimensions(this, vector);
-			double[] result = new double[data.Length];
-			for (int i = 0; i < data.Length; ++i) this.data[i] *= vector.data[i];
+			double[] result = new double[Elements.Length];
+			for (int i = 0; i < Elements.Length; ++i) this.Elements[i] *= vector.Elements[i];
 		}
 
 		/// <summary>
 		/// See <see cref="IVectorView.Norm2"/>
 		/// </summary>
-		public double Norm2() => Blas.Dnrm2(Length, data, 0, 1);
+		public double Norm2() => Blas.Dnrm2(Length, Elements, 0, 1);
 
 		/// <summary>
 		/// This method is used to remove duplicate values of a Knot Value Vector and return the multiplicity up to
@@ -738,21 +732,21 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		public Vector[] RemoveDuplicatesFindMultiplicity()
 		{
-			Array.Sort(data);
+			Array.Sort(Elements);
 			HashSet<double> set = new HashSet<double>();
 			int indexSingles = 0;
-			double[] singles = new double[data.Length];
+			double[] singles = new double[Elements.Length];
 
-			int[] multiplicity = new int[data.Length];
+			int[] multiplicity = new int[Elements.Length];
 			int counterMultiplicity = 0;
 
-			for (int i = 0; i < data.Length; i++)
+			for (int i = 0; i < Elements.Length; i++)
 			{
 				// If same integer is already present then add method will return
 				// FALSE
-				if (set.Add(data[i]) == true)
+				if (set.Add(Elements[i]) == true)
 				{
-					singles[indexSingles] = data[i];
+					singles[indexSingles] = Elements[i];
 
 					multiplicity[indexSingles] = counterMultiplicity;
 					indexSingles++;
@@ -764,7 +758,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				}
 			}
 			int numberOfZeros = 0;
-			for (int i = data.Length - 1; i >= 0; i--)
+			for (int i = Elements.Length - 1; i >= 0; i--)
 			{
 				if (singles[i] == 0)
 				{
@@ -777,14 +771,14 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 			Vector[] singlesMultiplicityVectors = new Vector[2];
 
-			singlesMultiplicityVectors[0] = Vector.CreateZero(data.Length - numberOfZeros);
-			for (int i = 0; i < data.Length - numberOfZeros; i++)
+			singlesMultiplicityVectors[0] = Vector.CreateZero(Elements.Length - numberOfZeros);
+			for (int i = 0; i < Elements.Length - numberOfZeros; i++)
 			{
 				singlesMultiplicityVectors[0][i] = singles[i];
 			}
 
-			singlesMultiplicityVectors[1] = Vector.CreateZero(data.Length - numberOfZeros);
-			for (int i = 0; i < data.Length - numberOfZeros; i++)
+			singlesMultiplicityVectors[1] = Vector.CreateZero(Elements.Length - numberOfZeros);
+			for (int i = 0; i < Elements.Length - numberOfZeros; i++)
 			{
 				singlesMultiplicityVectors[1][i] = multiplicity[i];
 			}
@@ -798,7 +792,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
 		{
 			double accumulator = identityValue;
-			for (int i = 0; i < data.Length; ++i) accumulator = processEntry(data[i], accumulator);
+			for (int i = 0; i < Elements.Length; ++i) accumulator = processEntry(Elements[i], accumulator);
 			// no zeros implied
 			return finalize(accumulator);
 		}
@@ -822,11 +816,11 @@ namespace MGroup.LinearAlgebra.Vectors
 			double[] reordered = new double[Length];
 			if (oldToNew)
 			{
-				for (int i = 0; i < Length; ++i) reordered[permutation[i]] = data[i];
+				for (int i = 0; i < Length; ++i) reordered[permutation[i]] = Elements[i];
 			}
 			else // TODO: can they be written as one in a smarter way?
 			{
-				for (int i = 0; i < Length; ++i) reordered[i] = data[permutation[i]];
+				for (int i = 0; i < Length; ++i) reordered[i] = Elements[permutation[i]];
 			}
 			return new Vector(reordered);
 		}
@@ -845,8 +839,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector Scale(double scalar)
 		{
 			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[data.Length];
-			Array.Copy(data, result, data.Length);
+			double[] result = new double[Elements.Length];
+			Array.Copy(Elements, result, Elements.Length);
 			Blas.Dscal(Length, scalar, result, 0, 1);
 			return new Vector(result);
 		}
@@ -854,7 +848,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// See <see cref="IVector.ScaleIntoThis(double)"/>.
 		/// </summary>
-		public void ScaleIntoThis(double scalar) => Blas.Dscal(Length, scalar, data, 0, 1);
+		public Vector ScaleIntoThis(double scalar)
+		{
+			Blas.Dscal(Length, scalar, Elements, 0, 1);
+			return this;
+		}
 
 		/// <summary>
 		/// Sets all entries of this vector to be equal to <paramref name="value"/>.
@@ -862,13 +860,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="value">The value that all entries of the this vector will be equal to.</param>
 		public void SetAll(double value)
 		{
-			for (int i = 0; i < Length; ++i) data[i] = value;
+			for (int i = 0; i < Length; ++i) Elements[i] = value;
 		}
 
 		/// <summary>
 		/// See <see cref="IVector.Set(int, double)"/>.
 		/// </summary>
-		public void Set(int index, double value) => data[index] = value;
+		public void Set(int index, double value) => Elements[index] = value;
 
 		/// <summary>
 		/// Calculates the tensor product of this vector with <paramref name="vector"/>:
@@ -882,9 +880,44 @@ namespace MGroup.LinearAlgebra.Vectors
 			var result = Matrix.CreateZero(this.Length, vector.Length);
 			for (int i = 0; i < this.Length; ++i)
 			{
-				for (int j = 0; j < vector.Length; ++j) result[i, j] = this.data[i] * vector.data[j];
+				for (int j = 0; j < vector.Length; ++j) result[i, j] = this.Elements[i] * vector.Elements[j];
 			}
 			return result;
 		}
+
+		public IFullyPopulatedMutableVector View(int fromIndex, int toIndex) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector View(int[] indices) => throw new NotImplementedException();
+		
+		public Vector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => throw new NotImplementedException();
+		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient); /*TODO: remove line when C#9*/
+
+		public IFullyPopulatedMutableVector AddIntoThis(IMinimalImmutableVector otherVector) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector) => throw new NotImplementedException();
+		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.ScaleIntoThis(double coefficient) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector Copy(int fromIndex, int toIndex) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector Copy(int[] indices) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector Add(IMinimalImmutableVector otherVector) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector Subtract(IMinimalImmutableVector otherVector) => throw new NotImplementedException();
+		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.Scale(double coefficient) => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => throw new NotImplementedException();
+		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.Copy() => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector CreateZero() => throw new NotImplementedException();
+		public IFullyPopulatedMutableVector DoEntrywise(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => throw new NotImplementedException();
+		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.DoToAllEntries(Func<double, double> unaryOperation) => throw new NotImplementedException();
+		IExtendedMutableVector IExtendedMutableVector.View(int fromIndex, int toIndex) => throw new NotImplementedException();
+		IExtendedMutableVector IExtendedMutableVector.View(int[] indices) => throw new NotImplementedException();
+		public double[] CopyToArray(int fromIndex, int toIndex) => throw new NotImplementedException();
+		public void CopyToArray(double[] array, int arrayIndex, int fromIndex, int toIndex) => throw new NotImplementedException();
+		public double[] CopyToArray(int[] indices) => throw new NotImplementedException();
+		public void CopyToArray(double[] array, int arrayIndex, int[] indices) => throw new NotImplementedException();
+		IExtendedImmutableVector IExtendedImmutableVector.View(int fromIndex, int toIndex) => throw new NotImplementedException();
+		IExtendedImmutableVector IExtendedImmutableVector.View(int[] indices) => throw new NotImplementedException();
+		IExtendedMutableVector IExtendedImmutableVector.CreateZero() => throw new NotImplementedException();
+		public void CopyFrom(IMinimalImmutableVector otherVector) => throw new NotImplementedException();
+		public void DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => throw new NotImplementedException();
+		public double DotProduct(IMinimalImmutableVector otherVector) => throw new NotImplementedException();
+		public double Square() => throw new NotImplementedException();
+		public bool Equals(IMinimalImmutableVector otherVector, double tolerance = 1E-07) => throw new NotImplementedException();
 	}
 }

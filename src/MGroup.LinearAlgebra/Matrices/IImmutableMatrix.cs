@@ -9,7 +9,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// A partial linear combination between this and another matrix.
 		/// </summary>
-		/// <param name="otherMatrix">A vector with the same number of elements with this vector</param>
+		/// <param name="otherMatrix">A vector with the same number of Elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
 		IMutableMatrix Axpy(IImmutableMatrix otherMatrix, double otherCoefficient)
@@ -25,7 +25,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// A linear combination between this and another one matrix.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar as coefficient to this matrix</param>
-		/// <param name="otherMatrix">A matrix with the same number of elements with this matrix</param>
+		/// <param name="otherMatrix">A matrix with the same number of Elements with this matrix</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix * <paramref name="thisCoefficient"/> + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
 		public IMutableMatrix LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		IMutableMatrix Copy();
 
 		/// <summary>
-		/// Creates a new matrix with all elements set to zero, the same dimensions with this matrix and probably with the same format with this matrix.
+		/// Creates a new matrix with all Elements set to zero, the same dimensions with this matrix and probably with the same format with this matrix.
 		/// </summary>
 		/// <returns>A new zero matrix with the same dimensions with this matrix</returns>
 		IMutableMatrix CreateZero();
@@ -46,7 +46,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Check if this matrix and <paramref name="otherMatrix"/> are almost equal.
 		/// </summary>
 		/// <param name="otherMatrix">A matrix of any dimensions</param>
-		/// <param name="tolerance">The maximum difference between corresponding elements to considered equal</param>
+		/// <param name="tolerance">The maximum difference between corresponding Elements to considered equal</param>
 		/// <returns>True if both vectors are almost equal</returns>
 		bool Equals(IImmutableMatrix otherMatrix, double tolerance = 1e-7);
 

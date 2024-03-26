@@ -46,7 +46,7 @@ namespace MGroup.LinearAlgebra.Providers
         void Dgetrf(int m, int n, double[] a, int offsetA, int ldA, int[] ipiv, int offsetIpiv, ref int info);
 
         /// <summary>
-        /// Matrix inversion using the factorized data of 
+        /// Matrix inversion using the factorized Elements of 
         /// <see cref="Dgetrf(int, int, double[], int, int, int[], int, ref int)"/>. The matrix is general, stored in full column 
         /// major format. See
         /// http://www.netlib.org/lapack/explore-html/dd/d9a/group__double_g_ecomputational_ga56d9c860ce4ce42ded7f914fdb0683ff.html#ga56d9c860ce4ce42ded7f914fdb0683ff
@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra.Providers
             double[] work, int offsetWork, int lWork, ref int info);
 
         /// <summary>
-        /// Linear system solution using the factorized data of 
+        /// Linear system solution using the factorized Elements of 
         /// <see cref="Dgetrf(int, int, double[], int, int, int[], int, ref int)"/>. 
         /// The matrix is general, stored in full column major format. See 
         /// http://www.netlib.org/lapack/explore-html/dd/d9a/group__double_g_ecomputational_ga58e332cb1b8ab770270843221a48296d.html#ga58e332cb1b8ab770270843221a48296d
@@ -64,7 +64,7 @@ namespace MGroup.LinearAlgebra.Providers
             double[] b, int offsetB, int ldB, ref int info);
 
         /// <summary>
-        /// Generates an m-by-n matrix holding the LQ factor Q, which has orthonormal columns, using the factorized data of 
+        /// Generates an m-by-n matrix holding the LQ factor Q, which has orthonormal columns, using the factorized Elements of 
         /// <see cref="Dgelqf(int, int, double[], int, int, double[], int, double[], int, int, ref int)"/>.
         /// The matrix is general, stored in full column major format. See 
         /// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_ga97adc24a3547a789a3ab145688e3a3ca.html#ga97adc24a3547a789a3ab145688e3a3ca
@@ -73,7 +73,7 @@ namespace MGroup.LinearAlgebra.Providers
             double[] work, int offsetWork, int lWork, ref int info);
 
         /// <summary>
-        /// Generates an m-by-n matrix holding the QR factor Q, which has orthonormal columns, using the factorized data of 
+        /// Generates an m-by-n matrix holding the QR factor Q, which has orthonormal columns, using the factorized Elements of 
         /// <see cref="Dgeqrf(int, int, double[], int, int, double[], int, double[], int, int, ref int)"/>.
         /// The matrix is general, stored in full column major format. See 
         /// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_ga14b45f7374dc8654073aa06879c1c459.html#ga14b45f7374dc8654073aa06879c1c459
@@ -82,7 +82,7 @@ namespace MGroup.LinearAlgebra.Providers
             double[] work, int offsetWork, int lWork, ref int info);
 
         /// <summary>
-        /// Multiplies the LQ factor Q with another matrix C, using the factorized data of 
+        /// Multiplies the LQ factor Q with another matrix C, using the factorized Elements of 
         /// <see cref="Dgelqf(int, int, double[], int, int, double[], int, double[], int, int, ref int)"/>.
         /// The matrix is general, stored in full column major format. See 
         /// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_ga99147464f79c5447c08eead5a06a90ce.html#ga99147464f79c5447c08eead5a06a90ce
@@ -91,7 +91,7 @@ namespace MGroup.LinearAlgebra.Providers
             int offsetTau, double[] c, int offsetC, int ldC, double[] work, int offsetWork, int lWork, ref int info);
 
         /// <summary>
-        /// Multiplies the QR factor Q with another matrix C, using the factorized data of 
+        /// Multiplies the QR factor Q with another matrix C, using the factorized Elements of 
         /// <see cref="Dgeqrf(int, int, double[], int, int, double[], int, double[], int, int, ref int)"/>.
         /// The matrix is general, stored in full column major format. See 
         /// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_ga17b0765a8a0e6547bcf933979b38f0b0.html#ga17b0765a8a0e6547bcf933979b38f0b0
@@ -106,7 +106,7 @@ namespace MGroup.LinearAlgebra.Providers
         void Dpotrf(string uplo, int n, double[] a, int offsetA, int ldA, ref int info);
 
         /// <summary>
-        /// Matrix inversion using the factorized data of 
+        /// Matrix inversion using the factorized Elements of 
         /// <see cref="Dpotrf(string, int, double[], int, int, ref int)"/>. 
         /// The matrix is symmetric positive definite, stored in full column major format. See 
         /// http://www.netlib.org/lapack/explore-html/d1/d7a/group__double_p_ocomputational_ga9dfc04beae56a3b1c1f75eebc838c14c.html#ga9dfc04beae56a3b1c1f75eebc838c14c
@@ -114,7 +114,7 @@ namespace MGroup.LinearAlgebra.Providers
         void Dpotri(string uplo, int n, double[] a, int offsetA, int ldA, ref int info);
 
         /// <summary>
-        /// Linear system solution using the factorized data of 
+        /// Linear system solution using the factorized Elements of 
         /// <see cref="Dpotrf(string, int, double[], int, int, ref int)"/>. 
         /// The matrix is symmetric positive definite, stored in full column major format. See 
         /// http://www.netlib.org/lapack/explore-html/d1/d7a/group__double_p_ocomputational_ga167aa0166c4ce726385f65e4ab05e7c1.html#ga167aa0166c4ce726385f65e4ab05e7c1
@@ -129,7 +129,7 @@ namespace MGroup.LinearAlgebra.Providers
         void Dpptrf(string uplo, int n, double[] a, int offsetA, ref int info);
 
         /// <summary>
-        /// Matrix inversion using the factorized data of 
+        /// Matrix inversion using the factorized Elements of 
         /// <see cref="Dpotrf(string, int, double[], int, int, ref int)"/>. 
         /// The matrix is symmetric positive definite, stored in packed column major format. See 
         /// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_gae50ca6e928ba3eb2917521a6c886a41b.html#gae50ca6e928ba3eb2917521a6c886a41b
@@ -137,7 +137,7 @@ namespace MGroup.LinearAlgebra.Providers
         void Dpptri(string uplo, int n, double[] a, int offsetA, ref int info);
 
         /// <summary>
-        /// Linear system solution using the factorized data of 
+        /// Linear system solution using the factorized Elements of 
         /// <see cref="Dpotrf(string, int, double[], int, int, ref int)"/>. 
         /// The matrix is symmetric positive definite, stored in packed column major format. See 
         /// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_gaa0b8f7830a459c434c84ce5e7a939850.html#gaa0b8f7830a459c434c84ce5e7a939850

@@ -84,7 +84,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         public double YNorm { get; set; } = double.MinValue;
 
         /// <summary>
-        /// Reports the accumulated data of this <see cref="MinresStatistics"/> instance. 
+        /// Reports the accumulated Elements of this <see cref="MinresStatistics"/> instance. 
         /// </summary>
         public override string ToString()
         {

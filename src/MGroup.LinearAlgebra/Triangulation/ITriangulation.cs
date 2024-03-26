@@ -1,7 +1,7 @@
 ﻿using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
-// Inversion is best handled by the matrix object itself, since the original should overwrite the factorized data in most cases, 
+// Inversion is best handled by the matrix object itself, since the original should overwrite the factorized Elements in most cases, 
 // which should be hidden from the user. Besides, I am not sure if first factorizing the matrix is more efficient than 
 // Gauss-Jordan.
 //TODO: also specify dimensions. For now this triangulation only works for square matrices.

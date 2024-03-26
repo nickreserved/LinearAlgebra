@@ -400,5 +400,32 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		}
 
 		IMinimalMutableVector IMinimalImmutableVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation); /*TODO: remove line when C#9*/
+
+
+
+
+		public DistributedOverlappingVector AddIntoThis(IMinimalImmutableVector otherVector) => AxpyIntoThis(otherVector, 1);
+		IMinimalMutableVector IMinimalMutableVector.AddIntoThis(IMinimalImmutableVector otherVector) => AddIntoThis(otherVector); /*TODO: remove line when C#9*/
+
+		public DistributedOverlappingVector SubtractIntoThis(IMinimalImmutableVector otherVector) => AxpyIntoThis(otherVector, -1);
+		IMinimalMutableVector IMinimalMutableVector.SubtractIntoThis(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector); /*TODO: remove line when C#9*/
+
+
+		public DistributedOverlappingVector Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().AxpyIntoThis(otherVector, otherCoefficient);
+		IMinimalMutableVector IMinimalImmutableVector.Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient); /*TODO: remove line when C#9*/
+
+		public DistributedOverlappingVector Add(IMinimalImmutableVector otherVector) => Copy().AddIntoThis(otherVector);
+		IMinimalMutableVector IMinimalImmutableVector.Add(IMinimalImmutableVector otherVector) => Add(otherVector); /*TODO: remove line when C#9*/
+
+		public DistributedOverlappingVector Subtract(IMinimalImmutableVector otherVector) => Copy().SubtractIntoThis(otherVector);
+		IMinimalMutableVector IMinimalImmutableVector.Subtract(IMinimalImmutableVector otherVector) => Subtract(otherVector); /*TODO: remove line when C#9*/
+
+		public double Square() => DotProduct(this);
+
+		public DistributedOverlappingVector Scale(double coefficient) => Copy().ScaleIntoThis(coefficient);
+		IMinimalMutableVector IMinimalImmutableVector.Scale(double coefficient) => Scale(coefficient); /*TODO: remove line when C#9*/
+
+		public DistributedOverlappingVector LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		IMinimalMutableVector IMinimalImmutableVector.LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient); /*TODO: remove line when C#9*/
 	}
 }

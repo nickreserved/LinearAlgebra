@@ -54,7 +54,7 @@ namespace MGroup.LinearAlgebra.Providers.MKL
                 // This MKL function is only for square CSR matrices. We can use it for rectangular too, but it overwrites memory 
                 // of the rhs vector y equal to the number of matrix rows. If the rhs vector is shorter than that, then the 
                 // remaining entries are overwritten with 0. However, this messes up the managed vector objects, since 
-                // important data is overwritten (why doesn't it throw access violation exception?). For now I am going to 
+                // important Elements is overwritten (why doesn't it throw access violation exception?). For now I am going to 
                 // use a temp array and then copy the relevant part. This problem does not seem to appear in the untransposeAd 
                 // version of the method.
                 //TODO: Try using the SparseBLAS inspector-executor routines, instead of the deprecated dcsrgemv().

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using MGroup.Environments;
-using MGroup.LinearAlgebra.Distributed.IterativeMethods.PCG;
-using MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning;
 using MGroup.LinearAlgebra.Distributed.Overlapping;
 using MGroup.LinearAlgebra.Iterative;
+using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
+using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Iterative.Termination;
 using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 using MGroup.LinearAlgebra.Matrices;
@@ -155,7 +155,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 			var distributedAxExpected = new DistributedOverlappingVector(indexer, localAxExpected);
 
 			var distributedAx = new DistributedOverlappingVector(indexer);
-			distributedA.MultiplyVector(distributedX, distributedAx);
+			distributedA.Multiply(distributedX, distributedAx);
 
 			double tol = 1E-13;
 			Assert.True(distributedAxExpected.Equals(distributedAx, tol));

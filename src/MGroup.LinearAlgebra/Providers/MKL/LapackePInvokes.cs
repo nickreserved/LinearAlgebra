@@ -56,9 +56,9 @@ namespace MGroup.LinearAlgebra.Providers.MKL
         /// <param name="n">The number of columns in the matrix A (<paramref name="n"/> ≥ 0).</param>
         /// <param name="A">Array containing the original matrix, with size: max(1, <paramref name="ldA"/> * <paramref name="n"/>)
         ///     for column major layout and max(1, <paramref name="ldA"/> * <paramref name="n"/>) for row major layout. 
-        ///     Overwritten by the factorization data as follows: The elements on and above the diagonal contain the 
+        ///     Overwritten by the factorization Elements as follows: The Elements on and above the diagonal contain the 
         ///     min(<paramref name="m"/>, <paramref name="n"/>)-by-<paramref name="n"/> upper trapezoidal matrix R (R is upper 
-        ///     triangular if <paramref name="m"/> ≥ <paramref name="n"/>). The elements below the diagonal, with the array 
+        ///     triangular if <paramref name="m"/> ≥ <paramref name="n"/>). The Elements below the diagonal, with the array 
         ///     <paramref name="Tau"/>, present the orthogonal matrix Q as a product of min(<paramref name="m"/>, 
         ///     <paramref name="n"/>) elementary reflectors.</param>
         /// <param name="ldA">The leading dimension of <paramref name="A"/>; at least max(1, <paramref name="m"/>) for column 
@@ -104,7 +104,7 @@ namespace MGroup.LinearAlgebra.Providers.MKL
         ///     ≤ <paramref name="m"/>). To generate the whole matrix Q, use: <paramref name="k"/> = p, where p = number of
         ///     rows of the original matrix (if <paramref name="n"/> ≥ p).</param>
         /// <param name="A">WARNING: To get the whole matrix Q, you must allocate enough space = 
-        ///     <paramref name="n"/>-by-<paramref name="n"/>, although the factorized data only need 
+        ///     <paramref name="n"/>-by-<paramref name="n"/>, although the factorized Elements only need 
         ///     p-by-<paramref name="n"/>.</param>
         /// <param name="ldA">The leading dimension of <paramref name="A"/>; at least max(1, <paramref name="m"/>) for column 
         ///     major layout and max(1, <paramref name="n"/>) for row major layout.</param>
@@ -127,13 +127,13 @@ namespace MGroup.LinearAlgebra.Providers.MKL
         /// <param name="k">The number of elementary reflectors whose product defines the matrix Q (0 ≤ <paramref name="k"/>
         ///     ≤ <paramref name="n"/>). To generate the whole matrix Q, use: <paramref name="k"/> = p, where p = number of
         ///     columns of the original matrix (if <paramref name="m"/> ≥ p).</param>
-        /// <param name="A">Array returned by <see cref="Dgeqrf(int, int, int, double[], int, double[])"/>. The elements on and 
+        /// <param name="A">Array returned by <see cref="Dgeqrf(int, int, int, double[], int, double[])"/>. The Elements on and 
         ///     above the diagonal contain the min(<paramref name="m"/>,p)-by-p upper trapezoidal matrix R (R is upper triangular 
-        ///     if <paramref name="m"/> ≥ p) The elements below the diagonal, with the array <paramref name="Tau"/>, present the 
+        ///     if <paramref name="m"/> ≥ p) The Elements below the diagonal, with the array <paramref name="Tau"/>, present the 
         ///     orthogonal matrix Q as a product of min(<paramref name="m"/>, p) elementary reflectors. The size of 
         ///     <paramref name="A"/> is max(1, <paramref name="ldA"/> * <paramref name="n"/>) for column major layout and 
         ///     max(1, <paramref name="ldA"/> * <paramref name="m"/>) for row major layout. WARNING: To get the whole matrix Q, 
-        ///     you must allocate enough space = <paramref name="m"/>-by-<paramref name="m"/>, although the factorized data only
+        ///     you must allocate enough space = <paramref name="m"/>-by-<paramref name="m"/>, although the factorized Elements only
         ///     need <paramref name="m"/>-by-p.</param>
         /// <param name="ldA">The leading dimension of <paramref name="A"/>; at least max(1, <paramref name="m"/>) for column 
         ///     major layout and max(1, <paramref name="n"/>) for row major layout.</param>
@@ -203,8 +203,8 @@ namespace MGroup.LinearAlgebra.Providers.MKL
         /// <param name="k">The number of elementary reflectors whose product defines the matrix Q. Constraints:        
         ///     If <paramref name="side"/> = <see cref="LAPACK_SIDE_LEFT"/> : 0 ≤ <paramref name="k"/> ≤ <paramref name="m"/>.
         ///     If <paramref name="side"/> = <see cref="LAPACK_SIDE_RIGHT"/> : 0 ≤ <paramref name="k"/> ≤ <paramref name="n"/>.</param>
-        /// <param name="A">Array returned by <see cref="Dgeqrf(int, int, int, double[], int, double[])"/>. The elements on and 
-        ///     above the diagonal contain upper trapezoidal matrix R. The elements below the diagonal, with the array 
+        /// <param name="A">Array returned by <see cref="Dgeqrf(int, int, int, double[], int, double[])"/>. The Elements on and 
+        ///     above the diagonal contain upper trapezoidal matrix R. The Elements below the diagonal, with the array 
         ///     <paramref name="Tau"/>, present the orthogonal matrix Q as a product of elementary reflectors. The size of 
         ///     <paramref name="A"/> is max(1, <paramref name="ldA"/> * <paramref name="k"/>) for column major layout, 
         ///     max(1, <paramref name="ldA"/> * <paramref name="m"/>) for row major layout and <paramref name="side"/> = 

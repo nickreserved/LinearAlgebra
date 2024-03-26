@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 
 		/// <summary>
-		/// All indexing data and functionality of <see cref="DistributedOverlappingIndexer"/>, but only for the local vector, 
+		/// All indexing Elements and functionality of <see cref="DistributedOverlappingIndexer"/>, but only for the local vector, 
 		/// matrix, etc. that corresponds to a specific <see cref="ComputeNode"/>.
 		/// </summary>
 		public class Local
@@ -109,7 +109,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			}
 
 			/// <summary>
-			/// Copy data shallowly from <paramref name="other"/>.
+			/// Copy Elements shallowly from <paramref name="other"/>.
 			/// </summary>
 			/// <param name="other"></param>
 			public void InitializeFrom(Local other)

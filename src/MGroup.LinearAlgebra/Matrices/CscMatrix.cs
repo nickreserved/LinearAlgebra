@@ -106,7 +106,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
         /// <summary>
         /// Initializes a new <see cref="CscMatrix"/> with the specified dimensions and the provided arrays 
-        /// (<paramref name="values"/>, <paramref name="rowIndices"/> and <paramref name="colOffsets"/>) as its internal data.
+        /// (<paramref name="values"/>, <paramref name="rowIndices"/> and <paramref name="colOffsets"/>) as its internal Elements.
         /// </summary>
         /// <param name="numRows">The number of rows of the new matrix.</param>
         /// <param name="numCols">The number of columns of the new matrix.</param>
@@ -276,7 +276,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Copies the entries of this matrix.
         /// </summary>
         /// <param name="copyIndexingData">
-        /// If true, all data of this object will be copied. If false, only the array containing the values of the stored 
+        /// If true, all Elements of this object will be copied. If false, only the array containing the values of the stored 
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         public CscMatrix Copy(bool copyIndexingData)

@@ -4,7 +4,7 @@ using MGroup.LinearAlgebra.Vectors;
 namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
 	/// <summary>
-	/// Manages the insertion and removal of PCG direction vectors and related data, that will be used for reorthogonalization.
+	/// Manages the insertion and removal of PCG direction vectors and related Elements, that will be used for reorthogonalization.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	public class PcgReorthogonalizationCache
@@ -32,10 +32,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		}
 
 		/// <summary>
-		/// Discards the direction vectors and any corresponding data of the newest PCG iterations.
+		/// Discards the direction vectors and any corresponding Elements of the newest PCG iterations.
 		/// </summary>
 		/// <param name="numNewVectorsToRemove">
-		/// The number of the newest entries (direction vectors and corresponding data) to discard. If it exceeds the number of
+		/// The number of the newest entries (direction vectors and corresponding Elements) to discard. If it exceeds the number of
 		/// entries currently stored, they will all be discarded without throwing any exceptions.
 		/// </param>
 		public void RemoveNewDirectionVectorData(int numNewVectorsToRemove)
@@ -56,10 +56,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		}
 
 		/// <summary>
-		/// Discards the direction vectors and any corresponding data of the oldest PCG iterations.
+		/// Discards the direction vectors and any corresponding Elements of the oldest PCG iterations.
 		/// </summary>
 		/// <param name="numOldVectorsToRemove">
-		/// The number of the oldest entries (direction vectors and corresponding data) to discard. If it exceeds the number of
+		/// The number of the oldest entries (direction vectors and corresponding Elements) to discard. If it exceeds the number of
 		/// entries currently stored, they will all be discarded without throwing any exceptions.
 		/// </param>
 		public void RemoveOldDirectionVectorData(int numOldVectorsToRemove)
@@ -79,7 +79,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		}
 
 		/// <summary>
-		/// Stores a new direction vector and other related data. The new entries will be regarded as latest.
+		/// Stores a new direction vector and other related Elements. The new entries will be regarded as latest.
 		/// </summary>
 		/// <param name="pcg">The Preconditioned Conjugate Gradient Aglorithm that uses this object.</param>
 		public void StoreDirectionData(ReorthogonalizedPcg pcg)

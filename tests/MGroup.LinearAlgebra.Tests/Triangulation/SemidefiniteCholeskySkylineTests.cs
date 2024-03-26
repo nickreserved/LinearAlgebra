@@ -9,7 +9,7 @@ using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Vectors;
 using Xunit;
 
-//TODO: Also check the invertible part of the factorized data 
+//TODO: Also check the invertible part of the factorized Elements 
 namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
 	/// <summary>

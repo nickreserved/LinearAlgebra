@@ -23,7 +23,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 		public bool HasStagnated()
 		{
 			var errorReductions = CalcRelativeErrorReductions();
-			if (errorReductions == null) return false; // Not enough data yet
+			if (errorReductions == null) return false; // Not enough Elements yet
 			var relativeImprovement = Vector.CreateFromArray(errorReductions).Average();//Γκέσος Παύλος
 			if (relativeImprovementTolerance == -1)
 			{
