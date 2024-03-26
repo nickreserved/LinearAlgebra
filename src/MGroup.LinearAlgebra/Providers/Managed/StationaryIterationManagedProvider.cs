@@ -34,6 +34,29 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 			}
 		}
 
+		/// <summary>
+		/// This implements only the back substitution for preconditioning, while the whole back Gauss-Seidel is
+		/// implemented by <see cref="CsrGaussSeidelBack(int, double[], int[], int[], int[], double[], double[])"/>.
+		/// </summary>
+		public void CsrGaussSeidelBackPrecond(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution)
+		{
+			for (int i = matrixOrder - 1; i >= 0; --i)
+			{
+				double sum = rhs[i];
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				{
+					sum -= csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				solution[i] = sum / csrValues[diagOffset];
+			}
+		}
+
 		public void CsrGaussSeidelForward(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			int[] diagOffsets, double[] rhs, double[] solution)
 		{
@@ -57,6 +80,29 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 				}
 
 				solution[i] = sum / diagEntry;
+			}
+		}
+
+		/// <summary>
+		/// This implements only the forward substitution for preconditioning, while the whole forward Gauss-Seidel is
+		/// implemented by <see cref="CsrGaussSeidelForward(int, double[], int[], int[], int[], double[], double[])"/>.
+		/// </summary>
+		public void CsrGaussSeidelForwardPrecond(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution)
+		{
+			for (int i = 0; i < matrixOrder; ++i)
+			{
+				double sum = rhs[i];
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = rowStart; k < diagOffset; ++k)
+				{
+					sum -= csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				solution[i] = sum / csrValues[diagOffset];
 			}
 		}
 

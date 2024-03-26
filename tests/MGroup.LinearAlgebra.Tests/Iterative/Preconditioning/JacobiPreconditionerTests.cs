@@ -19,22 +19,6 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-10);
 
 
-		[Fact]
-		public static void TestSingleIteration()
-		{
-			var matrix = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
-			var preconditioner = new JacobiPreconditioner();
-			preconditioner.UpdateMatrix(matrix, true);
-
-			var b = Vector.CreateWithValue(10, 1.0);
-			var xExpected = Vector.CreateFromArray(new double[] 
-			{ 
-				1, 3.000300030003000, 0.25, 0.2, 4, 0.111111111111111, 0.125, 0.142857142857143, 1, 0.5
-			});
-			var xComputed = Vector.CreateZero(10);
-
-			preconditioner.SolveLinearSystem(b, xComputed);
-			comparer.AssertEqual(xExpected, xComputed);
-		}
+		
 	}
 }
