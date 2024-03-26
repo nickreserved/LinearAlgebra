@@ -13,6 +13,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 	public class DistributedOverlappingJacobiPreconditioner : IPreconditioner
 	{
 		private readonly IComputeEnvironment environment;
+		private readonly DistributedOverlappingVector diagonal;
 
 		/// <summary>
 		/// Creates a Jacobi preconditioner in distributed environment.
@@ -30,6 +31,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 			DistributedOverlappingVector diagonal)
 		{
 			this.environment = environment;
+			this.diagonal = diagonal;
 			this.Indexer = diagonal.Indexer;
 
 			Func<int, Vector> invertDiagonal = nodeID => diagonal.LocalVectors[nodeID].DoToAllEntries(x => 1 / x);
@@ -54,6 +56,8 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 			}
 		}
 
+		public IPreconditioner CopyWithInitialSettings() => new DistributedOverlappingJacobiPreconditioner(environment, diagonal);
+
 		public void Multiply(DistributedOverlappingVector input, DistributedOverlappingVector output)
 		{
 			//TODOMPI: also check that environment is the same between M,x and M,y
@@ -73,5 +77,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 			//TODOMPI: do we need to call output.SumOverlappingEntries() here? Is this need covered by the fact that 
 			//      LocalInverseDiagonals already have the total stiffnesses?
 		}
+
+		public void UpdateMatrix(IGlobalMatrix matrix, bool isPatternModified) { } 
 	}
 }

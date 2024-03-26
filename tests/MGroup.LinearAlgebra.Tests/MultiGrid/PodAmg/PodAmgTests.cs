@@ -64,16 +64,13 @@ namespace MGroup.LinearAlgebra.Tests.MultiGrid.PodAmg
 			var numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
 
 			// POD-AMG as preconditioner
-			var preconditionerFactory = new PodAmgPreconditioner.Builder();
-			preconditionerFactory.NumIterations = 1;
-			preconditionerFactory.KeepOnlyNonZeroPrincipalComponents = true;
-			preconditionerFactory.Smoothing = new MultigridLevelSmoothing()
+			var smoothing = new MultigridLevelSmoothing()
 				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: true), 1)
 				.AddPreSmoother(new GaussSeidelIterationCsr(forwardDirection: false), 1)
 				.SetPostSmoothersSameAsPreSmoothers();
-			preconditionerFactory.Initialize(samples, numPrincipalComponents);
-			var preconditioner = preconditionerFactory.CreatePreconditionerFor(csr);
-
+			var preconditioner = new PodAmgPreconditioner(keepOnlyNonZeroPrincipalComponents: true, smoothing, numIterations: 1);
+			preconditioner.Initialize(samples, numPrincipalComponents);
+			preconditioner.UpdateMatrix(csr, true);
 
 			// PCG algorithm as solver
 			var solverBuilder = new PcgAlgorithm.Factory();

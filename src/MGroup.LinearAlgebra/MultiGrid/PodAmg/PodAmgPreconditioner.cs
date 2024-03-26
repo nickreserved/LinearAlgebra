@@ -13,6 +13,7 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 
 	public class PodAmgPreconditioner : IPreconditioner
 	{
+		private readonly bool keepOnlyNonZeroPrincipalComponents;
 		private readonly int numIterations;
 		private readonly MultigridLevelSmoothing smoothing;
 
@@ -22,14 +23,21 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 		// Restriction is the transpose of this
 		private Matrix prolongation;
 
-		public PodAmgPreconditioner(CsrMatrix fineMatrix, CholeskyFull coarseMatrixFactorized, Matrix prolongation,
-			MultigridLevelSmoothing smoothing, int numIterations)
+		public PodAmgPreconditioner(
+			bool keepOnlyNonZeroPrincipalComponents, MultigridLevelSmoothing smoothing, int numIterations)
 		{
-			this.fineMatrix = fineMatrix;
-			this.coarseMatrixFactorized = coarseMatrixFactorized;
-			this.prolongation = prolongation;
+			this.keepOnlyNonZeroPrincipalComponents = keepOnlyNonZeroPrincipalComponents;
 			this.smoothing = smoothing;
 			this.numIterations = numIterations;
+		}
+
+		public IPreconditioner CopyWithInitialSettings()
+			=> new PodAmgPreconditioner(keepOnlyNonZeroPrincipalComponents, smoothing.CopyWithInitialSettings(), numIterations);
+
+		public void Initialize(Matrix sampleVectors, int numPrincipalComponents)
+		{
+			var pod = new ProperOrthogonalDecomposition(keepOnlyNonZeroPrincipalComponents);
+			prolongation = pod.CalculatePrincipalComponents(sampleVectors.NumColumns, sampleVectors, numPrincipalComponents);
 		}
 
 		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
@@ -73,62 +81,24 @@ namespace MGroup.LinearAlgebra.AlgebraicMultiGrid.PodAmg
 			}
 		}
 
-		public class Builder : IPreconditionerFactory
+		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
 		{
-			private Matrix prolongation;
-			private bool isUsable = false;
-
-			public Builder()
+			if (prolongation == null)
 			{
-				NumIterations = 1;
-				KeepOnlyNonZeroPrincipalComponents = true;
-				Smoothing = new MultigridLevelSmoothing()
-					.AddPreSmoother(new GaussSeidelIterationCsr(), 1)
-					.AddPostSmoother(new GaussSeidelIterationCsr(), 1);
+				throw new InvalidOperationException("This preconditioner must be initialized first");
 			}
 
-			public bool KeepOnlyNonZeroPrincipalComponents { get; set; }
-
-			public int NumIterations { get; set; }
-
-			public MultigridLevelSmoothing Smoothing { get; set; }
-
-			public IPreconditioner CreatePreconditionerFor(IMatrixView matrix)
+			if (matrix is CsrMatrix csrMatrix)
 			{
-				if (!isUsable)
-				{
-					throw new InvalidOperationException("The preconditioner factory must be initialized first");
-				}
-
-				CsrMatrix fineMatrix = CheckMatrixFormat(matrix);
-				MultigridLevelSmoothing smoothing = Smoothing.CopyWithInitialSettings();
+				fineMatrix = csrMatrix;
 				smoothing.UpdateMatrix(fineMatrix, true);
-
 				Matrix temp = fineMatrix.MultiplyRight(prolongation);
 				Matrix coarseMatrix = prolongation.MultiplyRight(temp, transposeThis: true, transposeOther: false);
-				var coarseMatrixFactorized = CholeskyFull.Factorize(coarseMatrix.NumRows, coarseMatrix.RawData);
-				isUsable = false;
-
-				return new PodAmgPreconditioner(fineMatrix, coarseMatrixFactorized, prolongation, smoothing, NumIterations);
+				coarseMatrixFactorized = CholeskyFull.Factorize(coarseMatrix.NumRows, coarseMatrix.RawData);
 			}
-
-			public void Initialize(Matrix sampleVectors, int numPrincipalComponents)
+			else
 			{
-				var pod = new ProperOrthogonalDecomposition(KeepOnlyNonZeroPrincipalComponents);
-				prolongation = pod.CalculatePrincipalComponents(sampleVectors.NumColumns, sampleVectors, numPrincipalComponents);
-				isUsable = true;
-			}
-
-			private CsrMatrix CheckMatrixFormat(IMatrixView matrix)
-			{
-				if (matrix is CsrMatrix csrMatrix)
-				{
-					return csrMatrix;
-				}
-				else
-				{
-					throw new InvalidSparsityPatternException("PodAmgPreconditioner can be used only for matrices in CSR format");
-				}
+				throw new InvalidSparsityPatternException("This preconditioner can be used only for matrices in CSR format");
 			}
 		}
 	}

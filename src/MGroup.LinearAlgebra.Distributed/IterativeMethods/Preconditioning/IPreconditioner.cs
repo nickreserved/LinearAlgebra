@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
+using MGroup.LinearAlgebra.Iterative;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.MSolve.Solution.LinearSystem;
 
 //TODOMPI: Make it generic, fix comments. IIndexable1D is no longer valid for iterative method vectors, since random access does 
@@ -9,8 +11,8 @@ using MGroup.MSolve.Solution.LinearSystem;
 //      to know the whole length is a good design. Also fix XML comments.
 namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
 {
-    public interface IPreconditioner
-    {
+    public interface IPreconditioner : ISettingsCopiable<IPreconditioner>
+	{
         /// <summary>
         /// Applies the preconditioner by solving the system: M * v = w during the preconditioning step of an iterative 
         /// algorithm, where M is the preconditioner and the definition of the vectors v, w depends on the iterative algorithm. 
@@ -25,5 +27,7 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
         /// is different than the number of rows of this <see cref="IPreconditioner"/>.
         /// </exception>
         void Apply(IGlobalVector input, IGlobalVector output);
-    }
+
+		public void UpdateMatrix(IGlobalMatrix matrix, bool isPatternModified);
+	}
 }

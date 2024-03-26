@@ -19,15 +19,12 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		private static readonly MatrixComparer comparer = new MatrixComparer(1E-10);
 
 
-		[Theory]
-		[InlineData(true)]
-		[InlineData(false)]
-		public static void TestSingleIteration(bool preinvert)
+		[Fact]
+		public static void TestSingleIteration()
 		{
 			var matrix = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
-			var factory = new JacobiPreconditioner.Factory();
-			factory.PreInvert = preinvert;
-			var preconditioner = factory.CreatePreconditionerFor(matrix);
+			var preconditioner = new JacobiPreconditioner();
+			preconditioner.UpdateMatrix(matrix, true);
 
 			var b = Vector.CreateWithValue(10, 1.0);
 			var xExpected = Vector.CreateFromArray(new double[] 

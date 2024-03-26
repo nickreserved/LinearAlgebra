@@ -34,7 +34,8 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 				builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 				builder.BlockSize = 2;
 				var pcg = builder.Build();
-				var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+				var M = new JacobiPreconditioner();
+				M.UpdateMatrix(A, true);
 				var xComputed = Vector.CreateZero(A.NumRows);
 				var stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
 				comparer.AssertEqual(xExpected, xComputed);
@@ -55,7 +56,8 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Krylov
 				builder.ResidualTolerance = 1E-10;
 				builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 				var pcg = builder.Build();
-				var M = new JacobiPreconditioner(A.GetDiagonalAsArray());
+				var M = new JacobiPreconditioner();
+				M.UpdateMatrix(A, true);
 				var xComputed = Vector.CreateZero(A.NumRows);
 				var stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
 				comparer.AssertEqual(xExpected, xComputed);

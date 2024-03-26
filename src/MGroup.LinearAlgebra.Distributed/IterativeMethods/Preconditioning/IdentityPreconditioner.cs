@@ -9,7 +9,6 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
     /// <see cref="IPreconditioner"/> object without actually applying any preconditioning, e.g. for benchmarking an iterative  
     /// algorithm. Using this preconditioner with PCG is equivalent to using CG, however the computational cost will be higher,
     /// since the operation z = inv(M) * r cannot be safely avoided; it just reduces to a vector copy.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     public class IdentityPreconditioner: IPreconditioner
     {
@@ -31,21 +30,8 @@ namespace MGroup.LinearAlgebra.Distributed.IterativeMethods.Preconditioning
         public void Apply(IGlobalVector rhsVector, IGlobalVector lhsVector) 
             => lhsVector.CopyFrom(rhsVector);
 
-        /// <summary>
-        /// Creates instances of <see cref="IdentityPreconditioner"/>.
-        /// </summary>
-        public class Factory: IPreconditionerFactory
-        {
-            /// <summary>
-            /// Initializes a new instance of <see cref="IdentityPreconditioner.Factory"/>.
-            /// </summary>
-            public Factory() { }
+		public IPreconditioner CopyWithInitialSettings() => new IdentityPreconditioner();
 
-            /// <summary>
-            /// See <see cref="IPreconditionerFactory.CreatePreconditionerFor(IDistributedMatrix)"/>.
-            /// </summary>
-            public IPreconditioner CreatePreconditionerFor(ILinearTransformation matrix) 
-                => new IdentityPreconditioner();
-        }
+		public void UpdateMatrix(IGlobalMatrix matrix, bool isPatternModified) { }
     }
 }
