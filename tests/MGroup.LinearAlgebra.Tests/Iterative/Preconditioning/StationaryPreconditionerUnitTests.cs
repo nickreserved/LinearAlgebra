@@ -20,6 +20,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			var preconditioner = new GaussSeidelPreconditionerCsr(forwardDirection: false);
 			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
 			{
+				// Solve (D+U) * x = y
 				SparseMatrix UplusD = decomp.GetCombination("U+D", 0, 1, 1);
 				return UplusD.SolveBackSubstitution(rhs);
 			});
@@ -31,6 +32,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			var preconditioner = new GaussSeidelPreconditionerCsr(forwardDirection: true);
 			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
 			{
+				// Solve (D+L) * x = y
 				SparseMatrix LplusD = decomp.GetCombination("L+D", 1, 1, 0);
 				return LplusD.SolveForwardSubstitution(rhs);
 			});
@@ -42,6 +44,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			var preconditioner = new JacobiPreconditioner(1E-10);
 			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
 			{
+				// Solve D * x = y
 				SparseMatrix D = decomp.GetD();
 				return D.SolveDiagonal(rhs);
 			});
@@ -64,6 +67,32 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 
 			preconditioner.SolveLinearSystem(b, xComputed);
 			comparer.AssertEqual(xExpected, xComputed);
+		}
+
+		[Fact]
+		private static void TestSorBackPreconditioner()
+		{
+			double omega = 1.2;
+			var preconditioner = new SorPreconditionerCsr(omega, forwardDirection: false);
+			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
+			{
+				// Solve 1/omega*(D+omega*U) * x = y
+				SparseMatrix DplusWU = decomp.GetCombination("D+ωU", 0, 1, omega);
+				return DplusWU.SolveBackSubstitution(rhs).Scale(omega);
+			});
+		}
+
+		[Fact]
+		private static void TestSorForwardPreconditioner()
+		{
+			double omega = 1.2;
+			var preconditioner = new SorPreconditionerCsr(omega, forwardDirection: true);
+			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
+			{
+				// Solve 1/omega*(D+omega*L) * x = y
+				SparseMatrix LplusD = decomp.GetCombination("D+ωL", omega, 1, 0);
+				return LplusD.SolveForwardSubstitution(rhs).Scale(omega);
+			});
 		}
 
 		private static void RunTwoApplications(IPreconditioner preconditioner,
