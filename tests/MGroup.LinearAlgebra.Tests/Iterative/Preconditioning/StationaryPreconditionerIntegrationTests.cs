@@ -41,6 +41,18 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			RunPcg(new JacobiPreconditioner(1E-10));
 		}
 
+		[Fact]
+		private static void TestSsorGmres()
+		{
+			RunGmres(new SsorPreconditionerCsr(1.2));
+		}
+
+		[Fact]
+		private static void TestssorPcg()
+		{
+			RunPcg(new SsorPreconditionerCsr(1.2));
+		}
+
 		private static void RunGmres(IPreconditioner preconditioner)
 		{
 			var A = CsrMatrix.CreateFromDense(Matrix.CreateFromArray(SquareInvertible10by10.Matrix));

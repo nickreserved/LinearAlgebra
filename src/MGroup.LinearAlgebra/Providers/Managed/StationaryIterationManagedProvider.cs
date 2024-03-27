@@ -227,7 +227,50 @@ namespace MGroup.LinearAlgebra.Providers.Managed
 			}
 		}
 
-		//TODO: Move to another provider class. This can be parallelized trivially E.g. 
+		public void CsrSsorPrecond(int matrixOrder, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
+			int[] diagOffsets, double[] rhs, double[] solution, double omega, double[] work)
+		{
+			// Scalar and forward substitution. Btw save diagonal in work array.
+			double coeff = omega * (2 - omega);
+			for (int i = 0; i < matrixOrder; ++i)
+			{
+				double sum = 0;
+				int rowStart = csrRowOffsets[i]; // inclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = rowStart; k < diagOffset; ++k)
+				{
+					sum += csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				double diagonalEntry = csrValues[diagOffset];
+				work[i] = diagonalEntry;
+				solution[i] = (coeff * rhs[i] - omega * sum) / diagonalEntry;
+			}
+
+			// Diagonal solve
+			for (int i = 0; i < matrixOrder; ++i)
+			{
+				solution[i] *= work[i];
+			}
+
+			// Back substitution
+			for (int i = matrixOrder - 1; i >= 0; --i)
+			{
+				double sum = 0;
+				int rowEnd = csrRowOffsets[i + 1]; // exclusive
+				int diagOffset = diagOffsets[i];
+
+				for (int k = diagOffset + 1; k < rowEnd; ++k)
+				{
+					sum += csrValues[k] * solution[csrColIndices[k]];
+				}
+
+				solution[i] = (solution[i] - omega * sum) / csrValues[diagOffset];
+			}
+		}
+
+		//TODO: Move to another provider class. This can be parallelized trivially.
 		public int[] LocateDiagonalOffsetsCsr(int matrixOrder, int[] csrRowOffsets, int[] csrColIndices)
 		{
 			var diagonalOffsets = new int[matrixOrder];

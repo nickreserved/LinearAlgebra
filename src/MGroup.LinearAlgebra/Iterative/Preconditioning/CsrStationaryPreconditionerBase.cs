@@ -18,7 +18,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 			provider = new StationaryIterationManagedProvider();
 		}
 
-		public void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
+		public virtual void UpdateMatrix(IMatrixView matrix, bool isPatternModified)
 		{
 			Preconditions.CheckSquare(matrix);
 			if (matrix is CsrMatrix csrMatrix)

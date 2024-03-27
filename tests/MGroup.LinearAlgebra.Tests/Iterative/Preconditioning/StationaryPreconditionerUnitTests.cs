@@ -90,8 +90,27 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
 			{
 				// Solve 1/omega*(D+omega*L) * x = y
-				SparseMatrix LplusD = decomp.GetCombination("D+ωL", omega, 1, 0);
-				return LplusD.SolveForwardSubstitution(rhs).Scale(omega);
+				SparseMatrix DplusWL = decomp.GetCombination("D+ωL", omega, 1, 0);
+				return DplusWL.SolveForwardSubstitution(rhs).Scale(omega);
+			});
+		}
+
+		[Fact]
+		private static void TestSsorPreconditioner()
+		{
+			double omega = 1.2;
+			var preconditioner = new SsorPreconditionerCsr(omega);
+			RunTwoApplications(preconditioner, (StationaryAlgorithmDecomposition decomp, Vector rhs) =>
+			{
+				// Solve 1/(omega*(2-omega)*(D+omega*L)*inv(D)*(D+omega*U) * x = y
+				SparseMatrix D = decomp.GetD();
+				SparseMatrix DplusWL = decomp.GetCombination("D+ωL", omega, 1, 0);
+				SparseMatrix DplusWU = decomp.GetCombination("D+ωU", 0, 1, omega);
+
+				Vector x0 = rhs.Scale(omega * (2 - omega));
+				Vector x1 = DplusWL.SolveForwardSubstitution(x0);
+				Vector x2 = D * x1;
+				return DplusWU.SolveBackSubstitution(x2);
 			});
 		}
 

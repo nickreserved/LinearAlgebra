@@ -1,8 +1,8 @@
 namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 {
 	/// <summary>
-	/// Applies one the following preconditionings: 1/omega*(D+omega*L) * x = y (forward SOR) or 
-	/// 1/omega*(D+omega*L) * x = y (back SOR), where x is the unknown vector.
+	/// Applies one the following preconditionings: 1/w*(D+w*L) * x = y (forward SOR) or 
+	/// 1/w*(D+w*L) * x = y (back SOR), where x is the unknown vector and w the relaxation factor (scalar).
 	/// </summary>
 	public class SorPreconditionerCsr : CsrStationaryPreconditionerBase
 	{
