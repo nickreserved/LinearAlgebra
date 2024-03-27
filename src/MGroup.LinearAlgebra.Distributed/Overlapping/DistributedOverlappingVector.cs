@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
 using System.Collections.Concurrent;
-using System.Xml.Schema;
 
 //TODOMPI: this class will be mainly used for iterative methods. Taking that into account, make optimizations. E.g. work arrays
 //      used as buffers for MPI communication can be reused across vectors, instead of each vector allocating/freeing identical 
@@ -293,8 +292,8 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode) 
 				{
 					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
-					var sv = Vector.CreateFromArray(transferData.sendValues[neighborID]);
-					sv.CopyNonContiguouslyFrom(localVector, commonEntries);
+					var sv = new Vector(transferData.sendValues[neighborID]);
+					sv.CopyFrom(localVector.View(commonEntries));
 				}
 
 				return transferData;
@@ -315,8 +314,8 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				foreach (int neighborID in localIndexer.ActiveNeighborsOfNode) 
 				{
 					int[] commonEntries = localIndexer.GetCommonEntriesWithNeighbor(neighborID);
-					var rv = Vector.CreateFromArray(recvValues[neighborID]);
-					localVector.AddIntoThisNonContiguouslyFrom(commonEntries, rv);
+					var rv = new Vector(recvValues[neighborID]);
+					localVector.View(commonEntries).AddIntoThis(rv);
 				}
 			};
 			Environment.DoPerNode(sumLocalSubvectors);

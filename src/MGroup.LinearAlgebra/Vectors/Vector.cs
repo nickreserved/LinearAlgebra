@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
@@ -28,7 +30,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public int Length { get { return Elements.Length; } }
 
-		ref double this[int index] => ref Elements[index];
+		public ref double this[int index] => ref Elements[index];
 
 		public Vector Add(IMinimalImmutableVector otherVector) => Axpy(otherVector, 1);
 		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Add(IMinimalImmutableVector otherVector) => Add(otherVector); /*TODO: remove line when C#9*/
@@ -399,6 +401,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="length">The number of entries of the new <see cref="Vector"/> instance.</param>
 		public static Vector CreateZero(int length) => new Vector(new double[length]);
 
+
+
+
+
+
+
+
+
 		#region operators 
 		/// <summary>
 		/// Performs the operation: result[i] = <paramref name="vector1"/>[i] + <paramref name="vector2"/>[i], 
@@ -457,41 +467,35 @@ namespace MGroup.LinearAlgebra.Vectors
 		public static double operator *(Vector vector1, Vector vector2) => vector1.DotProduct(vector2); //TODO: Perhaps call BLAS directly
 		#endregion
 
+
+
+
+
+
+
+
+
+
+
+
 		/// <summary>
 		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
 		/// </summary>
+		[Obsolete("Use this.View(thisIndices).AddIntoThis(otherVector.View(otherIndices))")]
 		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
 		{
-			if (thisIndices.Length != otherIndices.Length) throw new NonMatchingDimensionsException(
-				"thisIndices and otherIndices must have the same length.");
-			if (otherVector is Vector casted)
-			{
-				for (int i = 0; i < thisIndices.Length; ++i)
-				{
-					this.Elements[thisIndices[i]] += casted.Elements[otherIndices[i]];
-				}
-			}
-			else
-			{
-				for (int i = 0; i < thisIndices.Length; ++i) Elements[thisIndices[i]] += otherVector[otherIndices[i]];
-			}
+			Preconditions.CheckVectorDimensions(thisIndices.Length, otherIndices.Length);
+			View(thisIndices).AddIntoThis(otherVector.View(otherIndices));
 		}
 
 		/// <summary>
 		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
 		/// </summary>
+		[Obsolete("Use this.View(thisIndices).AddIntoThis(otherVector)")]
 		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
 		{
-			if (thisIndices.Length != otherVector.Length) throw new NonMatchingDimensionsException(
-				"thisIndices and otherVector must have the same length.");
-			if (otherVector is Vector casted)
-			{
-				for (int i = 0; i < casted.Length; ++i) this.Elements[thisIndices[i]] += casted.Elements[i];
-			}
-			else
-			{
-				for (int i = 0; i < otherVector.Length; ++i) Elements[thisIndices[i]] += otherVector[i];
-			}
+			Preconditions.CheckVectorDimensions(thisIndices.Length, otherVector.Length);
+			View(thisIndices).AddIntoThis(otherVector);
 		}
 
 		/// <summary>
@@ -514,15 +518,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="destinationIdx"/>, <paramref name="sourceVector"/> or <paramref name="sourceIdx"/> 
 		/// violate the described constraints.
 		/// </exception>
+		[Obsolete("Use this.View(destinationIdx, destinationIdx + length).AddIntoThis(otherVector.View(sourceIdx, sourceIdx + length))")]
 		public void AddSubvectorIntoThis(int destinationIdx, IVectorView sourceVector, int sourceIdx, int length)
 		{
-			if (destinationIdx + sourceVector.Length > this.Length) throw new NonMatchingDimensionsException(
-				"The entries to set exceed this vector's length");
-			if (sourceVector is Vector subvectorDense)
-			{
-				Blas.Daxpy(length, 1.0, subvectorDense.Elements, sourceIdx, 1, this.Elements, destinationIdx, 1);
-			}
-			else this.AddSubvectorIntoThis(destinationIdx, sourceVector, 0, sourceVector.Length);
+			Debug.Assert(destinationIdx + length <= Length && sourceIdx + length <= sourceVector.Length);
+			View(destinationIdx, destinationIdx + length).AddIntoThis(otherVector.View(sourceIdx, sourceIdx + length));
 		}
 
 		/// <summary>
@@ -537,34 +537,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="last">The vector whose entries will be appended after all entries of this vector.</param>
 		public Vector Append(Vector last)
 		{
-			//TODO: Move this to an ArrayManipulations utility class.
-			int n1 = this.Elements.Length;
-			int n2 = last.Elements.Length;
-			var result = new double[n1 + n2];
-			Array.Copy(this.Elements, result, n1);
-			Array.Copy(last.Elements, 0, result, n1, n2);
-			return new Vector(result);
+			var result = new Vector(new double[Length + last.Length]);
+			result.View(0, Length).CopyFrom(this);
+			result.View(Length, result.Length).CopyFrom(last);
+			return result;
 		}
 
-
-		/// <summary>
-		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>:
-		/// result[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i]. 
-		/// The resulting vector is written to a new <see cref="Vector"/> and then returned.
-		/// </summary>
-		/// <param name="otherVector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
-		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="otherVector"/> has different 
-		///     <see cref="Length"/> than this.</exception>
-		public Vector Axpy(Vector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(this, otherVector);
-			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[Elements.Length];
-			Array.Copy(Elements, result, Elements.Length);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, result, 0, 1);
-			return new Vector(result);
-		}
 
 		/// <summary>
 		/// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>.
