@@ -8,7 +8,8 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 	{
 		private readonly bool forwardDirection;
 
-		public GaussSeidelPreconditionerCsr(bool forwardDirection = true)
+		public GaussSeidelPreconditionerCsr(bool forwardDirection = true, int numApplications = 1)
+			: base(numApplications)
 		{
 			this.forwardDirection = forwardDirection;
 		}

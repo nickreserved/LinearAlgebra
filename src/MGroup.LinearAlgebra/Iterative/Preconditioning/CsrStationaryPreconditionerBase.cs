@@ -9,12 +9,14 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 
 	public abstract class CsrStationaryPreconditionerBase : IPreconditioner
 	{
+		protected readonly int numApplications;
 		protected readonly StationaryIterationManagedProvider provider;
 		protected CsrMatrix matrix;
 		protected int[] diagonalOffsets;
 
-		public CsrStationaryPreconditionerBase()
+		public CsrStationaryPreconditionerBase(int numApplications)
 		{
+			this.numApplications = numApplications;
 			provider = new StationaryIterationManagedProvider();
 		}
 
@@ -41,7 +43,10 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		{
 			if ((rhsVector is Vector rhs) && (lhsVector is Vector lhs))
 			{
-				SolveLinearSystemInternal(rhs.RawData, lhs.RawData);
+				for (int i = 0; i < numApplications; ++i)
+				{
+					SolveLinearSystemInternal(rhs.RawData, lhs.RawData);
+				}
 			}
 			else
 			{

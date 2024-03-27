@@ -12,7 +12,8 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		private readonly double relaxationFactor;
 		private double[] workArray;
 
-		public SsorPreconditionerCsr(double relaxationFactor)
+		public SsorPreconditionerCsr(double relaxationFactor, int numApplications = 1)
+			: base(numApplications)
 		{
 			this.relaxationFactor = relaxationFactor;
 		}

@@ -9,7 +9,8 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		private readonly double relaxationFactor;
 		private readonly bool forwardDirection;
 
-		public SorPreconditionerCsr(double relaxationFactor, bool forwardDirection = true)
+		public SorPreconditionerCsr(double relaxationFactor, bool forwardDirection = true, int numApplications = 1)
+			: base(numApplications)
 		{
 			this.relaxationFactor = relaxationFactor;
 			this.forwardDirection = forwardDirection;

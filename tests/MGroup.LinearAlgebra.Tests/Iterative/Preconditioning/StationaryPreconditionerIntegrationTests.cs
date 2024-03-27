@@ -18,7 +18,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		[InlineData(false)]
 		private static void TestSorGmres(bool forwardDirection)
 		{
-			RunGmres(new SorPreconditionerCsr(1.2, forwardDirection));
+			RunGmres(new SorPreconditionerCsr(1.2, forwardDirection, numApplications: 1));
 		}
 
 		[Theory]
@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		[InlineData(false)]
 		private static void TestGaussSeidelGmres(bool forwardDirection)
 		{
-			RunGmres(new GaussSeidelPreconditionerCsr(forwardDirection));
+			RunGmres(new GaussSeidelPreconditionerCsr(forwardDirection, numApplications: 1));
 		}
 
 		[Fact]
@@ -44,13 +44,13 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 		[Fact]
 		private static void TestSsorGmres()
 		{
-			RunGmres(new SsorPreconditionerCsr(1.2));
+			RunGmres(new SsorPreconditionerCsr(1.2, numApplications: 1));
 		}
 
 		[Fact]
-		private static void TestssorPcg()
+		private static void TestSsorPcg()
 		{
-			RunPcg(new SsorPreconditionerCsr(1.2));
+			RunPcg(new SsorPreconditionerCsr(1.2, numApplications: 1));
 		}
 
 		private static void RunGmres(IPreconditioner preconditioner)
