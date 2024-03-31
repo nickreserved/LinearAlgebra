@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -15,312 +17,83 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 namespace MGroup.LinearAlgebra.Vectors
 {
 	/// <summary>
-	/// General purpose vector class with more functionality than other vectors. No sparsity is assumed.
+	/// General purpose fully populated vector class.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
-	public class Vector : IFullyPopulatedMutableVector
+	public class Vector : AbstractContiguousFullyPopulatedVector
 	{
-		public Vector(double[] elements)
-		{
-			Elements = elements;
-		}
+		/// <summary>
+		/// Construct a vector from an array of elements.
+		/// </summary>
+		/// <param name="elements">Array of elements provided as is in vector.
+		/// Any later change to a vector element, also modifies corresponding element of this array.
+		/// If you don't want that, use (double[]) elements.Clone()</param>
+		public Vector(double[] elements) =>  Elements = elements;
 
-		public double[] Elements { get; }
+		/// <summary>
+		/// Construct a vector from another.
+		/// </summary>
+		/// <param name="vector">Source vector. Its contents copied to the newly created this vector.</param>
+		public Vector(IExtendedImmutableVector vector) => Elements = vector.CopyToArray();
 
-		public int Length { get { return Elements.Length; } }
+		override public double[] Elements { get; }
 
-		public ref double this[int index] => ref Elements[index];
+		override public int FromIndex { get { return 0; } }
 
-		public Vector Add(IMinimalImmutableVector otherVector) => Axpy(otherVector, 1);
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Add(IMinimalImmutableVector otherVector) => Add(otherVector); /*TODO: remove line when C#9*/
+		override public int Length { get { return Elements.Length; } }
 
-		public Vector AddIntoThis(IMinimalImmutableVector otherVector) => AxpyIntoThis(otherVector, 1);
-		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.AddIntoThis(IMinimalImmutableVector otherVector) => AddIntoThis(otherVector); /*TODO: remove line when C#9*/
 
-		public Vector Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().AxpyIntoThis(otherVector, otherCoefficient);
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().AxpyIntoThis(otherVector, otherCoefficient); /*TODO: remove line when C#9*/
 
-		public Vector AxpyIntoThis(Vector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, Elements, 0, 1);
-			return this;
-		}
-		public Vector AxpyIntoThis(SubVectorView otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, otherVector.FromIndex, 1, Elements, 0, 1);
-			return this;
-		}
-		public Vector AxpyIntoThis(SparseVector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			SparseBlas.Daxpyi(otherVector.RawIndices.Length, otherCoefficient, otherVector.RawValues, otherVector.RawIndices, 0, Elements, 0);
-			return this;
-		}
-		public Vector AxpyIntoThis(INotFullyPopulatedImmutableVector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			//Blas my ass
-			if (otherCoefficient == 1)
-				for (int i = 0; i < Length; ++i)
-					this[i] += otherVector[i];
-			else if (otherCoefficient == -1)
-				for (int i = 0; i < Length; ++i)
-					this[i] -= otherVector[i];
-			else if (otherCoefficient != 0)
-				for (int i = 0; i < Length; ++i)
-					this[i] += otherCoefficient * otherVector[i];
-			return this;
-		}
-		public Vector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient)
-		{
-			// Runtime Identification is_a_bad_thing™
-			// Another (better) solution is otherVector.Scale(otherCoefficient).Add(this); because 'this' is already identified
-			// but it needs an implementation for any type of vector
-			if (otherVector is Vector vector) return AxpyIntoThis(vector, otherCoefficient);
-			if (otherVector is SubVectorView subVectorView) return AxpyIntoThis(subVectorView, otherCoefficient);
-			if (otherVector is SparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
-			if (otherVector is INotFullyPopulatedImmutableVector notFullyPopulatedVector) return AxpyIntoThis(notFullyPopulatedVector, otherCoefficient);
-			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
-		}
-		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient); /*TODO: remove line when C#9*/
+		/* Valid in C#9
+		// ------------------- COVARIANT RETURN TYPE FROM AbstractContiguousFullyPopulatedVector
 
-		public void Clear() => Array.Clear(Elements, 0, Length);
+		override public Vector View(int fromIndex, int toIndex) => (Vector)base.View(fromIndex, toIndex);
+		override public PermutatedVectorView View(int[] indices) => (PermutatedVectorView)base.View(indices);
+		override public Vector AddIntoThis(IMinimalImmutableVector otherVector) => (Vector)base.AddIntoThis(otherVector);
+		override public Vector Clear() => (Vector)base.Clear();
+		override public Vector CopyFrom(IMinimalImmutableVector otherVector) => (Vector)base.CopyFrom(otherVector);
+		override public Vector DoToAllEntriesIntoThis(Func<double, double> unaryOperation) => (Vector)base.DoToAllEntriesIntoThis(unaryOperation);
+		override public Vector LinearCombinationIntoThis(double thisCoefficient, AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		override public Vector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		override public Vector NegativeIntoThis() => (Vector)base.NegativeIntoThis();
+		override public Vector SetAll(double value) => (Vector)base.SetAll(value);
+		override public Vector SubtractIntoThis(IMinimalImmutableVector otherVector) => (Vector)base.SubtractIntoThis(otherVector);
+		override public Vector AxpyIntoThis(AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
+		override public Vector AxpyIntoThis(SparseVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
+		override public Vector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
+		override public Vector DoEntrywiseIntoThis(SparseVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
+		override public Vector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
+		override public Vector DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
+		override public Vector ScaleIntoThis(double coefficient) => (Vector)base.ScaleIntoThis(coefficient);
+		*/
 
-		public Vector Copy(int fromIndex, int toIndex) => new Vector(CopyToArray(fromIndex, toIndex));
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex); /*TODO: remove line when C#9*/
 
-		public Vector Copy(int[] indices) => new Vector(CopyToArray(indices));
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Copy(int[] indices) => Copy(indices); /*TODO: remove line when C#9*/
 
-		public Vector Copy() => new Vector(CopyToArray());
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Copy() => Copy(); /*TODO: remove line when C#9*/
+		// -------- OPERATORS FROM IMinimalImmutableVector
 
-		public void CopyFrom(IMinimalImmutableVector otherVector)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			for (int i = 0; i < Length; ++i)
-				this[i] = ((INotFullyPopulatedImmutableVector)otherVector)[i];
-		}
+		public static Vector operator -(Vector x) => x.Negative();
+		public static Vector operator +(Vector x, Vector y) => x.Add(y);
+		public static Vector operator +(Vector x, IMinimalImmutableVector y) => x.Add(y);
+		public static Vector operator +(IMinimalImmutableVector y, Vector x) => x.Add(y);
+		public static Vector operator -(Vector x, Vector y) => x.Subtract(y);
+		public static Vector operator -(Vector x, IMinimalImmutableVector y) => x.Subtract(y);
+		public static Vector operator -(IMinimalImmutableVector y, Vector x) => (Vector) (x - y).NegativeIntoThis();
+		public static double operator *(Vector x, Vector y) => x.DotProduct(y);
+		public static double operator *(Vector x, IMinimalImmutableVector y) => x.DotProduct(y);
+		public static double operator *(IMinimalImmutableVector x, Vector y) => x.DotProduct(y);
+		public static Vector operator *(Vector x, double y) => x.Scale(y);
+		public static Vector operator *(double y, Vector x) => x.Scale(y);
 
-		public double[] CopyToArray()
-		{
-			var result = new double[Length];
-			Array.Copy(Elements, result, result.Length);
-			return result;
-		}
 
-		public double[] CopyToArray(int fromIndex, int toIndex)
-		{
-			var result = new double[toIndex - fromIndex];
-			Array.Copy(Elements, fromIndex, result, 0, result.Length);
-			return result;
-		}
 
-		public void CopyToArray(double[] array, int arrayIndex, int fromIndex, int toIndex)
-			=> Array.Copy(Elements, fromIndex, array, arrayIndex, toIndex - fromIndex);
 
-		public double[] CopyToArray(int[] indices)
-		{
-			var result = new double[indices.Length];
-			for (int i = 0; i < indices.Length; ++i)
-				result[i] = this[indices[i]];
-			return result;
-		}
 
-		public void CopyToArray(double[] array, int arrayIndex, int[] indices)
-		{
-			for (int i = 0; i < indices.Length; ++i)
-				array[i + arrayIndex] = this[indices[i]];
-		}
 
-		public Vector CreateZero() => new Vector(new double[Length]);
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.CreateZero() => CreateZero(); /*TODO: remove line when C#9*/
 
-		public Vector DoEntrywise(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation)
-		{
-			Vector result = Copy();
-			result.DoEntrywiseIntoThis(otherVector, binaryOperation);
-			return result;
-		}
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.DoEntrywise(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation); /*TODO: remove line when C#9*/
 
-		public void DoEntrywiseIntoThis(SparseVector otherVector, Func<double, double, double> binaryOperation)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			for (int i = 0, j = 0; i < Length; ++i)
-				this[i] = binaryOperation(this[i],
-					j >= otherVector.RawIndices.Length || i < otherVector.RawIndices[j]
-					? 0
-					: otherVector.RawValues[j++]);
-		}
 
-		public void DoEntrywiseIntoThis(INotFullyPopulatedImmutableVector otherVector, Func<double, double, double> binaryOperation)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			for (int i = 0; i < Length; ++i)
-				this[i] = binaryOperation(this[i], otherVector[i]);
-		}
-		public void DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is SparseVector sparseVector) DoEntrywiseIntoThis(sparseVector, binaryOperation);
-			else if (otherVector is INotFullyPopulatedImmutableVector notFullyPopulatedVector) DoEntrywiseIntoThis(notFullyPopulatedVector, binaryOperation);
-			else throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
-		}
 
-		public Vector DoToAllEntries(Func<double, double> unaryOperation)
-		{
-			var result = Copy();
-			result.DoToAllEntriesIntoThis(unaryOperation);
-			return result;
-		}
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation); /*TODO: remove line when C#9*/
-
-		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
-		{
-			for (int i = 0; i < Length; ++i)
-				Elements[i] = unaryOperation(Elements[i]);
-		}
-
-		public double DotProduct(Vector otherVector)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			return Blas.Ddot(Length, Elements, 0, 1, otherVector.Elements, 0, 1);
-		}
-		public double DotProduct(SubVectorView otherVector)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			return Blas.Ddot(Length, Elements, 0, 1, otherVector.Elements, otherVector.FromIndex, 1);
-		}
-		public double DotProduct(SparseVector otherVector)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			return SparseBlas.Ddoti(Length, otherVector.RawValues, otherVector.RawIndices, 0, Elements, 0);
-		}
-		public double DotProduct(INotFullyPopulatedImmutableVector otherVector)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			double result = 0;
-			for (int i = 0; i < Length; ++i)
-				result += this[i] * otherVector[i];
-			return result;
-		}
-		public double DotProduct(IMinimalImmutableVector otherVector)
-		{
-			// Runtime Identification is_a_bad_thing™
-			// Another (better) solution is otherVector.DotProduct(this); because 'this' is already identified
-			// but it needs an implementation for any type of vector
-			if (otherVector is Vector vector) return DotProduct(vector);
-			if (otherVector is SubVectorView subVectorView) return DotProduct(subVectorView);
-			if (otherVector is SparseVector sparseVector) return DotProduct(sparseVector);
-			if (otherVector is INotFullyPopulatedImmutableVector notFullyPopulatedVector) return DotProduct(notFullyPopulatedVector);
-			throw new NotImplementedException("DotProduct(NotSupportedVector)");
-		}
-
-		public bool Equals(SparseVector otherVector, double tolerance = 1E-07)
-		{
-			if (Length != otherVector.Length) return false;
-			var cmp = new ValueComparer(tolerance);
-			for (int i = 0, j = 0; i < Length; ++i)
-				if (!cmp.AreEqual(this[i],
-						j >= otherVector.RawIndices.Length || i < otherVector.RawIndices[j]
-						? 0
-						: otherVector.RawValues[j++])) return false;
-			return true;
-		}
-		public bool Equals(INotFullyPopulatedImmutableVector otherVector, double tolerance = 1E-07)
-		{
-			if (Length != otherVector.Length) return false;
-			var cmp = new ValueComparer(tolerance);
-			for (int i = 0; i < Length; ++i)
-				if (!cmp.AreEqual(this[i], otherVector[i])) return false;
-			return true;
-		}
-		public bool Equals(IMinimalImmutableVector otherVector, double tolerance = 1E-07)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is SparseVector sparseVector) return Equals(sparseVector, tolerance);
-			if (otherVector is INotFullyPopulatedImmutableVector notFullyPopulatedVector) return Equals(notFullyPopulatedVector, tolerance);
-			throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
-		}
-
-		public Vector LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient); /*TODO: remove line when C#9*/
-
-		public Vector LinearCombinationIntoThis(double thisCoefficient, Vector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Elements, 0, 1, thisCoefficient, Elements, 0, 1);
-			return this;
-		}
-		public Vector LinearCombinationIntoThis(double thisCoefficient, SubVectorView otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Elements, otherVector.FromIndex, 1, thisCoefficient, Elements, 0, 1);
-			return this;
-		}
-		public Vector LinearCombinationIntoThis(double thisCoefficient, INotFullyPopulatedImmutableVector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			if (thisCoefficient == 0)
-			{
-				if (otherCoefficient == 0)
-					Clear();
-				else
-				{
-					CopyFrom(otherVector);
-					if (otherCoefficient != 1)
-						ScaleIntoThis(otherCoefficient);
-				}
-			}
-			else
-			{
-				if (thisCoefficient != 1)
-					ScaleIntoThis(thisCoefficient);
-				AxpyIntoThis(otherVector, otherCoefficient);
-			}
-			return this;
-		}
-		public Vector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is SubVectorView subVectorView) return LinearCombinationIntoThis(thisCoefficient, subVectorView, otherCoefficient);
-			if (otherVector is Vector vector) return LinearCombinationIntoThis(thisCoefficient, vector, otherCoefficient);
-			if (otherVector is INotFullyPopulatedImmutableVector notFullyPopulatedVector) return LinearCombinationIntoThis(thisCoefficient, notFullyPopulatedVector, otherCoefficient);
-			throw new NotImplementedException("LinearCombinationIntoThis(thisCoefficient, NotSupportedVector, otherCoefficient)");
-		}
-		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient); /*TODO: remove line when C#9*/
-
-		public double Norm2() => Math.Sqrt(Square());
-
-		public Vector Scale(double coefficient) => Copy().ScaleIntoThis(coefficient);
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Scale(double coefficient) => Scale(coefficient); /*TODO: remove line when C#9*/
-
-		public Vector ScaleIntoThis(double coefficient)
-		{
-			Blas.Dscal(Length, coefficient, Elements, 0, 1);
-			return this;
-		}
-		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.ScaleIntoThis(double coefficient) => ScaleIntoThis(coefficient); /*TODO: remove line when C#9*/
-
-		public void SetAll(double value) => Array.Fill(Elements, value);
-
-		public double Square() => DotProduct(this);
-
-		public Vector Subtract(IMinimalImmutableVector otherVector) => Axpy(otherVector, -1);
-		IFullyPopulatedMutableVector IFullyPopulatedImmutableVector.Subtract(IMinimalImmutableVector otherVector) => Subtract(otherVector); /*TODO: remove line when C#9*/
-
-		public Vector SubtractIntoThis(IMinimalImmutableVector otherVector) => AxpyIntoThis(otherVector, -1);
-		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.SubtractIntoThis(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector); /*TODO: remove line when C#9*/
-
-		public SubVectorView View(int fromIndex, int toIndex) => new SubVectorView(Elements, fromIndex, toIndex);
-		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex); /*TODO: remove line when C#9*/
-
-		public PermutatedVectorView View(int[] indices) => new PermutatedVectorView(Elements, indices);
-		IFullyPopulatedMutableVector IFullyPopulatedMutableVector.View(int[] indices) => View(indices); /*TODO: remove line when C#9*/
 
 
 
@@ -359,46 +132,35 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     will have a reference to the copy, which is safer. If false, the new vector will have a reference to 
 		///     <paramref name="data"/> itself, which is faster.</param>
 		/// <returns></returns>
-		public static Vector CreateFromArray(double[] data, bool copyArray = false)
-		{
-			if (copyArray)
-			{
-				double[] clone = new double[data.Length];
-				Array.Copy(data, clone, data.Length);
-				return new Vector(clone);
-			}
-			else return new Vector(data);
-		}
+		[Obsolete("Use new Vector(data) or new Vector((double[])data.Clone())")]
+		public static Vector CreateFromArray(double[] data, bool copyArray = false) => new Vector(copyArray ? (double[])data.Clone() : data);
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Vector"/> by copying the entries of an existing vector: 
 		/// <paramref name="original"/>.
 		/// </summary>
 		/// <param name="original">The original vector to copy.</param>
-		public static Vector CreateFromVector(IVectorView original)
-		{
-			if (original is Vector casted) return casted.Copy();
-			double[] clone = new double[original.Length];
-			for (int i = 0; i < clone.Length; ++i) clone[i] = original[i];
-			return new Vector(clone);
-		}
+		[Obsolete("Use new Vector(original.CopyToArray()) or new Vector(original)")]
+		public static Vector CreateFromVector(IExtendedImmutableVector original) => new Vector(original);
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Vector"/> with all entries being equal to <paramref name="value"/>.
 		/// </summary>
 		/// <param name="length">The number of entries of the new <see cref="Vector"/> instance.</param>
 		/// <param name="value">The value that all entries of the new vector will be initialized to.</param>
+		[Obsolete("Use v = new Vector(new double[length]); v.SetAll(value);")]
 		public static Vector CreateWithValue(int length, double value)
 		{
-			double[] data = new double[length];
-			for (int i = 0; i < length; ++i) data[i] = value;
-			return new Vector(data);
+			var result = new Vector(new double[length]);
+			result.SetAll(value);
+			return result;
 		}
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Vector"/> with all entries being equal to 0.
 		/// </summary>
 		/// <param name="length">The number of entries of the new <see cref="Vector"/> instance.</param>
+		[Obsolete("Use new Vector(new double[length])")]
 		public static Vector CreateZero(int length) => new Vector(new double[length]);
 
 
@@ -407,96 +169,13 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-
-
-		#region operators 
-		/// <summary>
-		/// Performs the operation: result[i] = <paramref name="vector1"/>[i] + <paramref name="vector2"/>[i], 
-		/// for 0 &lt;= i &lt; <paramref name="vector1"/>.<see cref="Length"/> = <paramref name="vector2"/>.<see cref="Length"/>.
-		/// The resulting entries are written to a new <see cref="Vector"/> instance.
-		/// </summary>
-		/// <param name="vector1">The first <see cref="Vector"/> operand. It must have the same <see cref="Length"/> as 
-		///     <paramref name="vector2"/>.</param>
-		/// <param name="vector2">The second <see cref="Vector"/> operand. It must have the same <see cref="Length"/> as 
-		///     <paramref name="vector1"/>.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="vector1"/> and <paramref name="vector2"/>
-		///     have different <see cref="Length"/>.</exception>
-		public static Vector operator +(Vector vector1, Vector vector2) => vector1.Axpy(vector2, 1.0);
-
-		/// <summary>
-		/// Performs the operation: result[i] = <paramref name="vector1"/>[i] - <paramref name="vector2"/>[i], 
-		/// for 0 &lt;= i &lt; <paramref name="vector1"/>.<see cref="Length"/> = <paramref name="vector2"/>.<see cref="Length"/>.
-		/// The resulting entries are written to a new <see cref="Vector"/> instance.
-		/// </summary>
-		/// <param name="vector1">The first <see cref="Vector"/> operand. It must have the same <see cref="Length"/> as 
-		///     <paramref name="vector2"/>.</param>
-		/// <param name="vector2">The second <see cref="Vector"/> operand. It must have the same <see cref="Length"/> as 
-		///     <paramref name="vector1"/>.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="vector1"/> and <paramref name="vector2"/>
-		///     have different <see cref="Length"/>.</exception>
-		public static Vector operator -(Vector vector1, Vector vector2) => vector1.Axpy(vector2, -1.0);
-
-		/// <summary>
-		/// Performs the operation: result[i] = <paramref name="scalar"/> * <paramref name="vector"/>[i],
-		/// for 0 &lt;= i &lt; <paramref name="vector"/>.<see cref="Length"/>. The resulting entries are written to a new 
-		/// <see cref="Vector"/> instance.
-		/// </summary>
-		/// <param name="scalar">The scalar value that will be multiplied with all vector entries.</param>
-		/// <param name="vector">The vector to multiply.</param>
-		public static Vector operator *(double scalar, Vector vector) => vector.Scale(scalar);
-
-		/// <summary>
-		/// Performs the operation: result[i] = <paramref name="scalar"/> * <paramref name="vector"/>[i],
-		/// for 0 &lt;= i &lt; <paramref name="vector"/>.<see cref="Length"/>. The resulting entries are written to a new 
-		/// <see cref="Vector"/> instance.
-		/// </summary>
-		/// <param name="vector">The vector to multiply.</param>
-		/// <param name="scalar">The scalar value that will be multiplied with all vector entries.</param>
-		public static Vector operator *(Vector vector, double scalar) => vector.Scale(scalar);
-
-		/// <summary>
-		/// Performs the operation: scalar = sum(<paramref name="vector1"/>[i] * <paramref name="vector2"/>[i]), 
-		/// for 0 &lt;= i &lt; <paramref name="vector1"/>.<see cref="Length"/> = <paramref name="vector2"/>.<see cref="Length"/>.
-		/// </summary>
-		/// <param name="vector1">The first <see cref="Vector"/> operand. It must have the same <see cref="Length"/> as 
-		///     <paramref name="vector2"/>.</param>
-		/// <param name="vector2">The second <see cref="Vector"/> operand. It must have the same <see cref="Length"/> as 
-		///     <paramref name="vector1"/>.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="vector1"/> and <paramref name="vector2"/>
-		///     have different <see cref="Length"/>.</exception>
-		public static double operator *(Vector vector1, Vector vector2) => vector1.DotProduct(vector2); //TODO: Perhaps call BLAS directly
-		#endregion
-
-
-
-
-
-
-
-
-
-
-
-
-		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
-		/// </summary>
 		[Obsolete("Use this.View(thisIndices).AddIntoThis(otherVector.View(otherIndices))")]
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-		{
-			Preconditions.CheckVectorDimensions(thisIndices.Length, otherIndices.Length);
-			View(thisIndices).AddIntoThis(otherVector.View(otherIndices));
-		}
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, AbstractFullyPopulatedVector otherVector, int[] otherIndices)
+			=> View(thisIndices).AddIntoThis(otherVector.View(otherIndices));
 
-		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
-		/// </summary>
 		[Obsolete("Use this.View(thisIndices).AddIntoThis(otherVector)")]
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
-		{
-			Preconditions.CheckVectorDimensions(thisIndices.Length, otherVector.Length);
-			View(thisIndices).AddIntoThis(otherVector);
-		}
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector)
+			=> View(thisIndices).AddIntoThis(otherVector);
 
 		/// <summary>
 		/// Performs the operation: this[<paramref name="destinationIdx"/> + i] = this[<paramref name="destinationIdx"/> + i]
@@ -506,7 +185,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="destinationIdx">
 		/// The index into this <see cref="Vector"/> instance, at which to start adding entries to. Constraints: 
 		/// 0 &lt;= <paramref name="destinationIdx"/>, 
-		/// <paramref name="destinationIdx"/> + <paramref name="Length"/> &lt;= this.<see cref="Length"/>.
+		/// <paramref name="destinationIdx"/> + <paramref name="length"/> &lt;= this.<see cref="Length"/>.
 		/// </param>
 		/// <param name="sourceVector">The vector that will be added to a part of this <see cref="Vector"/> instance.</param>
 		/// <param name="sourceIdx">
@@ -518,23 +197,16 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="destinationIdx"/>, <paramref name="sourceVector"/> or <paramref name="sourceIdx"/> 
 		/// violate the described constraints.
 		/// </exception>
-		[Obsolete("Use this.View(destinationIdx, destinationIdx + length).AddIntoThis(otherVector.View(sourceIdx, sourceIdx + length))")]
-		public void AddSubvectorIntoThis(int destinationIdx, IVectorView sourceVector, int sourceIdx, int length)
-		{
-			Debug.Assert(destinationIdx + length <= Length && sourceIdx + length <= sourceVector.Length);
-			View(destinationIdx, destinationIdx + length).AddIntoThis(otherVector.View(sourceIdx, sourceIdx + length));
-		}
-
-		/// <summary>
-		/// See <see cref="IVector.AddToIndex(int, double)"/>.
-		/// </summary>
-		public void AddToIndex(int index, double value) => Elements[index] += value;
+		[Obsolete("Use this.View(destinationIdx, destinationIdx + length).AddIntoThis(sourceVector.View(sourceIdx, sourceIdx + length))")]
+		public void AddSubvectorIntoThis(int destinationIdx, IExtendedImmutableVector sourceVector, int sourceIdx, int length)
+			=> View(destinationIdx, destinationIdx + length).AddIntoThis(sourceVector.View(sourceIdx, sourceIdx + length));
 
 		/// <summary>
 		/// Creates a new <see cref="Vector"/> that contains all entries of this followed by all entries of 
 		/// <paramref name="last"/>.
 		/// </summary>
 		/// <param name="last">The vector whose entries will be appended after all entries of this vector.</param>
+		[Obsolete("Use View with some lines more")]
 		public Vector Append(Vector last)
 		{
 			var result = new Vector(new double[Length + last.Length]);
@@ -543,303 +215,48 @@ namespace MGroup.LinearAlgebra.Vectors
 			return result;
 		}
 
+		[Obsolete("Use this.View(destinationIndex, destinationIndex + length).AxpyIntoThis(sourceVector.View(sourceIndex, sourceIndex + length), sourceCoefficient)")]
+		public void AxpySubvectorIntoThis(int destinationIndex, IExtendedImmutableVector sourceVector, double sourceCoefficient, int sourceIndex, int length)
+			=> View(destinationIndex, destinationIndex + length).AxpyIntoThis(sourceVector.View(sourceIndex, sourceIndex + length), sourceCoefficient);
 
-		/// <summary>
-		/// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>.
-		/// </summary>
-		public void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient,
-			int sourceIndex, int length)
-		{
-			Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
-			Preconditions.CheckSubvectorDimensions(sourceVector, sourceIndex, length);
 
-			if (sourceVector is Vector casted)
-			{
-				Blas.Daxpy(Length, sourceCoefficient, casted.Elements, sourceIndex, 1, this.Elements, destinationIndex, 1);
-			}
-			else
-			{
-				for (int i = 0; i < length; ++i) Elements[i + destinationIndex] += sourceCoefficient * sourceVector[i + sourceIndex];
-			}
-		}
+		[Obsolete("Use this.View(thisIndices).CopyFrom(otherVector.View(otherIndices))")]
+		public void CopyNonContiguouslyFrom(int[] thisIndices, AbstractFullyPopulatedVector otherVector, int[] otherIndices)
+			=> View(thisIndices).CopyFrom(otherVector.View(otherIndices));
 
-		/// <summary>
-		/// See <see cref="IVector.Copy(bool)"/>.
-		/// </summary>
-		public IVector Copy(bool copyIndexingData) => Copy();
-
-		/// <summary>
-		/// Copies <paramref name="length"/> consecutive entries from this <see cref="Vector"/> to a System array starting from 
-		/// the provided indices.
-		/// </summary>
-		/// <param name="sourceIndex">The index into this <see cref="Vector"/> where to start copying from.</param>
-		/// <param name="destinationArray">The System array where entries of this vector will be copied to.</param>
-		/// <param name="destinationIndex">The index into this <paramref name="destinationArray"/> where to start copying 
-		///     to.</param>
-		/// <param name="length">The number of entries to copy.</param>
-		public void CopyToArray(int sourceIndex, double[] destinationArray, int destinationIndex, int length)
-		{
-			Array.Copy(Elements, sourceIndex, destinationArray, destinationIndex, length);
-		}
-
-		/// <summary>
-		/// See <see cref="IVector.CopyFrom(IVectorView)"/>
-		/// </summary>
-		public void CopyFrom(IVectorView sourceVector)
-		{
-			Preconditions.CheckVectorDimensions(this, sourceVector);
-			if (sourceVector is Vector casted) Array.Copy(casted.Elements, this.Elements, this.Length);
-			else
-			{
-				for (int i = 0; i < Length; ++i) Elements[i] = sourceVector[i];
-			}
-		}
-
-		/// <summary>
-		/// Copies all entries from <paramref name="sourceVector"/> to this <see cref="IVector"/>.
-		/// </summary>
-		/// <param name="sourceVector">The vector containing the entries to be copied.</param>
-		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="sourceVector"/> has different <see cref="IIndexable1D.Length"/> than this.
-		/// </exception>
-		public void CopyFrom(Vector sourceVector)
-		{
-			Preconditions.CheckVectorDimensions(this, sourceVector);
-			Array.Copy(sourceVector.Elements, this.Elements, this.Length);
-		}
-
-		/// <summary>
-		/// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>
-		/// </summary>
-		public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-		{
-			if (thisIndices.Length != otherIndices.Length) throw new NonMatchingDimensionsException(
-				"thisIndices and otherIndices must have the same length.");
-			if (otherVector is Vector casted)
-			{
-				for (int i = 0; i < thisIndices.Length; ++i)
-				{
-					this.Elements[thisIndices[i]] = casted.Elements[otherIndices[i]];
-				}
-			}
-			else
-			{
-				for (int i = 0; i < thisIndices.Length; ++i) Elements[thisIndices[i]] = otherVector[otherIndices[i]];
-			}
-		}
 
 		/// <summary>
 		/// Copies selected entries from <paramref name="otherVector"/> to this vector:
 		/// this[<paramref name="thisIndices"/>[i]] = <paramref name="otherVector"/>[i],
-		/// for 0 &lt;= i &lt; this.<see cref="IIndexable1D.Length"/>.
+		/// for 0 &lt;= i &lt; this.
 		/// </summary>
 		/// <param name="thisIndices">
 		/// The indices of this vector, where entries will be copied to. Constraints: 
-		/// 2) 0 &lt;= <paramref name="thisIndices"/>[i] &lt; this.<see cref="IIndexable1D.Length"/>, for all valid i
-		/// </param>
+		/// 2) 0 &lt;= <paramref name="thisIndices"/>[i] &lt; this, for all valid i</param>
 		/// <param name="otherVector">The vector from which entries will be copied.</param>
 		/// /// <exception cref="IndexOutOfRangeException">
 		/// Thrown if <paramref name="thisIndices"/> violates the described constraints.
 		/// </exception>
-		public void CopyNonContiguouslyFrom(int[] thisIndices, Vector otherVector)
-		{
-			for (int i = 0; i < thisIndices.Length; ++i) this.Elements[thisIndices[i]] = otherVector.Elements[i];
-		}
+		[Obsolete("Use this.View(thisIndices).CopyFrom(otherVector)")]
+		public void CopyNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector)
+			=> View(thisIndices).CopyFrom(otherVector);
 
-		/// <summary>
-		/// See <see cref="IVector.CopyNonContiguouslyFrom(IVectorView, int[])"/>
-		/// </summary>
-		public void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
-		{
-			if (otherIndices.Length != this.Length) throw new NonMatchingDimensionsException(
-				"otherIndices and this vector must have the same length.");
-			if (otherVector is Vector casted)
-			{
-				for (int i = 0; i < this.Length; ++i) this.Elements[i] = casted.Elements[otherIndices[i]];
-			}
-			else
-			{
-				for (int i = 0; i < this.Length; ++i) Elements[i] = otherVector[otherIndices[i]];
-			}
-		}
+		[Obsolete("Use this.CopyFrom(otherVector.View(otherIndices))")]
+		public void CopyNonContiguouslyFrom(AbstractFullyPopulatedVector otherVector, int[] otherIndices)
+			=> CopyFrom(otherVector.View(otherIndices));
 
-		/// <summary>
-		/// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>
-		/// </summary>
-		public void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
-		{
-			//TODO: Perhaps a syntax closer to Array: 
-			// e.g. Vector.Copy(sourceVector, sourceIndex, destinationVector, destinationIndex, length)
+		[Obsolete("Use this.View(destinationIndex, destinationIndex + length).CopyFrom(sourceVector.View(sourceIndex, sourceIndex + length))")]
+		public void CopySubvectorFrom(int destinationIndex, IExtendedImmutableVector sourceVector, int sourceIndex, int length)
+			=> View(destinationIndex, destinationIndex + length).CopyFrom(sourceVector.View(sourceIndex, sourceIndex + length));
 
-			Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
-			Preconditions.CheckSubvectorDimensions(sourceVector, sourceIndex, length);
-			if (sourceVector is Vector casted) Array.Copy(casted.Elements, sourceIndex, this.Elements, destinationIndex, length);
-			else
-			{
-				for (int i = 0; i < length; ++i) Elements[i + destinationIndex] = sourceVector[i + sourceIndex];
-			}
-		}
+		[Obsolete("Use this.CreateZero()")]
+		public Vector CreateZeroVectorWithSameFormat() => CreateZero();
 
-		/// <summary>
-		/// See <see cref="IVectorView.CreateZeroVectorWithSameFormat"/>
-		/// </summary>
-		public IVector CreateZeroVectorWithSameFormat() => new Vector(new double[Length]);
+		[Obsolete("Use this.Copy(indices)")]
+		public Vector GetSubvector(int[] indices) => Copy(indices);
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
-		/// </summary>
-		public IVector DoEntrywise(IVectorView vector, Func<double, double, double> binaryOperation)
-		{
-			if (vector is Vector casted) return DoEntrywise(vector, binaryOperation);
-			else return vector.DoEntrywise(this, (x, y) => binaryOperation(y, x)); // To avoid accessing zero entries.
-		}
-
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>
-		/// </summary>
-		public Vector DoEntrywise(Vector vector, Func<double, double, double> binaryOperation)
-		{
-			Preconditions.CheckVectorDimensions(this, vector);
-			double[] result = new double[Elements.Length];
-			for (int i = 0; i < Elements.Length; ++i) result[i] = binaryOperation(this.Elements[i], vector.Elements[i]);
-			return new Vector(result);
-		}
-
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoEntrywiseIntoThis(TVectorIn, Func{double, double, double})"/>
-		/// </summary>
-		public void DoEntrywiseIntoThis(IVectorView vector, Func<double, double, double> binaryOperation)
-		{
-			if (vector is Vector casted) DoEntrywiseIntoThis(casted, binaryOperation);
-			else
-			{
-				Preconditions.CheckVectorDimensions(this, vector);
-				for (int i = 0; i < Elements.Length; ++i) Elements[i] = binaryOperation(Elements[i], vector[i]);
-			}
-		}
-
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoEntrywiseIntoThis(TVectorIn, Func{double, double, double})"/>
-		/// </summary>
-		public void DoEntrywiseIntoThis(Vector vector, Func<double, double, double> binaryOperation)
-		{
-			Preconditions.CheckVectorDimensions(this, vector);
-			for (int i = 0; i < Elements.Length; ++i) Elements[i] = binaryOperation(Elements[i], vector.Elements[i]);
-		}
-
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoToAllEntries(Func{double, double})"/>.
-		/// </summary>
-		IVector IEntrywiseOperableView1D<IVectorView, IVector>.DoToAllEntries(Func<double, double> unaryOperation) 
-			=> DoToAllEntries(unaryOperation);
-
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoToAllEntries(Func{double, double})"/>.
-		/// </summary>
-		public Vector DoToAllEntries(Func<double, double> unaryOperation)
-		{
-			double[] result = new double[Elements.Length];
-			for (int i = 0; i < Elements.Length; ++i) result[i] = unaryOperation(Elements[i]);
-			return new Vector(result);
-		}
-
-		/// <summary>
-		/// See <see cref="IIndexable1D.Equals(IIndexable1D, double)"/>.
-		/// </summary>
-		public bool Equals(IIndexable1D other, double tolerance = 1e-13)
-		{
-			if (other is Vector casted)
-			{
-				if (this.Length != other.Length) return false;
-				var comparer = new ValueComparer(tolerance);
-				for (int i = 0; i < Length; ++i)
-				{
-					if (!comparer.AreEqual(this.Elements[i], casted.Elements[i]))
-					{
-						return false;
-					}
-				}
-				return true;
-			}
-			else return other.Equals(this, tolerance); // To avoid accessing zero entries
-		}
-
-		/// <summary>
-		/// See <see cref="ISliceable1D.GetSubvector(int[])"/>.
-		/// </summary>
-		public Vector GetSubvector(int[] indices)
-		{
-			double[] subvector = new double[indices.Length];
-			for (int i = 0; i < indices.Length; ++i) subvector[i] = Elements[indices[i]];
-			return new Vector(subvector);
-		}
-
-		/// <summary>
-		/// See <see cref="ISliceable1D.GetSubvector(int, int)"/>.
-		/// </summary>
-		public Vector GetSubvector(int startInclusive, int endExclusive)
-		{
-			Preconditions.CheckIndex1D(this, startInclusive);
-			Preconditions.CheckIndex1D(this, endExclusive - 1);
-			if (endExclusive < startInclusive) throw new ArgumentException(
-				$"Exclusive end = {endExclusive} must be >= inclusive start = {startInclusive}");
-
-			int subvectorLength = endExclusive - startInclusive;
-			double[] subvector = new double[subvectorLength];
-			Array.Copy(this.Elements, startInclusive, subvector, 0, subvectorLength);
-			return new Vector(subvector);
-		}
-
-		/// <summary>
-		/// Returns true if this[i] &lt;= <paramref name="tolerance"/> for 0 &lt;= i &lt; this.<see cref="Length"/>. 
-		/// Otherwise false is returned.
-		/// </summary>
-		/// <param name="tolerance">The tolerance under which a vector entry is considered to be 0. It can be set to 0, to check 
-		///     if the entries are exactly 0.</param>
-		public bool IsZero(double tolerance) => DenseStrategies.IsZero(Elements, tolerance);
-
-		/// <summary>
-		/// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
-		/// </summary>
-		public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
-		{
-			if (otherVector is Vector casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
-			else return otherVector.LinearCombination(otherCoefficient, this, thisCoefficient); // To avoid accessing zero entries
-		}
-
-		/// <summary>
-		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>:
-		/// result[i] = <paramref name="thisCoefficient"/> * this[i] + <paramref name="otherCoefficient"/> * 
-		/// <paramref name="otherVector"/>[i]. The resulting vector is written to a new <see cref="Vector"/> and then returned.
-		/// </summary>
-		/// <param name="thisCoefficient">A scalar that multiplies each entry of this <see cref="Vector"/>.</param>
-		/// <param name="otherVector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
-		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="otherVector"/> has different 
-		///     <see cref="Length"/> than this.</exception>
-		public Vector LinearCombination(double thisCoefficient, Vector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(this, otherVector);
-			//TODO: Perhaps this should be done using mkl_malloc and BLAS copy. 
-			double[] result = new double[Elements.Length];
-			if (thisCoefficient == 1.0)
-			{
-				Array.Copy(Elements, result, Elements.Length);
-				Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, 0, 1, result, 0, 1);
-			}
-			else if (otherCoefficient == 1.0)
-			{
-				Array.Copy(otherVector.Elements, result, Elements.Length);
-				Blas.Daxpy(Elements.Length, thisCoefficient, this.Elements, 0, 1, result, 0, 1);
-			}
-			else
-			{
-				Array.Copy(Elements, result, Elements.Length);
-				BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Elements, 0, 1, thisCoefficient, result, 0, 1);
-			}
-			return new Vector(result);
-		}
-
+		[Obsolete("Use this.Copy(startInclusive, endExclusive)")]
+		public Vector GetSubvector(int startInclusive, int endExclusive) => Copy(startInclusive, endExclusive);
 
 
 		/// <summary>
@@ -848,13 +265,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// The resulting vector is written to a new <see cref="Vector"/> and then returned.
 		/// </summary>
 		/// <param name="vector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
-		public Vector MultiplyEntrywise(Vector vector) //TODO: use MKL's vector math
-		{
-			Preconditions.CheckVectorDimensions(this, vector);
-			double[] result = new double[Elements.Length];
-			for (int i = 0; i < Elements.Length; ++i) result[i] = this.Elements[i] * vector.Elements[i];
-			return new Vector(result);
-		}
+		[Obsolete("Use this.DoEntrywise(vector, (x, y) => x * y)")]
+		public Vector MultiplyEntrywise(Vector vector) => DoEntrywise(vector, (x, y) => x * y);
 
 		/// <summary>
 		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 
@@ -862,17 +274,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// The resulting vector overwrites the entries of this <see cref="Vector"/> instance.
 		/// </summary>
 		/// <param name="vector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
-		public void MultiplyEntrywiseIntoThis(Vector vector) //TODO: use MKL's vector math
-		{
-			Preconditions.CheckVectorDimensions(this, vector);
-			double[] result = new double[Elements.Length];
-			for (int i = 0; i < Elements.Length; ++i) this.Elements[i] *= vector.Elements[i];
-		}
+		[Obsolete("Use this.DoEntrywiseIntoThis(vector, (x, y) => x * y)")]
+		public void MultiplyEntrywiseIntoThis(Vector vector) => DoEntrywiseIntoThis(vector, (x, y) => x * y);
 
-		/// <summary>
-		/// See <see cref="IVectorView.Norm2"/>
-		/// </summary>
-		public double Norm2() => Blas.Dnrm2(Length, Elements, 0, 1);
 
 		/// <summary>
 		/// This method is used to remove duplicate values of a Knot Value Vector and return the multiplicity up to
@@ -920,13 +324,13 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 			Vector[] singlesMultiplicityVectors = new Vector[2];
 
-			singlesMultiplicityVectors[0] = Vector.CreateZero(Elements.Length - numberOfZeros);
+			singlesMultiplicityVectors[0] = new Vector(new double[Elements.Length - numberOfZeros]);
 			for (int i = 0; i < Elements.Length - numberOfZeros; i++)
 			{
 				singlesMultiplicityVectors[0][i] = singles[i];
 			}
 
-			singlesMultiplicityVectors[1] = Vector.CreateZero(Elements.Length - numberOfZeros);
+			singlesMultiplicityVectors[1] = new Vector(new double[Elements.Length - numberOfZeros]);
 			for (int i = 0; i < Elements.Length - numberOfZeros; i++)
 			{
 				singlesMultiplicityVectors[1][i] = multiplicity[i];
@@ -954,59 +358,21 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     order.</param>
 		/// <param name="oldToNew">If true, reordered[<paramref name="permutation"/>[i]] = original[i]. If false, 
 		///     reordered[i] = original[<paramref name="permutation"/>[i]].</param>
+		[Obsolete("Use View(indices) both ways")]
 		public Vector Reorder(IReadOnlyList<int> permutation, bool oldToNew)
 		{
-			//TODO: perhaps I should transfer this to a permutation matrix (implemented as a vector)
-			if (permutation.Count != Length)
-			{
-				throw new NonMatchingDimensionsException($"This vector has length = {Length}, while the permutation vector has"
-					+ $" {permutation.Count} entries");
-			}
-			double[] reordered = new double[Length];
+			// this copy is a super bad approach but it is obsolete
+			int[] indices = new int[permutation.Count];
+			for (int i = 0; i < permutation.Count; ++i)
+				indices[i] = permutation[i];
 			if (oldToNew)
 			{
-				for (int i = 0; i < Length; ++i) reordered[permutation[i]] = Elements[i];
+				var result = new Vector(new double[Length]);
+				result.View(indices).CopyFrom(this);
+				return result;
 			}
-			else // TODO: can they be written as one in a smarter way?
-			{
-				for (int i = 0; i < Length; ++i) reordered[i] = Elements[permutation[i]];
-			}
-			return new Vector(reordered);
+			else return Copy(indices);
 		}
-
-		/// <summary>
-		/// See <see cref="IVector.Set(int, double)"/>.
-		/// </summary>
-		public void Set(int index, double value) => Elements[index] = value;
-
-		/// <summary>
-		/// Calculates the tensor product of this vector with <paramref name="vector"/>:
-		/// result[i, j] = this[i] * vector[j], for all valid i, j.
-		/// </summary>
-		/// <param name="vector">The other vector.</param>
-		public Matrix TensorProduct(Vector vector)
-		{
-			//TODO: perhaps I should store them directly in a 1D col major array. That is more efficient but then I should move 
-			//      this method elsewhere, so that it doesn't break the encapsulation of Matrix.
-			var result = Matrix.CreateZero(this.Length, vector.Length);
-			for (int i = 0; i < this.Length; ++i)
-			{
-				for (int j = 0; j < vector.Length; ++j) result[i, j] = this.Elements[i] * vector.Elements[j];
-			}
-			return result;
-		}
-
-
-
-
-
-
-
-
-
-
-
-
 
 		/// <summary>
 		/// The internal array that stores the entries of the vector. 

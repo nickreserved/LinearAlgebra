@@ -1,7 +1,11 @@
 namespace MGroup.LinearAlgebra.Vectors
 {
 	using System;
+	using MGroup.LinearAlgebra.Commons;
 
+	/// <summary>
+	/// The minimal vector functionality for algorithms, which require modifications to vector elements.
+	/// </summary>
 	public interface IMinimalMutableVector : IMinimalImmutableVector
 	{
 		/// <summary>
@@ -18,14 +22,23 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="otherVector">A vector to add to this vector</param>
 		/// <returns>This vector</returns>
-		IMinimalMutableVector AddIntoThis(IMinimalImmutableVector otherVector); // => AxpyIntoThis(otherVector, +1.0);
+		IMinimalMutableVector AddIntoThis(IMinimalImmutableVector otherVector);
+		public static IMinimalMutableVector AddIntoThis(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) => thisVector.AxpyIntoThis(otherVector, 1);
 
 		/// <summary>
 		/// Subtract <paramref name="otherVector"/> from this vector and return this vector.
 		/// </summary>
 		/// <param name="otherVector">A vector to subtract from this vector</param>
 		/// <returns>This vector</returns>
-		IMinimalMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector); // => AxpyIntoThis(otherVector, -1.0);
+		IMinimalMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector);
+		public static IMinimalMutableVector SubtractIntoThis(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) => thisVector.AxpyIntoThis(otherVector, -1);
+
+		/// <summary>
+		/// Negative this vector and return this vector
+		/// </summary>
+		/// <returns>This vector negative</returns>
+		IMinimalMutableVector NegativeIntoThis() => ScaleIntoThis(-1);
+		public static IMinimalMutableVector NegativeIntoThis(IMinimalMutableVector thisVector) => thisVector.ScaleIntoThis(-1);
 
 		/// <summary>
 		/// Multiply this vector with scalar <paramref name="coefficient"/> and return this vector.
@@ -42,24 +55,48 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns><c>thisVector * <paramref name="thisCoefficient"/> + <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></c></returns>
 		IMinimalMutableVector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient);
+		public static IMinimalMutableVector LinearCombinationIntoThis(IMinimalMutableVector thisVector, double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient)
+		{
+			Preconditions.CheckVectorDimensions(thisVector.Length, otherVector.Length);
+			if (thisCoefficient == 0)
+			{
+				if (otherCoefficient == 0)
+					thisVector.Clear();
+				else
+				{
+					thisVector.CopyFrom(otherVector);
+					if (otherCoefficient != 1)
+						thisVector.ScaleIntoThis(otherCoefficient);
+				}
+			}
+			else
+			{
+				if (thisCoefficient != 1)
+					thisVector.ScaleIntoThis(thisCoefficient);
+				thisVector.AxpyIntoThis(otherVector, otherCoefficient);
+			}
+			return thisVector;
+		}
 
 		/// <summary>
 		/// Copy Elements from <paramref name="otherVector"/>
 		/// </summary>
 		/// <param name="otherVector">The source vector from where the Elements will by copied to this vector</param>
-		void CopyFrom(IMinimalImmutableVector otherVector);
+		/// <returns>This vector</returns>
+		IMinimalMutableVector CopyFrom(IMinimalImmutableVector otherVector);
 
 		/// <summary>
 		/// Set all Elements of vector to zero.
 		/// </summary>
-		void Clear();
+		/// <returns>This vector</returns>
+		IMinimalMutableVector Clear();
+		public static IMinimalMutableVector Clear(IMinimalMutableVector thisVector) => thisVector.SetAll(0);
 
 		/// <summary>
 		/// Set all Elements of vector to <paramref name="value"/>.
 		/// </summary>
-		void SetAll(double value);
-
-
+		/// <returns>This vector</returns>
+		IMinimalMutableVector SetAll(double value);
 
 		/// <summary>
 		/// Performs a binary operation on each pair of entries: 
@@ -74,7 +111,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception> 
-		void DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation);
+		/// <returns>This vector</returns>
+		IMinimalMutableVector DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation);
 
 		/// <summary>
 		/// Performs a unary operation on each entry: this[i] = <paramref name="unaryOperation"/>(this[i]).
@@ -84,13 +122,25 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception> 
-		void DoToAllEntriesIntoThis(Func<double, double> unaryOperation);
+		/// <returns>This vector</returns>
+		IMinimalMutableVector DoToAllEntriesIntoThis(Func<double, double> unaryOperation);
 
 
-		// -------- OPERATORS: implied by C# because of +, - and *
 
-		// static IMinimalMutableVector operator +=(IMinimalImmutableVector otherVector) => AddIntoThis(otherVector);
-		// static IMinimalMutableVector operator -=(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector);
-		// static IMinimalMutableVector operator *=(double coefficient) => ScaleIntoThis(coefficient);
+		// -------- OPERATORS FROM IMinimalImmutableVector
+
+		public static IMinimalMutableVector operator -(IMinimalMutableVector x) => x.Negative();
+		public static IMinimalMutableVector operator +(IMinimalMutableVector x, IMinimalMutableVector y) => x.Add(y);
+		public static IMinimalMutableVector operator +(IMinimalMutableVector x, IMinimalImmutableVector y) => x.Add(y);
+		public static IMinimalMutableVector operator +(IMinimalImmutableVector y, IMinimalMutableVector x) => x.Add(y);
+		public static IMinimalMutableVector operator -(IMinimalMutableVector x, IMinimalMutableVector y) => x.Subtract(y);
+		public static IMinimalMutableVector operator -(IMinimalMutableVector x, IMinimalImmutableVector y) => x.Subtract(y);
+		public static IMinimalMutableVector operator -(IMinimalImmutableVector y, IMinimalMutableVector x) => (x - y).NegativeIntoThis();
+		public static double operator *(IMinimalMutableVector x, IMinimalMutableVector y) => x.DotProduct(y);
+		public static double operator *(IMinimalMutableVector x, IMinimalImmutableVector y) => x.DotProduct(y);
+		public static double operator *(IMinimalImmutableVector x, IMinimalMutableVector y) => x.DotProduct(y);
+		public static IMinimalMutableVector operator *(IMinimalMutableVector x, double y) => x.Scale(y);
+		public static IMinimalMutableVector operator *(double y, IMinimalMutableVector x) => x.Scale(y);
+
 	}
 }

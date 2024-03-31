@@ -5,56 +5,32 @@ using MGroup.LinearAlgebra.Reduction;
 
 namespace MGroup.LinearAlgebra.Vectors
 {
-    /// <summary>
-    /// A vector with 2 entries. Optimized version of <see cref="Vector"/>.
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    public class Vector2: IVector, IEntrywiseOperableView1D<Vector2, Vector2>, IEntrywiseOperable1D<Vector2>
+	/// <summary>
+	/// A otherVector with 2 entries. Optimized version of <see cref="Vector"/>.
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	[Obsolete("Use Vector instead")]
+    public class Vector2 : Vector
     {
-        private readonly double[] data;
-
-        private Vector2(double[] data)
-        {
-            this.data = data;
-        }
-
-        /// <summary>
-        /// See <see cref="IIndexable1D.Length"/>.
-        /// </summary>
-        public int Length { get { return 2; } }
-
-        /// <summary>
-        /// The internal array that stores the entries of the vector. It should only be used for passing the raw array to linear 
-        /// algebra libraries.
-        /// </summary>
-        internal double[] InternalData { get { return data; } }
-
-        /// <summary>
-        /// See <see cref="IIndexable1D.this[int]"/>.
-        /// </summary>
-        public double this[int index]
-        {
-            get { return data[index]; }
-            set { data[index] = value; }
-        }
+        public Vector2(double[] data) : base(data) { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="Vector2"/> that contains the provided entries: 
         /// {<paramref name="entry0"/>, <paramref name="entry1"/>}.
         /// </summary>
-        /// <param name="entry0">The first entry of the new vector.</param>
-        /// <param name="entry1">The second entry of the new vector.</param>
+        /// <param name="entry0">The first entry of the new otherVector.</param>
+        /// <param name="entry1">The second entry of the new otherVector.</param>
         public static Vector2 Create(double entry0, double entry1) => new Vector2(new double[] { entry0, entry1 });
 
         /// <summary>
         /// Initializes a new instance of <see cref="Vector2"/> with <paramref name="data"/> or a clone as its internal array.
         /// </summary>
-        /// <param name="data">The entries of the vector to create. Constraints: <paramref name="data"/>.Length == 2.</param>
+        /// <param name="data">The entries of the otherVector to create. Constraints: <paramref name="data"/>.Length == 2.</param>
         /// <param name="copyArray">If true, <paramref name="data"/> will be copied and the new <see cref="Vector2"/> instance 
-        ///     will have a reference to the copy, which is safer. If false, the new vector will have a reference to 
+        ///     will have a reference to the copy, which is safer. If false, the new otherVector will have a reference to 
         ///     <paramref name="data"/> itself, which is faster.</param>
         /// <returns></returns>
-        public static Vector2 CreateFromArray(double[] data, bool copyArray = false)
+        new public static Vector2 CreateFromArray(double[] data, bool copyArray = false)
         {
             if (data.Length != 2) throw new NonMatchingDimensionsException(
                 $"The provided array had length = {data.Length} instead of 2");
@@ -65,7 +41,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// <summary>
         /// Creates an new instance of <see cref="Vector2"/> with all entries being equal to 0.
         /// </summary>
-        public static Vector2 CreateZero() => new Vector2(new double[2]);
+        new public static Vector2 CreateZero() => new Vector2(new double[2]);
 
         #region operators 
         /// <summary>
@@ -94,8 +70,8 @@ namespace MGroup.LinearAlgebra.Vectors
         /// Performs the operation: result[i] = <paramref name="scalar"/> * <paramref name="vector"/>[i],
         /// for 0 &lt;= i &lt; 2. The resulting entries are written to a new <see cref="Vector2"/> instance.
         /// </summary>
-        /// <param name="scalar">The scalar value that will be multiplied with all vector entries.</param>
-        /// <param name="vector">The vector to multiply.</param>
+        /// <param name="scalar">The scalar value that will be multiplied with all otherVector entries.</param>
+        /// <param name="vector">The otherVector to multiply.</param>
         public static Vector2 operator *(double scalar, Vector2 vector)
         {
             return new Vector2(new double[] { scalar * vector.data[0], scalar * vector.data[1] });
@@ -105,8 +81,8 @@ namespace MGroup.LinearAlgebra.Vectors
         /// Performs the operation: result[i] = <paramref name="scalar"/> * <paramref name="vector"/>[i],
         /// for 0 &lt;= i &lt; 2. The resulting entries are written to a new <see cref="Vector2"/> instance.
         /// </summary>
-        /// <param name="vector">The vector to multiply.</param>
-        /// <param name="scalar">The scalar value that will be multiplied with all vector entries.</param>
+        /// <param name="vector">The otherVector to multiply.</param>
+        /// <param name="scalar">The scalar value that will be multiplied with all otherVector entries.</param>
         public static Vector2 operator *(Vector2 vector, double scalar)
         {
             return new Vector2(new double[] { scalar * vector.data[0], scalar * vector.data[1] });
@@ -125,85 +101,34 @@ namespace MGroup.LinearAlgebra.Vectors
         #endregion
 
         /// <summary>
-        /// Performs the operation: this[i] = this[i] + <paramref name="vector"/>[i], 
-        /// for 0 &lt;= i &lt; 2. The resulting vector overwrites the entries of this <see cref="Vector2"/> instance.
+        /// Performs the operation: this[i] = this[i] + <paramref name="otherVector"/>[i], 
+        /// for 0 &lt;= i &lt; 2. The resulting otherVector overwrites the entries of this <see cref="Vector2"/> instance.
         /// </summary>
-        /// <param name="vector">A vector with two entries.</param>
-        public void AddIntoThis(Vector2 vector)
+        /// <param name="otherVector">A otherVector with two entries.</param>
+        public AbstractFullyPopulatedVector AddIntoThis(AbstractFullyPopulatedVector otherVector)
         {
-            this.data[0] += vector.data[0];
-            this.data[1] += vector.data[1];
-        }
-
-        /// <summary>
-        /// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
-        /// </summary>
-        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
-            => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
-
-        /// <summary>
-        /// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
-        /// </summary>
-        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
-            => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
-
-		/// <summary>
-		/// See <see cref="IVector.AddToIndex(int, double)"/>
-		/// </summary>
-		public void AddToIndex(int index, double value)
-		{
-			data[index] += value;
-		}
-
-		/// <summary>
-		/// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
-		/// </summary>
-		public IVector Axpy(IVectorView otherVector, double otherCoefficient)
-        {
-            if (otherVector is Vector2 casted) return Axpy(casted, otherCoefficient);
-            else
-            {
-                Preconditions.CheckVectorDimensions(this, otherVector);
-                return new Vector2(new double[]
-                {
-                    data[0] + otherCoefficient * otherVector[0], data[1] + otherCoefficient * otherVector[1]
-                });
-            }
-        }
-
-        /// <summary>
-        /// Performs the operation: result[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i], 
-        /// for 0 &lt;= i &lt; 2. The resulting vector is written to a new <see cref="Vector2"/> and then returned.
-        /// </summary>
-        /// <param name="otherVector">A vector with two entries.</param>
-        /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
-        public Vector2 Axpy(Vector2 otherVector, double otherCoefficient)
-        {
-            return new Vector2(new double[] 
-            {
-                this.data[0] + otherCoefficient * otherVector.data[0], this.data[1] + otherCoefficient * otherVector.data[1]
-            });
+			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Elements[0] += otherVector[0];
+			Elements[1] += otherVector[1];
+			return this;
         }
 
         /// <summary>
         /// See <see cref="IVector.AxpyIntoThis(IVectorView, double)"/>
         /// </summary>
-        public void AxpyIntoThis(IVectorView otherVector, double otherCoefficient)
+        override public AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
         {
-            if (otherVector is Vector2 casted) AxpyIntoThis(casted, otherCoefficient);
-            else
-            {
-                Preconditions.CheckVectorDimensions(this, otherVector);
-                data[0] += otherCoefficient * otherVector[0];
-                data[1] += otherCoefficient * otherVector[1];
-            }
+            Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+            Elements[0] += otherCoefficient * otherVector[0];
+			Elements[1] += otherCoefficient * otherVector[1];
+			return this;
         }
 
         /// <summary>
         /// Performs the operation: this[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i], 
-        /// for 0 &lt;= i &lt; 2. The resulting vector overwrites the entries of this <see cref="Vector2"/> instance.
+        /// for 0 &lt;= i &lt; 2. The resulting otherVector overwrites the entries of this <see cref="Vector2"/> instance.
         /// </summary>
-        /// <param name="otherVector">A vector with two entries.</param>
+        /// <param name="otherVector">A otherVector with two entries.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
         public void AxpyIntoThis(Vector2 otherVector, double otherCoefficient)
         {
@@ -313,25 +238,8 @@ namespace MGroup.LinearAlgebra.Vectors
         /// Performs the operation: result = this[0] * other[1] - this[1] * other[0]. The result is a scalar value.  
         /// Also note that: other.Cross(this) = - this.Cross(other).
         /// </summary>
-        /// <param name="vector">A vector with two entries.</param>
-        public double CrossProduct(Vector2 vector) => this.data[0] * vector.data[1] - this.data[1] * vector.data[0];
-
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
-        /// </summary>
-        public IVector DoEntrywise(IVectorView vector, Func<double, double, double> binaryOperation)
-        {
-            if (vector is Vector2 casted) return DoEntrywise(vector, binaryOperation);
-            else
-            {
-                Preconditions.CheckVectorDimensions(this, vector);
-                return new Vector2(new double[] 
-                {
-                    binaryOperation(this.data[0], vector[0]),
-                    binaryOperation(this.data[1], vector[1])
-                });
-            }
-        }
+        /// <param name="otherVector">A otherVector with two entries.</param>
+        public double CrossProduct(Vector2 otherVector) => base.CrossProductZ(otherVector);
 
         /// <summary>
         /// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
@@ -402,10 +310,10 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// Calculates the dot (or inner/scalar) product of this vector with <paramref name="vector"/>:
+        /// Calculates the dot (or inner/scalar) product of this otherVector with <paramref name="vector"/>:
         /// result = this[0] * <paramref name="vector"/>[0] + this[1] * <paramref name="vector"/>[1].
         /// </summary>
-        /// <param name="vector">A vector with two entries</param>
+        /// <param name="vector">A otherVector with two entries</param>
         public double DotProduct(Vector2 vector) => this.data[0] * vector.data[0] + this.data[1] * vector.data[1];
 
         /// <summary>
@@ -425,7 +333,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// Returns true if this[i] - <paramref name="other"/>[i] is within the acceptable <paramref name="tolerance"/> for all
         /// 0 &lt;= i &lt; 2. 
         /// </summary>
-        /// <param name="other">The other vector that this <see cref="Vector2"/> instance will be compared to.</param>
+        /// <param name="other">The other otherVector that this <see cref="Vector2"/> instance will be compared to.</param>
         /// <param name="tolerance">The entries at index i of the two vectors will be considered equal, if
         ///     (<paramref name="other"/>[i] - this[i]) / this[i] &lt;= <paramref name="tolerance"/>. Setting 
         ///     <paramref name="tolerance"/> = 0, will check if these entries are exactly the same.</param>
@@ -456,10 +364,10 @@ namespace MGroup.LinearAlgebra.Vectors
         /// <summary>
         /// Performs the operation: result[i] = <paramref name="thisCoefficient"/> * this[i] + 
         ///     <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i], 
-        /// for 0 &lt;= i &lt; 2. The resulting vector is written to a new <see cref="Vector2"/> and then returned.
+        /// for 0 &lt;= i &lt; 2. The resulting otherVector is written to a new <see cref="Vector2"/> and then returned.
         /// </summary>
-        /// <param name="thisCoefficient">A scalar that multiplies each entry of this vector.</param>
-        /// <param name="otherVector">A vector with two entries.</param>
+        /// <param name="thisCoefficient">A scalar that multiplies each entry of this otherVector.</param>
+        /// <param name="otherVector">A otherVector with two entries.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
         public Vector2 LinearCombination(double thisCoefficient, Vector2 otherVector, double otherCoefficient)
         {
@@ -490,10 +398,10 @@ namespace MGroup.LinearAlgebra.Vectors
         /// <summary>
         /// Performs the operation: this[i] = <paramref name="thisCoefficient"/> * this[i] + 
         ///     <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i], 
-        /// for 0 &lt;= i &lt; 2. The resulting vector overwrites the entries of this <see cref="Vector2"/> instance.
+        /// for 0 &lt;= i &lt; 2. The resulting otherVector overwrites the entries of this <see cref="Vector2"/> instance.
         /// </summary>
-        /// <param name="thisCoefficient">A scalar that multiplies each entry of this vector.</param>
-        /// <param name="otherVector">A vector with two entries.</param>
+        /// <param name="thisCoefficient">A scalar that multiplies each entry of this otherVector.</param>
+        /// <param name="otherVector">A otherVector with two entries.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherVector"/>.</param>
         public void LinearCombinationIntoThis(double thisCoefficient, Vector2 otherVector, double otherCoefficient)
         {
@@ -528,16 +436,16 @@ namespace MGroup.LinearAlgebra.Vectors
 
         /// <summary>
         /// Performs the operation: result[i] = <paramref name="scalar"/> * this[i],
-        /// for 0 &lt;= i &lt; 2. The resulting vector is written to a new <see cref="Vector2"/> and then returned.
+        /// for 0 &lt;= i &lt; 2. The resulting otherVector is written to a new <see cref="Vector2"/> and then returned.
         /// </summary>
-        /// <param name="scalar">A scalar that multiplies each entry of this vector.</param>
+        /// <param name="scalar">A scalar that multiplies each entry of this otherVector.</param>
         public Vector2 Scale(double scalar) => new Vector2(new double[] { scalar * data[0], scalar * data[1] });
 
         /// <summary>
         /// Performs the operation: this[i] = <paramref name="scalar"/> * this[i],
-        /// for 0 &lt;= i &lt; 2. The resulting vector overwrites the entries of this <see cref="Vector2"/> instance.
+        /// for 0 &lt;= i &lt; 2. The resulting otherVector overwrites the entries of this <see cref="Vector2"/> instance.
         /// </summary>
-        /// <param name="scalar">A scalar that multiplies each entry of this vector.</param>
+        /// <param name="scalar">A scalar that multiplies each entry of this otherVector.</param>
         public void ScaleIntoThis(double scalar)
         {
             data[0] *= scalar;
@@ -553,9 +461,9 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// Sets all entries of this vector to be equal to <paramref name="value"/>.
+        /// Sets all entries of this otherVector to be equal to <paramref name="value"/>.
         /// </summary>
-        /// <param name="value">The value that all entries of the this vector will be equal to.</param>
+        /// <param name="value">The value that all entries of the this otherVector will be equal to.</param>
         public void SetAll(double value)
         {
             data[0] = value;
@@ -564,9 +472,9 @@ namespace MGroup.LinearAlgebra.Vectors
 
         /// <summary>
         /// Performs the operation: this[i] = this[i] - <paramref name="vector"/>[i], 
-        /// for 0 &lt;= i &lt; 2. The resulting vector overwrites the entries of this <see cref="Vector2"/> instance.
+        /// for 0 &lt;= i &lt; 2. The resulting otherVector overwrites the entries of this <see cref="Vector2"/> instance.
         /// </summary>
-        /// <param name="vector">A vector with two entries.</param>
+        /// <param name="vector">A otherVector with two entries.</param>
         public void SubtractIntoThis(Vector2 vector)
         {
             this.data[0] -= vector.data[0];

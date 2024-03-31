@@ -32,8 +32,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static IVector Add(this IVectorView thisVector, IVectorView otherVector)
-			=> thisVector.Axpy(otherVector, 1.0);
+		//		public static IMinimalMutableVector Add(this IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector)
+		//			=> thisVector.Axpy(otherVector, 1.0);
 
 		/// <summary>
 		/// Performs the operation: 
@@ -52,8 +52,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static void AddIntoThis(this IVector thisVector, IVectorView otherVector) 
-			=> thisVector.AxpyIntoThis(otherVector, 1.0);
+		//		public static void AddIntoThis(this IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) 
+		//			=> thisVector.AxpyIntoThis(otherVector, 1.0);
 
 
 		/// <summary>
@@ -73,8 +73,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static void AddIntoThis(this Vector thisVector, Vector otherVector) 
-			=> thisVector.AxpyIntoThis(otherVector, 1.0);
+		//		public static void AddIntoThis(this Vector thisVector, Vector otherVector) 
+		//			=> thisVector.AxpyIntoThis(otherVector, 1.0);
 
 		/// <summary>
 		/// Performs the following operation for <paramref name="length"/> consecutive entries starting from the provided 
@@ -93,9 +93,10 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     </exception>
 		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i] needs to be overwritten, but that 
 		///     is not permitted by the vector storage format.</exception>
-		public static void AddSubvectorIntoThis(this IVector destinationVector, int destinationIndex, IVectorView sourceVector,
+		[Obsolete("Use destinationVector.View(destinationIndex, destinationIndex + length).AddIntoThis(sourceVector.View(sourceIndex, sourceIndex + length))")]
+		public static void AddSubvectorIntoThis(this IExtendedMutableVector destinationVector, int destinationIndex, IExtendedImmutableVector sourceVector,
 			int sourceIndex, int length) 
-			=> destinationVector.AxpySubvectorIntoThis(destinationIndex, sourceVector, 1.0, sourceIndex, length);
+			=> destinationVector.View(destinationIndex, destinationIndex + length).AddIntoThis(sourceVector.View(sourceIndex, sourceIndex + length));
 
 		/// <summary>
 		/// Performs the operation: a x b = { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]},

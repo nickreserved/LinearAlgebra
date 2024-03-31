@@ -38,7 +38,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		}
 
 		public DistributedOverlappingVector(DistributedOverlappingIndexer indexer)
-		: this(indexer, indexer.Environment.CalcNodeData(node => Vector.CreateZero(indexer.GetLocalComponent(node).NumEntries)))
+		: this(indexer, indexer.Environment.CalcNodeData(node => new Vector(new double[indexer.GetLocalComponent(node).NumEntries])))
 		{}
 
 		public DistributedOverlappingVector(DistributedOverlappingIndexer indexer, Func<int, Vector> createLocalVector)
@@ -72,18 +72,10 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		IMinimalMutableVector IMinimalMutableVector.AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient);/*TODO: remove line when C#9*/
 
 
-		public void Clear()
-		{
-			Environment.DoPerNode(node => LocalVectors[node].Clear());
-		}
+		public void Clear() => Environment.DoPerNode(node => LocalVectors[node].Clear());
 
 
-		public DistributedOverlappingVector Copy()
-		{
-			Dictionary<int, Vector> localVectorsCloned =
-				Environment.CalcNodeData(node => LocalVectors[node].Copy());
-			return new DistributedOverlappingVector(Indexer, localVectorsCloned);
-		}
+		public DistributedOverlappingVector Copy() => new DistributedOverlappingVector(Indexer, Environment.CalcNodeData(node => LocalVectors[node].Copy()));
 		
 		IMinimalMutableVector IMinimalImmutableVector.Copy() => Copy();/*TODO: remove line when C#9*/
 
@@ -156,8 +148,14 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public bool Equals(IMinimalImmutableVector otherVector, double tolerance = 1E-7)
 			=> Equals((DistributedOverlappingVector)otherVector, tolerance);
 
+		public bool IsZero(double tolerance = 1E-7)
+		{
+			Dictionary<int, bool> flags = Environment.CalcNodeData(node => LocalVectors[node].IsZero(tolerance));
+			return Environment.AllReduceAnd(flags);
+		}
 
-		protected int LengthInner()
+
+		private int LengthInner()
 		{
 			Dictionary<int, double> localLengths = Environment.CalcNodeData(node =>
 			{
@@ -426,5 +424,15 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public DistributedOverlappingVector LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => Copy().LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
 		IMinimalMutableVector IMinimalImmutableVector.LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient); /*TODO: remove line when C#9*/
+	
+		public DistributedOverlappingVector NegativeIntoThis()
+		{
+			Environment.DoPerNode(node => LocalVectors[node].NegativeIntoThis());
+			return this;
+		}
+		IMinimalMutableVector IMinimalMutableVector.NegativeIntoThis() => NegativeIntoThis(); /*TODO: remove line when C#9*/
+
+		public DistributedOverlappingVector Negative() => Copy().NegativeIntoThis();
+		IMinimalMutableVector IMinimalImmutableVector.Negative() => Negative(); /*TODO: remove line when C#9*/
 	}
 }

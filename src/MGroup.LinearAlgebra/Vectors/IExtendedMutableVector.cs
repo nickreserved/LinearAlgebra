@@ -2,8 +2,15 @@ namespace MGroup.LinearAlgebra.Vectors
 {
 	using System;
 
+
+	/// The minimal vector functionality for algorithms, which requires modifications to vector elements.
 	public interface IExtendedMutableVector : IExtendedImmutableVector, IMinimalMutableVector
 	{
+
+
+		// ------------------- COVARIANT RETURN TYPE FROM IExtendedImmutableVector
+
+
 		/// <summary>
 		/// Provides a view to a contiguous part of this vector.
 		/// </summary>
@@ -12,39 +19,60 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="toIndex">Index <paramref name="toIndex"/>, of this vector, will be the last+1 element of view vector</param>
 		/// <returns>A subvector view of this vector in range [<paramref name="fromIndex"/>, <paramref name="toIndex"/>)</returns>
 		new IExtendedMutableVector View(int fromIndex, int toIndex);
-		IExtendedImmutableVector IExtendedImmutableVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex); /*TODO: remove line when C#9*/
-
-		/// <summary>
-		/// Provides a scattered view to this vector.
-		/// </summary>
-		/// View can expose mutable functionality in derived classes.
-		/// In that case, any change in subvector view Elements, changes also corresponding Elements of this vector.
-		/// <param name="indices">Element with that indices of this vector, form the returned vector view.
-		/// Not all indices from this vector needed and the same indices can exist more than once.</param>
-		/// <returns>A vector view of this vector with Elements for given indices</returns>
-		new IExtendedMutableVector View(int[] indices);
-		IExtendedImmutableVector IExtendedImmutableVector.View(int[] indices) => View(indices); /*TODO: remove line when C#9*/
-
-
-
+		IExtendedImmutableVector IExtendedImmutableVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex);
 
 
 
 		// ------------------- COVARIANT RETURN TYPE FROM IMinimalMutableVector
 
 		new IExtendedMutableVector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient);
-		IMinimalMutableVector IMinimalMutableVector.AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient); /*TODO: remove line when C#9*/
+		IMinimalMutableVector IMinimalMutableVector.AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient);
 
-		new IExtendedMutableVector AddIntoThis(IMinimalImmutableVector otherVector); // => AxpyIntoThis(otherVector, +1.0);
-		IMinimalMutableVector IMinimalMutableVector.AddIntoThis(IMinimalImmutableVector otherVector) => AddIntoThis(otherVector); /*TODO: remove line when C#9*/
+		new IExtendedMutableVector AddIntoThis(IMinimalImmutableVector otherVector);
+		IMinimalMutableVector IMinimalMutableVector.AddIntoThis(IMinimalImmutableVector otherVector) => AddIntoThis(otherVector);
 
-		new IExtendedMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector); // => AxpyIntoThis(otherVector, -1.0);
-		IMinimalMutableVector IMinimalMutableVector.SubtractIntoThis(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector); /*TODO: remove line when C#9*/
+		new IExtendedMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector);
+		IMinimalMutableVector IMinimalMutableVector.SubtractIntoThis(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector);
+
+		new IExtendedMutableVector NegativeIntoThis() => (IExtendedMutableVector)((IMinimalMutableVector)this).NegativeIntoThis();
+		IMinimalMutableVector IMinimalMutableVector.NegativeIntoThis() => NegativeIntoThis();
 
 		new IExtendedMutableVector ScaleIntoThis(double coefficient);
-		IMinimalMutableVector IMinimalMutableVector.ScaleIntoThis(double coefficient) => ScaleIntoThis(coefficient); /*TODO: remove line when C#9*/
+		IMinimalMutableVector IMinimalMutableVector.ScaleIntoThis(double coefficient) => ScaleIntoThis(coefficient);
 
 		new IExtendedMutableVector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient);
-		IMinimalMutableVector IMinimalMutableVector.LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient); /*TODO: remove line when C#9*/
+		IMinimalMutableVector IMinimalMutableVector.LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+
+		new IExtendedMutableVector CopyFrom(IMinimalImmutableVector otherVector);
+		IMinimalMutableVector IMinimalMutableVector.CopyFrom(IMinimalImmutableVector otherVector) => CopyFrom(otherVector);
+
+		new IExtendedMutableVector Clear();
+		IMinimalMutableVector IMinimalMutableVector.Clear() => Clear();
+
+		new IExtendedMutableVector SetAll(double value);
+		IMinimalMutableVector IMinimalMutableVector.SetAll(double value) => SetAll(value);
+
+		new IExtendedMutableVector DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation);
+		IMinimalMutableVector IMinimalMutableVector.DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywiseIntoThis(otherVector, binaryOperation);
+
+		new IExtendedMutableVector DoToAllEntriesIntoThis(Func<double, double> unaryOperation);
+		IMinimalMutableVector IMinimalMutableVector.DoToAllEntriesIntoThis(Func<double, double> unaryOperation) => DoToAllEntriesIntoThis(unaryOperation);
+
+
+
+		// -------- OPERATORS FROM IMinimalImmutableVector
+
+		public static IExtendedMutableVector operator -(IExtendedMutableVector x) => x.Negative();
+		public static IExtendedMutableVector operator +(IExtendedMutableVector x, IExtendedMutableVector y) => x.Add(y);
+		public static IExtendedMutableVector operator +(IExtendedMutableVector x, IMinimalImmutableVector y) => x.Add(y);
+		public static IExtendedMutableVector operator +(IMinimalImmutableVector y, IExtendedMutableVector x) => x.Add(y);
+		public static IExtendedMutableVector operator -(IExtendedMutableVector x, IExtendedMutableVector y) => x.Subtract(y);
+		public static IExtendedMutableVector operator -(IExtendedMutableVector x, IMinimalImmutableVector y) => x.Subtract(y);
+		public static IExtendedMutableVector operator -(IMinimalImmutableVector y, IExtendedMutableVector x) => (x - y).NegativeIntoThis();
+		public static double operator *(IExtendedMutableVector x, IExtendedMutableVector y) => x.DotProduct(y);
+		public static double operator *(IExtendedMutableVector x, IMinimalImmutableVector y) => x.DotProduct(y);
+		public static double operator *(IMinimalImmutableVector x, IExtendedMutableVector y) => x.DotProduct(y);
+		public static IExtendedMutableVector operator *(IExtendedMutableVector x, double y) => x.Scale(y);
+		public static IExtendedMutableVector operator *(double y, IExtendedMutableVector x) => x.Scale(y);
 	}
 }
