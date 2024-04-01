@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Iterative.Preconditioning
+namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 {
 	/// <summary>
 	/// Applies one the following preconditionings: (L+D) * x = y (forward Gauss-Seidel) or (U+D) * x = y (back Gauss-Seidel),

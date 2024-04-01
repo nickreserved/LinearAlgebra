@@ -1,8 +1,9 @@
-namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
+namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 {
 	using MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual;
 	using MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient;
 	using MGroup.LinearAlgebra.Iterative.Preconditioning;
+	using MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary;
 	using MGroup.LinearAlgebra.Iterative.Termination.Iterations;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.Tests.TestData;
@@ -11,7 +12,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 
 	using Xunit;
 
-	public class StationaryPreconditionerIntegrationTests
+	public class StationaryPrecondIntegrationSmallTests
 	{
 		[Theory]
 		[InlineData(true)]
@@ -64,7 +65,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning
 			builder.RelativeTolerance = 1E-7;
 			builder.AbsoluteTolerance = 1E-5;
 			builder.MaximumIterations = 10;
-			GmresAlgorithm gmres = builder.Build();
+			var gmres = builder.Build();
 			preconditioner.UpdateMatrix(A, true);
 			var stats = gmres.Solve(A, preconditioner, b, xComputed, true, () => Vector.CreateZero(b.Length));
 

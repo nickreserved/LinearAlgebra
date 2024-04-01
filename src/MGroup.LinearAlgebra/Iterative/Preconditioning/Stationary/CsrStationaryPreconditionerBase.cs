@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Iterative.Preconditioning
+namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 {
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
@@ -41,9 +41,9 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 
 		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
 		{
-			if ((rhsVector is Vector rhs) && (lhsVector is Vector lhs))
+			if (rhsVector is Vector rhs && lhsVector is Vector lhs)
 			{
-				for (int i = 0; i < numApplications; ++i)
+				for (var i = 0; i < numApplications; ++i)
 				{
 					SolveLinearSystemInternal(rhs.RawData, lhs.RawData);
 				}

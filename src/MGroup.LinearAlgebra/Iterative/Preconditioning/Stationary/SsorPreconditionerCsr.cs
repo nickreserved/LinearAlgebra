@@ -1,6 +1,7 @@
-namespace MGroup.LinearAlgebra.Iterative.Preconditioning
+namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 {
 	using System;
+
 	using MGroup.LinearAlgebra.Matrices;
 
 	/// <summary>

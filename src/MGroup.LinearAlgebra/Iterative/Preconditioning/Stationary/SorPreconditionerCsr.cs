@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Iterative.Preconditioning
+namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 {
 	/// <summary>
 	/// Applies one the following preconditionings: 1/w*(D+w*L) * x = y (forward SOR) or 
