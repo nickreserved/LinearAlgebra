@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			//TODO: perhaps this should be done in an Initialize() method
 			if (numIterationsBeforeCorrection == int.MinValue)
 			{
-				numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.Rows()));
+				numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.NumRows));
 			}
 
 			if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)
             {
-                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.Rows()));
+                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(pcg.Matrix.NumRows));
             }
 
             if ((pcg.Iteration % numIterationsBeforeCorrection == 0) && (pcg.Iteration != 0)) //The first iteration uses the correct residual.

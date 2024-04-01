@@ -159,8 +159,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
 
-			Preconditions.CheckMultiplicationDimensions(matrix.Columns(), solution.Length());
-			Preconditions.CheckSystemSolutionDimensions(matrix.Rows(), rhs.Length());
+			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
+			Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
 			this.Matrix = matrix;
 			this.Preconditioner = preconditioner;
@@ -170,7 +170,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			// r = b - A * x
 			if (initialGuessIsZero) residual = rhs.Copy();
 			else residual = ExactResidual.Calculate(matrix, rhs, solution);
-			return SolveInternal(MaxIterationsProvider.GetMaxIterations(matrix.Columns()));
+			return SolveInternal(MaxIterationsProvider.GetMaxIterations(matrix.NumColumns));
 		}
 
 		protected abstract IterativeStatistics SolveInternal(int maxIterations);

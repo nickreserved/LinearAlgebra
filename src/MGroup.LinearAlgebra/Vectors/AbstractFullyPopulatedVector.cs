@@ -18,6 +18,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="index">The index of the element to return.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="index"/> is lower than 0 or greater or equal to size of the vector</exception>
 		abstract public ref double this[int index] { get; }
+		[Obsolete("Intention of this property, is for sparse vectors and it is highly inefficient. Please stop use it RIGHT NOW")]
+		double IExtendedMutableVector.this[int index]
+		{
+			get { return this[index]; }
+			set { this[index] = value; }
+		}
 
 		abstract public int Length { get; }
 		int IMinimalImmutableVector.Length => Length;
@@ -136,7 +142,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (otherCoefficient == 1)
 				for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
 					this[otherVector.Indices[i]] += otherVector.Values[i];
@@ -150,7 +156,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 		virtual public AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (otherCoefficient == 1)
 				for (int i = 0; i < Length; ++i)
 					this[i] += otherVector[i];
@@ -200,7 +206,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public AbstractFullyPopulatedVector CopyFrom(IMinimalImmutableVector otherVector)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			for (int i = 0; i < Length; ++i)
 				this[i] = ((AbstractFullyPopulatedVector)otherVector)[i];
 			return this;
@@ -220,7 +226,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			for (int i = 0, j = otherVector.FromIndex; i < Length; ++i)
 				this[i] = binaryOperation(this[i],
 					j >= otherVector.ToIndex || i < otherVector.Indices[j]
@@ -230,7 +236,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			for (int i = 0; i < Length; ++i)
 				this[i] = binaryOperation(this[i], otherVector[i]);
 			return this;
@@ -258,7 +264,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public double DotProduct(AbstractSparseVector otherVector)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			double result = 0;
 			for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
 				result += this[otherVector.Indices[i]] * otherVector.Values[i];
@@ -266,7 +272,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 		virtual public double DotProduct(AbstractFullyPopulatedVector otherVector)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			double result = 0;
 			for (int i = 0; i < Length; ++i)
 				result += this[i] * otherVector[i];

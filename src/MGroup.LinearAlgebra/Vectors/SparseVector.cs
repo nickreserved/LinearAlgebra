@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using CSparse.Double.Factorization;
 
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -30,6 +30,8 @@ namespace MGroup.LinearAlgebra.Vectors
             Length = length;
             Values = values;
             Indices = indices;
+			Debug.Assert(Indices.Length == 0 || Indices.Last() < Length);
+			Debug.Assert(Indices.Length <= Values.Length);
         }
 
 		/// <summary>
@@ -59,6 +61,15 @@ namespace MGroup.LinearAlgebra.Vectors
 		override public int FromIndex { get => 0; }
 		override public int ToIndex { get => Indices.Length; }
 
+		override public AbstractSparseVector CopyFrom(AbstractSparseVector otherVector)
+		{
+			Preconditions.CheckVectorDimensions(this, otherVector);
+			Indices = new int[otherVector.ToIndex - otherVector.FromIndex];
+			Values = new double[Indices.Length];
+			Array.Copy(otherVector.Indices, otherVector.FromIndex, Indices, 0, Indices.Length);
+			Array.Copy(otherVector.Values, otherVector.FromIndex, Values, 0, Values.Length);
+			return this;
+		}
 
 
 
@@ -187,7 +198,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// <see cref="SparseVector"/>.
         /// </summary>
         /// <param name="denseVector">The original vector that will be converted to <see cref="SparseVector"/>.</param>
-        public static SparseVector CreateFromDense(Vector denseVector) => CreateFromDense(denseVector.RawData);
+        public static SparseVector CreateFromDense(Vector denseVector) => CreateFromDense(denseVector.Elements);
 
         /// <summary>
         /// Creates a new instance of <see cref="SparseVector"/> with the entries of <paramref name="denseVector"/>. Only the
@@ -279,165 +290,32 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
-		/// </summary>
 		[Obsolete("Avoid use of this")]
-        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector, int[] otherIndices)
+        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IExtendedImmutableVector otherVector, int[] otherIndices)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
 
-		/// <summary>
-		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
-		/// </summary>
 		[Obsolete("Avoid use of this")]
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector)
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IExtendedImmutableVector otherVector)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
 
-		/// <summary>
-		/// See <see cref="IVector.AddToIndex(int, double)"/>.
-		/// </summary>
-		[Obsolete("use this[index] += value instead")]
+		[Obsolete("use this[index] += value instead - better not using it at all because it is highly inefficient")]
 		public void AddToIndex(int index, double value) => this[index] += value;
 
-		/// <summary>
-		/// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
-		/// </summary>
-		public IVector Axpy(IVectorView otherVector, double otherCoefficient)
-        {
-            Preconditions.CheckVectorDimensions(this, otherVector);
-            if (otherVector is SparseVector otherSparse) // In case both matrices have the exact same index arrays
-            {
-                if (HasSameIndexer(otherSparse))
-                {
-                    // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-                    double[] result = new double[this.values.Length];
-                    Array.Copy(this.values, result, this.values.Length);
-                    Blas.Daxpy(values.Length, otherCoefficient, otherSparse.values, 0, 1, result, 0, 1);
-                    return new SparseVector(Length, result, indices);
-                }
-            }
-            else if (otherVector is Vector otherDense)
-            {
-                double[] result = otherDense.Scale(otherCoefficient).RawData;
-                SparseBlas.Daxpyi(this.indices.Length, 1.0, this.values, this.indices, 0, result, 0);
-                return Vector.CreateFromArray(result, false);
-            }
-            // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this vector)
-            return DenseStrategies.LinearCombination(this, 1.0, otherVector, otherCoefficient);
-        }
+		[Obsolete("Avoid use of this")]
+		public void AxpySubvectorIntoThis(int destinationIndex, IExtendedImmutableVector sourceVector, double sourceCoefficient, int sourceIndex, int length)
+			=> View(destinationIndex, destinationIndex + length).AxpyIntoThis(sourceVector.View(sourceIndex, sourceIndex + length), sourceCoefficient);
 
-        /// <summary>
-        /// See <see cref="IVector.AxpyIntoThis(IVectorView, double)"/>.
-        /// </summary>
-        public void AxpyIntoThis(IVectorView otherVector, double otherCoefficient)
-        {
-            if (otherVector is SparseVector otherSparse) AxpyIntoThis(otherSparse, otherCoefficient);
-            else throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the otherVector vector has the same sparsity pattern");
-        }
-
-        /// <summary>
-        /// Performs the following operation for all i:
-        /// this[i] = <paramref name="otherCoefficient"/> * <paramref name="otherVector"/>[i] + this[i]. 
-        /// Optimized version of <see cref="IVector.DoEntrywise(IVectorView, Func{double, double, double})"/> and 
-        /// <see cref="IVector.LinearCombination(double, IVectorView, double)"/>. Named after BLAS axpy (y = a*x plus y).
-        /// The resulting vector overwrites the entries of this.
-        /// </summary>
-        /// <param name="otherVector">
-        /// A vector with the same <see cref="IIndexable1D.Length"/> as this.
-        /// </param>
-        /// <param name="otherCoefficient">
-        /// A scalar that multiplies each entry of <paramref name="otherVector"/>.
-        /// </param>
-        /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if <paramref name="otherVector"/> has different <see cref="IIndexable1D.Length"/> than this.
-        /// </exception>
-        /// <exception cref="SparsityPatternModifiedException">
-        /// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
-        /// </exception> 
-        public void AxpyIntoThis(SparseVector otherVector, double otherCoefficient)
-        {
-            Preconditions.CheckVectorDimensions(this, otherVector);
-            if (!HasSameIndexer(otherVector)) throw new SparsityPatternModifiedException(
-                "This operation is legal only if the otherVector vector has the same sparsity pattern");
-
-            Blas.Daxpy(values.Length, otherCoefficient, otherVector.values, 0, 1, this.values, 0, 1);
-        }
-
-        /// <summary>
-        /// See <see cref="IVector.AxpySubvectorIntoThis(int, IVectorView, double, int, int)"/>.
-        /// </summary>
-        public void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient,
-            int sourceIndex, int length)
-        {  
-            //TODO: needs testing for off-by-1 bugs and extension to cases where source and destination indices are different.
-
-            Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
-            Preconditions.CheckSubvectorDimensions(sourceVector, sourceIndex, length);
-
-            if ( (sourceVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
-            {
-                if (destinationIndex != sourceIndex) throw new NotImplementedException();
-                int start = Array.FindIndex(this.indices, x => x >= destinationIndex);
-                int end = Array.FindIndex(this.indices, x => x >= destinationIndex + length);
-                int sparseLength = end - start;
-                Blas.Daxpy(sparseLength, sourceCoefficient, otherSparse.values, start, 1, this.values, start, 1);
-            }
-            throw new SparsityPatternModifiedException(
-                "This operation is legal only if the otherVector vector has the same sparsity pattern");
-        }
-
-
-        /// <summary>
-        /// See <see cref="IVector.CopyFrom(IVectorView)"/>
-        /// </summary>
-        public void CopyFrom(IVectorView sourceVector)
-        {
-            Preconditions.CheckVectorDimensions(this, sourceVector);
-            if ((sourceVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
-            {
-                Array.Copy(otherSparse.values, this.values, this.Length);
-            }
-            throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the otherVector vector has the same sparsity pattern");
-        }
-
-/*		MUCH OF EFFORT FOR NOTHING(?)
- * 
-		 /// <summary>
-        /// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>
-        /// </summary>
-        public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+		[Obsolete("Avoid use of this because it is highly inefficient")]
+		public void CopyNonContiguouslyFrom(int[] thisIndices, IExtendedImmutableVector otherVector, int[] otherIndices)
             => DenseStrategies.CopyNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
 
-        /// <summary>
-        /// See <see cref="IVector.CopyNonContiguouslyFrom(IVectorView, int[])"/>
-        /// </summary>
-        public void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
+		[Obsolete("Avoid use of this because it is highly inefficient")]
+		public void CopyNonContiguouslyFrom(IExtendedImmutableVector otherVector, int[] otherIndices)
             => DenseStrategies.CopyNonContiguouslyFrom(this, otherVector, otherIndices);
 
-        /// <summary>
-        /// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>
-        /// </summary>
-        public void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
-        {
-            //TODO: needs testing for off-by-1 bugs and extension to cases where source and destination indices are different.
-            Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
-            Preconditions.CheckSubvectorDimensions(sourceVector, sourceIndex, length);
-
-            if ((sourceVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
-            {
-                if (destinationIndex != sourceIndex) throw new NotImplementedException();
-                int start = Array.FindIndex(this.indices, x => x >= destinationIndex);
-                int end = Array.FindIndex(this.indices, x => x >= destinationIndex + length);
-                int sparseLength = end - start;
-                Array.Copy(otherSparse.values, start, this.values, start, sparseLength);
-            }
-            throw new SparsityPatternModifiedException(
-                "This operation is legal only if the otherVector vector has the same sparsity pattern");
-        }
-*/
-
+		[Obsolete("Avoid use of this")]
+		public void CopySubvectorFrom(int destinationIndex, IExtendedImmutableVector sourceVector, int sourceIndex, int length)
+			=> View(destinationIndex, destinationIndex + length).CopyFrom(sourceVector.View(sourceIndex, sourceIndex + length));
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Vector"/> that contains the same non-zero entries as this 
@@ -452,97 +330,30 @@ namespace MGroup.LinearAlgebra.Vectors
 		[Obsolete("Use this.ToIndex - this.FromIndex instead")]
         public int CountNonZeros() => ToIndex - FromIndex;
 
-
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
-        /// </summary>
-        public IVector DoEntrywise(IVectorView otherVector, Func<double, double, double> binaryOperation)
-        {
-            Preconditions.CheckVectorDimensions(this, otherVector);
-            if (otherVector is SparseVector otherSparse) // In case both matrices have the exact same index arrays
-            {
-                if (HasSameIndexer(otherSparse))
-                {
-                    // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-                    double[] resultValues = new double[values.Length];
-                    for (int i = 0; i < values.Length; ++i)
-                    {
-                        resultValues[i] = binaryOperation(this.values[i], otherSparse.values[i]);
-                    }
-                    return new SparseVector(Length, resultValues, indices);
-                }
-            }
-
-            // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this vector)
-            return DenseStrategies.DoEntrywise(this, otherVector, binaryOperation);
-        }
-
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoEntrywiseIntoThis(TVectorIn, Func{double, double, double})"/>
-        /// </summary>
-        public void DoEntrywiseIntoThis(IVectorView otherVector, Func<double, double, double> binaryOperation)
-        {
-            Preconditions.CheckVectorDimensions(this, otherVector);
-            if ((otherVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
-            {
-                for (int i = 0; i < values.Length; ++i)
-                {
-                    this.values[i] = binaryOperation(this.values[i], otherSparse.values[i]);
-                }
-            }
-            throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the otherVector vector has the same sparsity pattern");
-        }
-
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoToAllEntries(Func{double, double})"/>.
-        /// </summary>
-        public IVector DoToAllEntries(Func<double, double> unaryOperation)
-        {
-            // Only apply the operation on non zero entries
-            double[] newValues = new double[values.Length];
-            for (int i = 0; i < values.Length; ++i) newValues[i] = unaryOperation(values[i]);
-
-            if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0)) // The same sparsity pattern can be used.
-            {
-                // Copy the index arrays. TODO: See if we can use the same index arrays (e.g. if this class does not change them (it shouldn't))
-                int[] indicesCopy = new int[indices.Length];
-                Array.Copy(indices, indicesCopy, indices.Length);
-                return new SparseVector(Length, newValues, indicesCopy);
-            }
-            else // The sparsity is destroyed. Revert to a full vector.
-            {
-                return new SparseVector(Length, newValues, indices).CopyToFullVector();
-            }
-        }
-
 		/// <summary>
 		/// Iterates over the non zero entries of the vector. This includes zeros that are explicitly stored.
 		/// </summary>
 		[Obsolete("use EnumerateStoredElements() instead")]
 		public IEnumerable<(int index, double value)> EnumerateNonZeros() => EnumerateStoredElements();
 
-
         /// <summary>
         /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
         /// </summary>
         public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
         {
-            double aggregator = identityValue;
-            int nnz = values.Length;
-            for (int i = 0; i < nnz; ++i) aggregator = processEntry(values[i], aggregator);
-            aggregator = processZeros(Length - nnz, aggregator);
-            return finalize(aggregator);
+            for (int i = FromIndex; i < ToIndex; ++i)
+				identityValue = processEntry(Values[i], identityValue);
+			identityValue = processZeros(Length - (ToIndex - FromIndex), identityValue);
+            return finalize(identityValue);
         }
 
 		[Obsolete("use this[index] = value")]
         public void Set(int index, double value) => this[index] = value;
 
-
-		private void CheckMutatedIndex(int index, int sparseIdx)
+/*		private void CheckMutatedIndex(int index, int sparseIdx)
 		{
 			if (sparseIdx < 0) throw new SparsityPatternModifiedException(
 				$"The entry at index = {index} is zero and not stored explicilty, therefore it cannot be modified.");
-		}
+		}*/
 	}
 }

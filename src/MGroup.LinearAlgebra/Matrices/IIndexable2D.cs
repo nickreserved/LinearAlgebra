@@ -8,7 +8,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// other builders.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	public interface IIndexable2D : IBounded2D
+	public interface IIndexable2D : ILinearTransformation
     {
 		/// <summary>
 		/// Matrix symmetry properties (i.e.: unknown, symmetric or not symmetric).

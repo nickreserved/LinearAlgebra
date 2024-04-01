@@ -37,27 +37,6 @@ namespace MGroup.LinearAlgebra.Vectors
 		public int Length { get; protected set; }
 
 		/// <summary>
-		/// Gets or sets sparse vector elements. This is a very inefficient way to do this. Try to avoid.
-		/// </summary>
-		/// <param name="index">Index of vector element</param>
-		/// <returns>Value of vector element</returns>
-		/// <exception cref="IndexOutOfRangeException">If you try to set an element not existed in sparse vector</exception>
-		public double this[int index]
-		{
-			get
-			{
-				index = Array.BinarySearch(Indices, FromIndex, ToIndex - FromIndex, index);
-				return index < 0 ? 0 : Values[index];
-			}
-			set
-			{
-				index = Array.BinarySearch(Indices, FromIndex, ToIndex - FromIndex, index);
-				if (index >= 0) Values[index] = value;
-				else throw new IndexOutOfRangeException("Element with that index is not stored in sparse vector");
-			}
-		}
-
-		/// <summary>
 		/// Finds the first non-zero element's index which is greater or equal to <paramref name="value"/>
 		/// </summary>
 		/// <param name="Indices">The array of indices of non-zero elements of matrix</param>
@@ -103,7 +82,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="toIndex">The index  of vector element (not the index to array <see cref="Indices"/>) which is the end of bounds</param>
 		/// <returns>First value is greater or equal to <paramref name="fromIndex"/>. Second value is greater or equal to <paramref name="toIndex"/>.
 		/// Both values form a range in array <see cref="Indices"/> [indicesFromIndex, indicesToIndex)
-		/// which corresponds to a sparse vector range [<paramref name="fromIndex"/>, <paramref name="toIndex"/>).
+		/// which corresponds to a sparse vector range [<paramref name="fromIndex"/>, <paramref name="toIndex"/>).</returns>
 		protected (int, int) Bounds(int fromIndex, int toIndex)
 		{
 			int indicesFromIndex = GetLowerBound(Indices, FromIndex, ToIndex, fromIndex);
@@ -117,7 +96,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Caller must avoid to shift indices to negative indices. This function doesn't check that.
 		/// <param name="offsetIndex">The shift for all indices of non-zero elements. Usually this value is negative.</param>
 		/// <returns>This vector</returns>
-		virtual protected AbstractSparseVector ShiftIntoThis(int offsetIndex)
+		virtual public AbstractSparseVector ShiftIntoThis(int offsetIndex)
 		{
 			for (int i = FromIndex; i < ToIndex; ++i)
 				Indices[i] += offsetIndex;
@@ -133,6 +112,28 @@ namespace MGroup.LinearAlgebra.Vectors
 		{
 			for (int i = FromIndex; i < ToIndex; ++i)
 				yield return (Indices[i], Values[i]);
+		}
+
+		/// <summary>
+		/// Gets or sets sparse vector elements. This is a very inefficient way to do this. Try to avoid.
+		/// </summary>
+		/// <param name="index">Index of vector element</param>
+		/// <returns>Value of vector element</returns>
+		/// <exception cref="IndexOutOfRangeException">If you try to set an element not existed in sparse vector</exception>
+		[Obsolete("Intention of this property, is for sparse vectors and it is highly inefficient. Please stop use it RIGHT NOW")]
+		public double this[int index]
+		{
+			get
+			{
+				index = Array.BinarySearch(Indices, FromIndex, ToIndex - FromIndex, index);
+				return index < 0 ? 0 : Values[index];
+			}
+			set
+			{
+				index = Array.BinarySearch(Indices, FromIndex, ToIndex - FromIndex, index);
+				if (index >= 0) Values[index] = value;
+				else throw new IndexOutOfRangeException("Element with that index is not stored in sparse vector");
+			}
 		}
 
 
@@ -152,7 +153,17 @@ namespace MGroup.LinearAlgebra.Vectors
 		virtual public SparseVector Copy(int fromIndex, int toIndex) => (SparseVector)CopyUnshifted(fromIndex, toIndex).ShiftIntoThis(-fromIndex);
 		IExtendedMutableVector IExtendedImmutableVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex);
 
-		virtual public SparseVector Axpy(AbstractSparseVector otherVector, double otherCoefficient) => DoEntrywise(otherVector, (double x, double y) => x + y * otherCoefficient);
+		virtual public SparseVector Axpy(AbstractSparseVector otherVector, double otherCoefficient)
+		{
+			if (HasSameIndexer(otherVector))
+			{
+				Preconditions.CheckVectorDimensions(this, otherVector);
+				SparseVector result = Copy();
+				Blas.Daxpy(result.ToIndex - result.FromIndex, otherCoefficient, otherVector.Values, otherVector.FromIndex, 1, result.Values, result.FromIndex, 1);
+				return result;
+			}
+			else return DoEntrywise(otherVector, (double x, double y) => x + y * otherCoefficient);
+		}
 		virtual public Vector Axpy(AbstractFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)otherVector.Scale(otherCoefficient).AddIntoThis(this);
 		virtual public IExtendedMutableVector Axpy(IMinimalImmutableVector otherVector, double otherCoefficient)
 		{
@@ -189,7 +200,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		{
 			if (HasSameIndexer(otherVector))
 			{
-				Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+				Preconditions.CheckVectorDimensions(this, otherVector);
 				SparseVector result = Copy();
 				BlasExtensions.Daxpby(result.ToIndex - result.FromIndex, otherCoefficient, otherVector.Values, otherVector.FromIndex, 1,
 																			thisCoefficient, result.Values, result.FromIndex, 1);
@@ -317,12 +328,23 @@ namespace MGroup.LinearAlgebra.Vectors
 			// There is no need to complete populate it
 			for (int i = indicesFromIndex; i < indicesToIndex; ++i)
 				indices[i] = Indices[i] - fromIndex;
-			return new SparseVectorView(toIndex - fromIndex, Values, indices, indicesFromIndex);
+			return new SparseVectorView(toIndex - fromIndex, Values, indices, indicesFromIndex, indicesToIndex);
 		}
 		IExtendedMutableVector IExtendedMutableVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex);
 
-		virtual public AbstractSparseVector AxpyIntoThis(SparseVector otherVector, double otherCoefficient) => otherCoefficient != 0 ? DoEntrywiseIntoThis(otherVector, (double x, double y) => x + y * otherCoefficient) : this;
-			
+		virtual public AbstractSparseVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
+		{
+			if (otherCoefficient != 0)
+			{
+				if (HasSameIndexer(otherVector))
+				{
+					Preconditions.CheckVectorDimensions(this, otherVector);
+					Blas.Daxpy(ToIndex - FromIndex, otherCoefficient, otherVector.Values, otherVector.FromIndex, 1, Values, FromIndex, 1);
+				}
+				else DoEntrywiseIntoThis(otherVector, (double x, double y) => x + y * otherCoefficient);
+			}
+			return this;
+		}
 		virtual public AbstractSparseVector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient)
 		{
 			// Runtime Identification is_a_bad_thing™
@@ -368,7 +390,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		{
 			if (HasSameIndexer(otherVector))
 			{
-				Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+				Preconditions.CheckVectorDimensions(this, otherVector);
 				BlasExtensions.Daxpby(ToIndex - FromIndex, otherCoefficient, otherVector.Values, otherVector.FromIndex, 1,
 																thisCoefficient, Values, FromIndex, 1);
 			}
@@ -408,7 +430,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public AbstractSparseVector DoEntrywiseIntoThis(AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			int i = FromIndex, j = otherVector.FromIndex;
 			for (; i < ToIndex && j < otherVector.ToIndex;)
 			{
@@ -457,7 +479,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public double DotProduct(AbstractSparseVector otherVector)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (HasSameIndexer(otherVector))
 				return Blas.Ddot(ToIndex - FromIndex, Values, FromIndex, 1, otherVector.Values, otherVector.FromIndex, 1);
 			else

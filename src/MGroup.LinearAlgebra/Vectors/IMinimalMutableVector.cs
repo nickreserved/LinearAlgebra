@@ -57,7 +57,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		IMinimalMutableVector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient);
 		public static IMinimalMutableVector LinearCombinationIntoThis(IMinimalMutableVector thisVector, double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient)
 		{
-			Preconditions.CheckVectorDimensions(thisVector.Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(thisVector, otherVector);
 			if (thisCoefficient == 0)
 			{
 				if (otherCoefficient == 0)
@@ -105,10 +105,10 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// this[i] = <paramref name="binaryOperation"/>(this[i], <paramref name="otherVector"/>[i]). 
 		/// The resulting vector overwrites the entries of this.
 		/// </summary>
-		/// <param name="otherVector">A vector with the same <see cref="IIndexable1D.Length"/> as this.</param>
+		/// <param name="otherVector">A vector with the same length as this.</param>
 		/// <param name="binaryOperation">A method that takes 2 arguments and returns 1 result.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="otherVector"/> has different <see cref="IIndexable1D.Length"/> than this.
+		/// Thrown if <paramref name="otherVector"/> has different length than this.
 		/// </exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.

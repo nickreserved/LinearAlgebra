@@ -6,6 +6,9 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// The minimal vector functionality for algorithms, which requires modifications to vector elements.
 	public interface IExtendedMutableVector : IExtendedImmutableVector, IMinimalMutableVector
 	{
+		[Obsolete("Intention of this property, is for sparse vectors and it is highly inefficient. Please stop use it RIGHT NOW")]
+		new double this[int index] { get; set; }
+		double IExtendedImmutableVector.this[int index] => this[index];
 
 
 		// ------------------- COVARIANT RETURN TYPE FROM IExtendedImmutableVector

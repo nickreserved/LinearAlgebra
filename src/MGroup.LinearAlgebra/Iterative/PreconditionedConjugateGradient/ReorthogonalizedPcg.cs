@@ -86,8 +86,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			IMinimalMutableVector solution, bool initialGuessIsZero)
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
-			Preconditions.CheckMultiplicationDimensions(matrix.Columns(), solution.Length());
-			Preconditions.CheckSystemSolutionDimensions(matrix.Rows(), rhs.Length());
+			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
+			Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
 			this.Matrix = matrix;
 			this.Preconditioner = preconditioner;
@@ -114,7 +114,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			direction = Rhs.CreateZero();
 			matrixTimesDirection = Rhs.CreateZero();
 
-			int maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.Columns());
+			int maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.NumColumns);
 			return SolveInternal(maxIterations);
 		}
 

@@ -1,4 +1,5 @@
 using System;
+using System.Data.Common;
 using System.Diagnostics;
 
 using MGroup.LinearAlgebra.Exceptions;
@@ -15,27 +16,22 @@ namespace MGroup.LinearAlgebra.Commons
 	/// </summary>
 	public static class DenseStrategies
 	{
-		public static void AddNonContiguouslyFrom(IMinimalMutableVector thisVector, int[] thisIndices, IMinimalImmutableVector otherVector,
+		public static void AddNonContiguouslyFrom(IExtendedMutableVector thisVector, int[] thisIndices, IExtendedImmutableVector otherVector,
 			int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			Debug.Assert(thisIndices.Length == otherIndices.Length);
 			for (int i = 0; i < thisIndices.Length; ++i)
-			{
-				int thisIdx = thisIndices[i];
-				thisVector.Set(thisIdx, thisVector[thisIdx] + otherVector[otherIndices[i]]);
-			}
+				thisVector[thisIndices[i]] += otherVector[otherIndices[i]];
 		}
 
-		public static void AddNonContiguouslyFrom(IMinimalMutableVector thisVector, int[] thisIndices, IMinimalImmutableVector otherVector)
+		public static void AddNonContiguouslyFrom(IExtendedMutableVector thisVector, int[] thisIndices, IExtendedImmutableVector otherVector)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < otherVector.Length; ++i)
-			{
-				thisVector.Set(thisIndices[i], otherVector[i]);
-			}
+				thisVector[thisIndices[i]] += otherVector[i];
 		}
 
 		public static bool AreEqual(IIndexable2D matrix1, IIndexable2D matrix2, double tolerance = 1e-13)
@@ -62,26 +58,21 @@ namespace MGroup.LinearAlgebra.Commons
 			return true;
 		}
 
-		public static void CopyNonContiguouslyFrom(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector, int[] otherIndices)
+		public static void CopyNonContiguouslyFrom(IExtendedMutableVector thisVector, IExtendedImmutableVector otherVector, int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			for (int i = 0; i < thisVector.Length; ++i)
-			{
-				thisVector.Set(i, otherVector[otherIndices[i]]);
-			}
+				thisVector[i] = otherVector[otherIndices[i]];
 		}
 
-		public static void CopyNonContiguouslyFrom(IMinimalMutableVector thisVector, int[] thisIndices, IMinimalImmutableVector otherVector,
-			int[] otherIndices)
+		public static void CopyNonContiguouslyFrom(IExtendedMutableVector thisVector, int[] thisIndices, IExtendedImmutableVector otherVector, int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			Debug.Assert(thisIndices.Length == otherIndices.Length);
 			for (int i = 0; i < thisIndices.Length; ++i)
-			{
-				thisVector.Set(thisIndices[i], otherVector[otherIndices[i]]);
-			}
+				thisVector[thisIndices[i]] = otherVector[otherIndices[i]];
 		}
 
 		public static double[,] CopyToArray2D(IIndexable2D matrix)
@@ -118,18 +109,15 @@ namespace MGroup.LinearAlgebra.Commons
 			return Matrix.CreateFromArray(result, m, n, false);
 		}
 
-		public static Vector DoEntrywise(IVectorView vector1, IVectorView vector2,
+		public static Vector DoEntrywise(IExtendedImmutableVector vector1, IExtendedImmutableVector vector2,
 			Func<double, double, double> binaryOperation)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			Preconditions.CheckVectorDimensions(vector1, vector2);
-			var result = Vector.CreateZero(vector1.Length);
+			var result = new Vector(new double[vector1.Length]);
 			for (int i = 0; i < vector1.Length; ++i)
-			{
 				result[i] = binaryOperation(vector1[i], vector2[i]);
-			}
-
 			return result;
 		}
 
@@ -161,7 +149,7 @@ namespace MGroup.LinearAlgebra.Commons
 				column[i] = matrix[i, colIdx];
 			}
 
-			return Vector.CreateFromArray(column, false);
+			return new Vector(column);
 		}
 
 		public static Vector GetRow(IIndexable2D matrix, int rowIdx)
@@ -174,7 +162,7 @@ namespace MGroup.LinearAlgebra.Commons
 				row[j] = matrix[rowIdx, j];
 			}
 
-			return Vector.CreateFromArray(row, false);
+			return new Vector(row);
 		}
 
 		public static Matrix GetSubmatrix(IIndexable2D matrix, int[] rowIndices, int[] colIndices)
@@ -245,18 +233,14 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static Vector LinearCombination(IIndexable1D vector1, double coefficient1, IIndexable1D vector2,
-			double coefficient2)
+		public static Vector LinearCombination(IExtendedImmutableVector vector1, double coefficient1, IExtendedImmutableVector vector2, double coefficient2)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			Preconditions.CheckVectorDimensions(vector1, vector2);
-			var result = Vector.CreateZero(vector1.Length);
+			var result = new Vector(new double[vector1.Length]);
 			for (int i = 0; i < vector1.Length; ++i)
-			{
 				result[i] = coefficient1 * vector1[i] + coefficient2 * vector2[i];
-			}
-
 			return result;
 		}
 
@@ -374,7 +358,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static Vector Multiply(IMatrixView matrix, IVectorView vector, bool transposeMatrix)
+		public static Vector Multiply(IMatrixView matrix, IExtendedImmutableVector vector, bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -408,7 +392,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void MultiplyIntoResult(IMatrixView matrix, IVectorView lhsVector, IVector rhsVector,
+		public static void MultiplyIntoResult(IMatrixView matrix, IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector,
 			bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
@@ -174,7 +174,7 @@ namespace MGroup.LinearAlgebra.Triangulation
                 nnz, newRow.RawValues, newRow.RawIndices, colOffsets, common);
             if (status != 1)
             {
-                throw new SuiteSparseException("Rows addition did not succeed. This could be caused by insufficent memory");
+                throw new SuiteSparseException("NumRows addition did not succeed. This could be caused by insufficent memory");
             }
         }
 
@@ -246,7 +246,7 @@ namespace MGroup.LinearAlgebra.Triangulation
             int status = SuiteSparsePInvokes.RowDelete(factorizedMatrix, rowIdx, common);
             if (status != 1)
             {
-                throw new SuiteSparseException("Rows deletion did not succeed.");
+                throw new SuiteSparseException("NumRows deletion did not succeed.");
             }
         }
 

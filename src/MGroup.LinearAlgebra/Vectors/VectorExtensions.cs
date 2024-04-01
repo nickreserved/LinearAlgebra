@@ -13,6 +13,7 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// Defines common vector operation shortcuts that can be used as extensions for <see cref="Vector"/>.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
+	[Obsolete]
 	public static class VectorExtensions
 	{
 		/// <summary>
@@ -32,8 +33,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		//		public static IMinimalMutableVector Add(this IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector)
-		//			=> thisVector.Axpy(otherVector, 1.0);
+		public static IMinimalMutableVector Add(this IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector)
+			=> thisVector.Axpy(otherVector, 1.0);
 
 		/// <summary>
 		/// Performs the operation: 
@@ -52,8 +53,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		//		public static void AddIntoThis(this IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) 
-		//			=> thisVector.AxpyIntoThis(otherVector, 1.0);
+		public static void AddIntoThis(this IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) 
+			=> thisVector.AxpyIntoThis(otherVector, 1.0);
 
 
 		/// <summary>
@@ -73,8 +74,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		//		public static void AddIntoThis(this Vector thisVector, Vector otherVector) 
-		//			=> thisVector.AxpyIntoThis(otherVector, 1.0);
+		public static void AddIntoThis(this Vector thisVector, Vector otherVector) 
+			=> thisVector.AxpyIntoThis(otherVector, 1.0);
 
 		/// <summary>
 		/// Performs the following operation for <paramref name="length"/> consecutive entries starting from the provided 
@@ -136,10 +137,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="otherVector"/> has different <see cref="IIndexable1D.Length"/> than this vector.
 		/// </exception>
-		public static TVectorOut MultiplyEntrywise<TVectorIn, TVectorOut>(
-			this IEntrywiseOperableView1D<TVectorIn, TVectorOut> thisVector, TVectorIn otherVector)
-			where TVectorIn: IVectorView
-			where TVectorOut: IVector
+		public static IMinimalMutableVector MultiplyEntrywise(
+			this IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector)
 			=> thisVector.DoEntrywise(otherVector, (x, y) => x * y); //TODO: nice in theory, but passing a lambda to DoEntrywise is less verbose.
 
 		public static int[] Find(this Vector vector)
@@ -181,34 +180,33 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
-		public static void MultiplyEntrywiseIntoThis<TVectorIn>(
-			this IEntrywiseOperable1D<TVectorIn> thisVector, TVectorIn otherVector)
-			where TVectorIn: IVectorView
+		public static void MultiplyEntrywiseIntoThis(
+			this IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector)
 			=> thisVector.DoEntrywiseIntoThis(otherVector, (x, y) => x * y); //TODO: nice in theory, but passing a lambda to DoEntrywise() is less verbose.
 
 		/// <summary>
 		/// Performs the operation: result[i] = this[i] ^ 0.5 for all valid i. 
 		/// The resulting vector is written in a new object and then returned.
 		/// </summary>
-		public static Vector Sqrt(this Vector vector) => vector.DoToAllEntries(x => Math.Sqrt(x));
+		public static IMinimalMutableVector Sqrt(this IMinimalImmutableVector vector) => vector.DoToAllEntries(x => Math.Sqrt(x));
 
 		/// <summary>
 		/// Performs the operation: this[i] = this[i] ^ 0.5 for all valid i. 
 		/// The resulting vector overwrites the entries of this vector.
 		/// </summary>
-		public static void SqrtIntoThis(this Vector vector) => vector.DoToAllEntriesIntoThis(x => Math.Sqrt(x));
+		public static IMinimalMutableVector SqrtIntoThis(this IMinimalMutableVector vector) => vector.DoToAllEntriesIntoThis(x => Math.Sqrt(x));
 
 		/// <summary>
 		/// Performs the operation: result[i] = this[i] ^ 2 for all valid i. 
 		/// The resulting vector is written in a new object and then returned.
 		/// </summary>
-		public static Vector Square(this Vector vector) => vector.DoToAllEntries(x => x * x);
+		public static IMinimalMutableVector Square(this IMinimalImmutableVector vector) => vector.DoToAllEntries(x => x * x);
 
 		/// <summary>
 		/// Performs the operation: this[i] = this[i] ^ 2 for all valid i. 
 		/// The resulting vector overwrites the entries of this vector.
 		/// </summary>
-		public static void SquareIntoThis(this Vector vector) => vector.DoToAllEntriesIntoThis(x => x * x);
+		public static IMinimalMutableVector SquareIntoThis(this IMinimalMutableVector vector) => vector.DoToAllEntriesIntoThis(x => x * x);
 
 		/// <summary>
 		/// Performs the operation: 
@@ -227,7 +225,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static IVector Subtract(this IVectorView thisVector, IVectorView otherVector)
+		public static IMinimalMutableVector Subtract(this IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector)
 			=> thisVector.Axpy(otherVector, -1.0);
 
 		/// <summary>
@@ -247,27 +245,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
 		/// <see cref="IIndexable1D.Length"/>.
 		/// </exception>
-		public static void SubtractIntoThis(this IVector thisVector, IVectorView otherVector)
-			=> thisVector.AxpyIntoThis(otherVector, -1.0);
-
-		/// <summary>
-		/// Performs the operation: 
-		/// <paramref name="thisVector"/>[i] = <paramref name="thisVector"/>[i] - <paramref name="otherVector"/>[i], 
-		/// for 0 &lt;= i &lt; <paramref name="thisVector"/>.<see cref="IIndexable1D.Length"/> 
-		/// = <paramref name="otherVector"/>.<see cref="IIndexable1D.Length"/>.
-		/// The resulting vector overwrites the entries of this <see cref="Vector"/> instance.
-		/// </summary>
-		/// <param name="thisVector">
-		/// A vector with the same <see cref="IIndexable1D.Length"/> as <paramref name="otherVector"/>.
-		/// </param>
-		/// <param name="otherVector">
-		/// A vector with the same <see cref="IIndexable1D.Length"/> as <paramref name="thisVector"/>.
-		/// </param>
-		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if <paramref name="thisVector"/> and <paramref name="otherVector"/> have different 
-		/// <see cref="IIndexable1D.Length"/>.
-		/// </exception>
-		public static void SubtractIntoThis(this Vector thisVector, Vector otherVector) 
+		public static IMinimalMutableVector SubtractIntoThis(this IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector)
 			=> thisVector.AxpyIntoThis(otherVector, -1.0);
 
 		/// <summary>
@@ -287,8 +265,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     </exception>
 		/// <exception cref="PatternModifiedException">Thrown if an entry this[i] needs to be overwritten, but that 
 		///     is not permitted by the vector storage format.</exception>
-		public static void SubtractSubvectorIntoThis(this IVector destinationVector, int destinationIndex,
-			IVectorView sourceVector, int sourceIndex, int length)
-			=> destinationVector.AxpySubvectorIntoThis(destinationIndex, sourceVector, -1.0, sourceIndex, length);
+		public static void SubtractSubvectorIntoThis(this IExtendedMutableVector destinationVector, int destinationIndex,
+			IExtendedImmutableVector sourceVector, int sourceIndex, int length)
+			=> destinationVector.View(destinationIndex, destinationIndex + length).SubtractIntoThis(sourceVector.View(sourceIndex, sourceIndex + length));
 	}
 }

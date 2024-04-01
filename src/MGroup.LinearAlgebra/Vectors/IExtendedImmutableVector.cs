@@ -8,6 +8,9 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// </summary>
 	public interface IExtendedImmutableVector : IMinimalImmutableVector
 	{
+		[Obsolete("Intention of this property, is for sparse vectors and it is highly inefficient. Please stop use it RIGHT NOW")]
+		double this[int index] { get; }
+
 		/// <summary>
 		/// Provides a vector from a contiguous part of this vector.
 		/// </summary>

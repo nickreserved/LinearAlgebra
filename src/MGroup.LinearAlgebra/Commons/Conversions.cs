@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 //TODO: All the functions in this namespace serve to copy entries to other positions. They should be performed in C and Pinvoked.
 //      Some might exist in MKL, thus I should use that one instead. In C# I should write the Pinvoke methods and wrap them in

@@ -40,7 +40,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		
 		virtual public AbstractContiguousFullyPopulatedVector LinearCombinationIntoThis(double thisCoefficient, AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Elements, otherVector.FromIndex, 1, thisCoefficient, Elements, FromIndex, 1);
 			return this;
 		}
@@ -59,13 +59,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		
 		virtual public AbstractFullyPopulatedVector AxpyIntoThis(AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, otherVector.FromIndex, 1, Elements, FromIndex, 1);
 			return this;
 		}
 		override public AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			SparseBlas.Daxpyi(otherVector.Indices.Length, otherCoefficient, otherVector.Values, otherVector.Indices, otherVector.FromIndex, Elements, FromIndex);
 			return this;
 		}
@@ -80,12 +80,12 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public double DotProduct(AbstractContiguousFullyPopulatedVector otherVector)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			return Blas.Ddot(Length, Elements, FromIndex, 1, otherVector.Elements, otherVector.FromIndex, 1);
 		}
 		override public double DotProduct(AbstractSparseVector otherVector)
 		{
-			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
+			Preconditions.CheckVectorDimensions(this, otherVector);
 			return SparseBlas.Ddoti(Length, otherVector.Values, otherVector.Indices, otherVector.FromIndex, Elements, FromIndex);
 		}
 		override public double DotProduct(IMinimalImmutableVector otherVector)

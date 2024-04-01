@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Commons
             else return true;
         }
 
-        public static void CheckIndex1D(IVectorView vector, int idx)
+        public static void CheckIndex1D(IMinimalImmutableVector vector, int idx)
         {
             if ((idx < 0) || (idx >= vector.Length))
             {
@@ -81,8 +81,8 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckMultiplicationDimensionsSection(IIndexable2D matrixLeft, IVectorView vectorRight,
-            int vectorStart, IVectorView result, int resultStart)
+        public static void CheckMultiplicationDimensionsSection(IIndexable2D matrixLeft, IMinimalImmutableVector vectorRight,
+            int vectorStart, IMinimalImmutableVector result, int resultStart)
         {
             if (vectorStart + matrixLeft.NumColumns > vectorRight.Length) throw new NonMatchingDimensionsException(
                 $"The multiplied vector's length = {vectorRight.Length} must be at least as large as the start index =" +
@@ -92,8 +92,8 @@ namespace MGroup.LinearAlgebra.Commons
                 $" {resultStart} + the matrix' rows = {matrixLeft.NumRows}");
         }
 
-        public static void CheckMultiplicationDimensions(IIndexable2D matrix, IVectorView lhsVector, int lhsOffset,
-            IVectorView rhsVector, int rhsOffset, bool transposeMatrix)
+        public static void CheckMultiplicationDimensions(IIndexable2D matrix, IMinimalImmutableVector lhsVector, int lhsOffset,
+			IMinimalImmutableVector rhsVector, int rhsOffset, bool transposeMatrix)
         {
             int m, n;
             if (transposeMatrix)
@@ -114,7 +114,7 @@ namespace MGroup.LinearAlgebra.Commons
                 + "matrix (or its transpose).");
         }
 
-        public static void CheckSameColDimension(IIndexable2D matrix, IVectorView vector)
+        public static void CheckSameColDimension(IIndexable2D matrix, IMinimalImmutableVector vector)
         {
             if (matrix.NumColumns != vector.Length)
             {
@@ -147,7 +147,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckSameRowDimension(IIndexable2D matrix, IVectorView vector)
+        public static void CheckSameRowDimension(IIndexable2D matrix, IMinimalImmutableVector vector)
         {
             if (matrix.NumRows != vector.Length)
             {
@@ -181,7 +181,7 @@ namespace MGroup.LinearAlgebra.Commons
                 $"The matrix must be square, but was {numRows}-by-{numColumns}");
         }
 
-		public static void CheckSquareLinearSystemDimensions(IIndexable2D matrix, IIndexable1D lhsVector, IIndexable1D rhsVector)
+		public static void CheckSquareLinearSystemDimensions(IIndexable2D matrix, IMinimalImmutableVector lhsVector, IMinimalImmutableVector rhsVector)
 		{
 			CheckSquareLinearSystemDimensions(matrix.NumRows, matrix.NumColumns, lhsVector.Length, rhsVector.Length);
 		}
@@ -195,13 +195,13 @@ namespace MGroup.LinearAlgebra.Commons
 				$"The matrix rows ({numMatrixRows}), matrix columns ({numMatrixColumns}), left-hand-side vector length ({lhsLength}) and right-hand-side vector length ({rhsLength}) must be the same");
 		}
 
-		public static void CheckSubvectorDimensions(IIndexable1D vector, int startIndex, int subvectorLength)
+		public static void CheckSubvectorDimensions(IMinimalImmutableVector vector, int startIndex, int subvectorLength)
         {
             if (startIndex + subvectorLength > vector.Length) throw new NonMatchingDimensionsException(
                 "The entries to access exceed the vector's length");
         }
 
-        public static void CheckSystemSolutionDimensions(IIndexable2D matrix, IVectorView rhsVector)
+        public static void CheckSystemSolutionDimensions(IIndexable2D matrix, IMinimalImmutableVector rhsVector)
         {
             if (matrix.NumRows != rhsVector.Length)
             {
@@ -222,36 +222,16 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-		public static void CheckVectorDimensions(int vector1Length, int vector2Length)
+		public static void CheckVectorDimensions(IMinimalImmutableVector vector1, IMinimalImmutableVector vector2)
 		{
-			if (vector1Length != vector2Length)
-			{
-				string message = string.Format("Vector1 has length of {0}, while vector2 has length of {1}",
-					vector1Length, vector2Length);
-				throw new NonMatchingDimensionsException(message);
-			}
+			if (vector1.Length != vector2.Length)
+				throw new NonMatchingDimensionsException($"Vector1 has length of {vector1.Length}, while vector2 has length of {vector2.Length}");
 		}
 
 		public static void CheckVectorDimensions(double[] vector1, double[] vector2)
         {
             if (vector1.Length != vector2.Length)
-            {
-                string message = string.Format("Vector1 has length of {0}, while vector2 has length of {1}",
-                    vector1.Length, vector2.Length);
-                throw new NonMatchingDimensionsException(message);
-            }
-
-        }
-
-        public static void CheckVectorDimensions(IIndexable1D vector1, IIndexable1D vector2)
-        {
-            if (vector1.Length != vector2.Length)
-            {
-                string message = string.Format("Vector1 has length of {0}, while vector2 has length of {1}",
-                    vector1.Length, vector2.Length);
-                throw new NonMatchingDimensionsException(message);
-            }
-
+				throw new NonMatchingDimensionsException($"Vector1 has length of {vector1.Length}, while vector2 has length of {vector2.Length}");
         }
     }
 }

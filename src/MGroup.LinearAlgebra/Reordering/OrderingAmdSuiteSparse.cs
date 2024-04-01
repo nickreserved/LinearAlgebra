@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices.Builders;
 using MGroup.LinearAlgebra.Providers.PInvoke;
