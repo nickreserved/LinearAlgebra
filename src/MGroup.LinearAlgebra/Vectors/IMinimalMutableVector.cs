@@ -12,7 +12,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// A row operation from Gauss elimination.
 		/// Adds to this vector the <paramref name="otherVector"/> * <paramref name="otherCoefficient"/> and returns the this vector after that.
 		/// </summary>
-		/// <param name="otherVector">A vector with the same number of Elements with this vector</param>
+		/// <param name="otherVector">A vector with the same number of elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns><c>thisVector += <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></c></returns>
 		IMinimalMutableVector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient);
@@ -51,7 +51,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// A linear combination between this and another one vector.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar as coefficient to this vector</param>
-		/// <param name="otherVector">A vector with the same number of Elements with this vector</param>
+		/// <param name="otherVector">A vector with the same number of elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns><c>thisVector * <paramref name="thisCoefficient"/> + <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></c></returns>
 		IMinimalMutableVector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient);
@@ -79,22 +79,24 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 
 		/// <summary>
-		/// Copy Elements from <paramref name="otherVector"/>
+		/// Copy elements from <paramref name="otherVector"/>
 		/// </summary>
-		/// <param name="otherVector">The source vector from where the Elements will by copied to this vector</param>
+		/// <param name="otherVector">The source vector from where the elements will by copied to this vector</param>
 		/// <returns>This vector</returns>
 		IMinimalMutableVector CopyFrom(IMinimalImmutableVector otherVector);
 
 		/// <summary>
-		/// Set all Elements of vector to zero.
+		/// Set all elements of vector to zero.
 		/// </summary>
+		/// In sparse vectors, it does not eliminate current stored (non-zero) elements. It just set them to 0.
 		/// <returns>This vector</returns>
 		IMinimalMutableVector Clear();
 		public static IMinimalMutableVector Clear(IMinimalMutableVector thisVector) => thisVector.SetAll(0);
 
 		/// <summary>
-		/// Set all Elements of vector to <paramref name="value"/>.
+		/// Set all stored elements of vector to <paramref name="value"/>.
 		/// </summary>
+		/// In sparse vectors only the non-zero (stored) elements get that value.
 		/// <returns>This vector</returns>
 		IMinimalMutableVector SetAll(double value);
 

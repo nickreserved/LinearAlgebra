@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Commons
 	/// </summary>
 	public static class DenseStrategies
 	{
-		public static void AddNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IVectorView otherVector,
+		public static void AddNonContiguouslyFrom(IMinimalMutableVector thisVector, int[] thisIndices, IMinimalImmutableVector otherVector,
 			int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void AddNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IVectorView otherVector)
+		public static void AddNonContiguouslyFrom(IMinimalMutableVector thisVector, int[] thisIndices, IMinimalImmutableVector otherVector)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return true;
 		}
 
-		public static void CopyNonContiguouslyFrom(IVector thisVector, IVectorView otherVector, int[] otherIndices)
+		public static void CopyNonContiguouslyFrom(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector, int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -72,7 +72,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void CopyNonContiguouslyFrom(IVector thisVector, int[] thisIndices, IVectorView otherVector,
+		public static void CopyNonContiguouslyFrom(IMinimalMutableVector thisVector, int[] thisIndices, IMinimalImmutableVector otherVector,
 			int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();

@@ -63,16 +63,16 @@ namespace MGroup.LinearAlgebra.Vectors
 			Blas.Daxpy(Length, otherCoefficient, otherVector.Elements, otherVector.FromIndex, 1, Elements, FromIndex, 1);
 			return this;
 		}
-		override public AbstractFullyPopulatedVector AxpyIntoThis(SparseVector otherVector, double otherCoefficient)
+		override public AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			SparseBlas.Daxpyi(otherVector.RawIndices.Length, otherCoefficient, otherVector.RawValues, otherVector.RawIndices, 0, Elements, FromIndex);
+			SparseBlas.Daxpyi(otherVector.Indices.Length, otherCoefficient, otherVector.Values, otherVector.Indices, otherVector.FromIndex, Elements, FromIndex);
 			return this;
 		}
 		override public AbstractFullyPopulatedVector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient)
 		{
 			// Runtime Identification is_a_bad_thing™
-			if (otherVector is SparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
+			if (otherVector is AbstractSparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
 			if (otherVector is AbstractContiguousFullyPopulatedVector contiguousVector) return AxpyIntoThis(contiguousVector, otherCoefficient);
 			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return AxpyIntoThis(fullyPopulatedVector, otherCoefficient);
 			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
@@ -83,15 +83,15 @@ namespace MGroup.LinearAlgebra.Vectors
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
 			return Blas.Ddot(Length, Elements, FromIndex, 1, otherVector.Elements, otherVector.FromIndex, 1);
 		}
-		override public double DotProduct(SparseVector otherVector)
+		override public double DotProduct(AbstractSparseVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			return SparseBlas.Ddoti(Length, otherVector.RawValues, otherVector.RawIndices, 0, Elements, FromIndex);
+			return SparseBlas.Ddoti(Length, otherVector.Values, otherVector.Indices, otherVector.FromIndex, Elements, FromIndex);
 		}
 		override public double DotProduct(IMinimalImmutableVector otherVector)
 		{
 			// Runtime Identification is_a_bad_thing™
-			if (otherVector is SparseVector sparseVector) return DotProduct(sparseVector);
+			if (otherVector is AbstractSparseVector sparseVector) return DotProduct(sparseVector);
 			if (otherVector is AbstractContiguousFullyPopulatedVector contiguousVector) return DotProduct(contiguousVector);
 			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return DotProduct(fullyPopulatedVector);
 			throw new NotImplementedException("DotProduct(NotSupportedVector)");

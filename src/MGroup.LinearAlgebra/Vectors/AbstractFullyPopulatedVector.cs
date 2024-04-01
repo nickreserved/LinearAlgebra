@@ -134,18 +134,18 @@ namespace MGroup.LinearAlgebra.Vectors
 		abstract public AbstractFullyPopulatedVector View(int fromIndex, int toIndex);
 		IExtendedMutableVector IExtendedMutableVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex);
 
-		virtual public AbstractFullyPopulatedVector AxpyIntoThis(SparseVector otherVector, double otherCoefficient)
+		virtual public AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
 			if (otherCoefficient == 1)
-				for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-					this[otherVector.RawIndices[i]] += otherVector.RawValues[i];
+				for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
+					this[otherVector.Indices[i]] += otherVector.Values[i];
 			else if (otherCoefficient == -1)
-				for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-					this[otherVector.RawIndices[i]] -= otherVector.RawValues[i];
+				for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
+					this[otherVector.Indices[i]] -= otherVector.Values[i];
 			else if (otherCoefficient != 0)
-				for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-					this[otherVector.RawIndices[i]] += otherCoefficient * otherVector.RawValues[i];
+				for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
+					this[otherVector.Indices[i]] += otherCoefficient * otherVector.Values[i];
 			return this;
 		}
 		virtual public AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
@@ -167,7 +167,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			// Runtime Identification is_a_bad_thing™
 			// Another (better) solution is otherVector.Scale(otherCoefficient).Add(this); because 'this' is already identified
 			// but it needs an implementation for any type of vector
-			if (otherVector is SparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
+			if (otherVector is AbstractSparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
 			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return AxpyIntoThis(fullyPopulatedVector, otherCoefficient);
 			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
 		}
@@ -218,14 +218,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 		IExtendedMutableVector IExtendedMutableVector.SetAll(double value) => SetAll(value);
 
-		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(SparseVector otherVector, Func<double, double, double> binaryOperation)
+		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
-			for (int i = 0, j = 0; i < Length; ++i)
+			for (int i = 0, j = otherVector.FromIndex; i < Length; ++i)
 				this[i] = binaryOperation(this[i],
-					j >= otherVector.RawIndices.Length || i < otherVector.RawIndices[j]
+					j >= otherVector.ToIndex || i < otherVector.Indices[j]
 					? 0
-					: otherVector.RawValues[j++]);
+					: otherVector.Values[j++]);
 			return this;
 		}
 		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation)
@@ -238,7 +238,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			// Runtime Identification is_a_bad_thing™
-			if (otherVector is SparseVector sparseVector) return DoEntrywiseIntoThis(sparseVector, binaryOperation);
+			if (otherVector is AbstractSparseVector sparseVector) return DoEntrywiseIntoThis(sparseVector, binaryOperation);
 			else if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return DoEntrywiseIntoThis(fullyPopulatedVector, binaryOperation);
 			else throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
 		}
@@ -256,12 +256,12 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		// ------------------- COVARIANT RETURN TYPE FROM IMinimalImmutableVector
 
-		virtual public double DotProduct(SparseVector otherVector)
+		virtual public double DotProduct(AbstractSparseVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(Length, otherVector.Length);
 			double result = 0;
-			for (int i = 0; i < otherVector.RawIndices.Length; ++i)
-				result += this[otherVector.RawIndices[i]] * otherVector.RawValues[i];
+			for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
+				result += this[otherVector.Indices[i]] * otherVector.Values[i];
 			return result;
 		}
 		virtual public double DotProduct(AbstractFullyPopulatedVector otherVector)
@@ -277,7 +277,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			// Runtime Identification is_a_bad_thing™
 			// Another (better) solution is otherVector.DotProduct(this); because 'this' is already identified
 			// but it needs an implementation for any type of vector
-			if (otherVector is SparseVector sparseVector) return DotProduct(sparseVector);
+			if (otherVector is AbstractSparseVector sparseVector) return DotProduct(sparseVector);
 			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return DotProduct(fullyPopulatedVector);
 			throw new NotImplementedException("DotProduct(NotSupportedVector)");
 		}
@@ -301,15 +301,15 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		virtual public double Norm2() => IMinimalImmutableVector.Norm2(this);
 
-		virtual public bool Equals(SparseVector otherVector, double tolerance = 1E-07)
+		virtual public bool Equals(AbstractSparseVector otherVector, double tolerance = 1E-07)
 		{
 			if (Length != otherVector.Length) return false;
 			var cmp = new ValueComparer(tolerance);
 			for (int i = 0, j = 0; i < Length; ++i)
 				if (!cmp.AreEqual(this[i],
-						j >= otherVector.RawIndices.Length || i < otherVector.RawIndices[j]
+						j >= otherVector.ToIndex || i < otherVector.Indices[j]
 						? 0
-						: otherVector.RawValues[j++])) return false;
+						: otherVector.Values[j++])) return false;
 			return true;
 		}
 		virtual public bool Equals(AbstractFullyPopulatedVector otherVector, double tolerance = 1E-07)
@@ -323,7 +323,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		virtual public bool Equals(IMinimalImmutableVector otherVector, double tolerance = 1E-07)
 		{
 			// Runtime Identification is_a_bad_thing™
-			if (otherVector is SparseVector sparseVector) return Equals(sparseVector, tolerance);
+			if (otherVector is AbstractSparseVector sparseVector) return Equals(sparseVector, tolerance);
 			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return Equals(fullyPopulatedVector, tolerance);
 			throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
 		}

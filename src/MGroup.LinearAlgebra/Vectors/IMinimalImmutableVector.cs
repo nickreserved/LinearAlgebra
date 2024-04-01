@@ -51,7 +51,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <returns>Return the negative of this vector.</returns>
 		IMinimalMutableVector Negative();
-		static public IMinimalMutableVector Negative(IMinimalMutableVector thisVector) => thisVector.Scale(-1);
+		static public IMinimalMutableVector Negative(IMinimalMutableVector thisVector) => thisVector.Copy().NegativeIntoThis();
 
 		/// <summary>
 		/// Return the multiplication of this vector and scalar <paramref name="coefficient"/>

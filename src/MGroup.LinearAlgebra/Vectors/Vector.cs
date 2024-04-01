@@ -39,9 +39,9 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		override public double[] Elements { get; }
 
-		override public int FromIndex { get { return 0; } }
+		override public int FromIndex { get => 0; }
 
-		override public int Length { get { return Elements.Length; } }
+		override public int Length { get => Elements.Length; }
 
 
 

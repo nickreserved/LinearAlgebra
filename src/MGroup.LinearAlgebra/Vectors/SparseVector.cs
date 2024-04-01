@@ -15,68 +15,104 @@ namespace MGroup.LinearAlgebra.Vectors
     /// and thus handled as non-zero entries.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    public class SparseVector: INotFullyPopulatedMutableVector
+    public class SparseVector: AbstractSparseVector
     {
-        private readonly double[] values;
-
-        /// <summary>
-        /// They must be sorted.
-        /// </summary>
-        private readonly int[] indices;
-
-        private SparseVector(int length, double[] values, int[] indices)
+		/// <summary>
+		/// Creates a sparse vector
+		/// </summary>
+		/// <param name="length">Number of vector elements, zero or non-zero.</param>
+		/// <param name="values">An array of non-zero element values, althrough it is not a problem if some elements are zero.
+		/// Number of array elements must be equal to number of elements in <paramref name="indices"/> array and at most <paramref name="length"/>.</param>
+		/// <param name="indices">An array of indices corresponding to <paramref name="values"/>, in ascending order.
+		/// Number of array elements must be equal to number of elements in <paramref name="values"/> array and at most <paramref name="length"/>.</param>
+		public SparseVector(int length, double[] values, int[] indices)
         {
-            this.Length = length;
-            this.values = values;
-            this.indices = indices;
+            Length = length;
+            Values = values;
+            Indices = indices;
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable1D.Length"/>.
-        /// </summary>
-        public int Length { get; }
+		/// <summary>
+		/// Create a sparse vector from a dense vector
+		/// </summary>
+		/// <param name="otherVector">The other dense vector</param>
+		/// <param name="torelance">Dense vector's elements with absolute value smaller or equal than that, considered zero and they are not stored in sparse vector.</param>
+		public SparseVector(AbstractFullyPopulatedVector otherVector, double torelance = 1e-7)
+		{
+			Length = otherVector.Length;
+			Indices = new int[Length];
+			int pos = 0;
+			for (int i = 0; i < Length; ++i)
+				if (Math.Abs(otherVector[i]) > torelance)
+					Indices[pos++] = i;
+			Values = new double[pos];
+			for (int i = 0; i < Values.Length; ++i)
+				Values[i] = otherVector[Indices[i]];
+			if (Indices.Length != Values.Length)
+			{
+				var indices = new int[Values.Length];
+				Array.Copy(Indices, indices, indices.Length);
+				Indices = indices;
+			}
+		}
 
-        /// <summary>
-        /// The internal array that stores the indices of the non-zero entries of the vector. 
-        /// Its length is equal to the number of non-zero entries.
-        /// It should only be used for passing the raw array to linear algebra libraries.
-        /// </summary>
-        public int[] RawIndices => indices;
+		override public int FromIndex { get => 0; }
+		override public int ToIndex { get => Indices.Length; }
 
-        /// <summary>
-        /// The internal array that stores the values of the non-zero entries of the vector.
-        /// Its length is equal to the number of non-zero entries.
-        /// It should only be used for passing the raw array to linear algebra libraries.
-        /// </summary>
-        public double[] RawValues => values;
 
-        /// <summary>
-        /// See <see cref="IIndexable1D.this[int]"/>
-        /// </summary>
-        public double this[int index]
-        {
-            get
-            {
-                int sparseIdx = FindSparseIndexOf(index);
-                if (sparseIdx < 0) return 0.0;
-                else return values[sparseIdx];
-            }
-        }
 
-        /// <summary>
-        /// Creates a new instance of <see cref="SparseVector"/> with the provided arrays as its internal Elements.
-        /// </summary>
-        /// <param name="length">The number of zero and non-zero entries of the new <see cref="SparseVector"/>.</param>
-        /// <param name="values">The internal array that stores the values of the non-zero entries of the vector. Constraints: 
-        ///     <paramref name="values"/>.Length == <paramref name="indices"/>.Length &lt;= <paramref name="length"/>.</param>
-        /// <param name="indices">The internal array that stores the indices of the non-zero entries of the vector. Constraints: 
-        ///     <paramref name="values"/>.Length == <paramref name="indices"/>.Length &lt;= <paramref name="length"/>.</param>
-        /// <param name="checkInput">If true, the validity of <paramref name="values"/> and <paramref name="indices"/> will be 
-        ///     checked, which is safer. If false, no check will be made, which is daster.</param>
-        /// <param name="sortInput">If true, <paramref name="values"/> and <paramref name="indices"/> will be sorted in
-        ///     ascending order of the entries of <paramref name="indices"/>. If false, they are assumed to be sorted. If they 
-        ///     are not, some methods may produce errors or have lower performance.</param>
-        public static SparseVector CreateFromArrays(int length, double[] values, int[] indices, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/// <summary>
+		/// The internal array that stores the indices of the non-zero entries of the vector. 
+		/// Its length is equal to the number of non-zero entries.
+		/// It should only be used for passing the raw array to linear algebra libraries.
+		/// </summary>
+		[Obsolete("Use Indices instead")]
+		public int[] RawIndices => Indices;
+
+		/// <summary>
+		/// The internal array that stores the values of the non-zero entries of the vector.
+		/// Its length is equal to the number of non-zero entries.
+		/// It should only be used for passing the raw array to linear algebra libraries.
+		/// </summary>
+		[Obsolete("Use Values instead")]
+		public double[] RawValues => Values;
+
+		/// <summary>
+		/// Creates a new instance of <see cref="SparseVector"/> with the provided arrays as its internal Elements.
+		/// </summary>
+		/// <param name="length">The number of zero and non-zero entries of the new <see cref="SparseVector"/>.</param>
+		/// <param name="values">The internal array that stores the values of the non-zero entries of the vector. Constraints: 
+		///     <paramref name="values"/>.Length == <paramref name="indices"/>.Length &lt;= <paramref name="length"/>.</param>
+		/// <param name="indices">The internal array that stores the indices of the non-zero entries of the vector. Constraints: 
+		///     <paramref name="values"/>.Length == <paramref name="indices"/>.Length &lt;= <paramref name="length"/>.</param>
+		/// <param name="checkInput">If true, the validity of <paramref name="values"/> and <paramref name="indices"/> will be 
+		///     checked, which is safer. If false, no check will be made, which is daster.</param>
+		/// <param name="sortInput">If true, <paramref name="values"/> and <paramref name="indices"/> will be sorted in
+		///     ascending order of the entries of <paramref name="indices"/>. If false, they are assumed to be sorted. If they 
+		///     are not, some methods may produce errors or have lower performance.</param>
+		public static SparseVector CreateFromArrays(int length, double[] values, int[] indices, 
             bool checkInput, bool sortInput)
         {
             bool verifiedSorted = false;
@@ -164,12 +200,12 @@ namespace MGroup.LinearAlgebra.Vectors
         ///     <paramref name="tolerance"/> = 0 use <see cref="CreateFromDense(double[])"/>.</param>
         public static SparseVector CreateFromDense(Vector denseVector, double tolerance)
         {
-            return CreateFromDense(denseVector.RawData, tolerance);
+            return CreateFromDense(denseVector.Elements, tolerance);
         }
 
         /// <summary>
         /// Creates a new instance of <see cref="SparseVector"/> that has the provided <paramref name="length"/> and explicitly
-        /// stores only the entries in <paramref name="nonZeroEntries"/>. All other entries are considered as 0. First 
+        /// stores only the entries in <paramref name="nonZeroEntries"/>. All otherVector entries are considered as 0. First 
         /// <paramref name="nonZeroEntries"/> will be sorted.
         /// </summary>
         /// <param name="length">The number of zero and non-zero entries in the new <see cref="SparseVector"/>.</param>
@@ -199,7 +235,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
         /// <summary>
         /// Creates a new instance of <see cref="SparseVector"/> that has the provided <paramref name="length"/> and explicitly
-        /// stores only the entries in <paramref name="nonZeroEntries"/>. All other entries are considered as 0.
+        /// stores only the entries in <paramref name="nonZeroEntries"/>. All otherVector entries are considered as 0.
         /// </summary>
         /// <param name="length">The number of zero and non-zero entries in the new <see cref="SparseVector"/>.</param>
         /// <param name="nonZeroEntries">The indices and values of the non-zero entries of the new vector. Constraints:
@@ -226,27 +262,42 @@ namespace MGroup.LinearAlgebra.Vectors
             return new SparseVector(length, values, indices);
         }
 
-        /// <summary>
-        /// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
-        /// </summary>
-        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/// <summary>
+		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView, int[])"/>
+		/// </summary>
+		[Obsolete("Avoid use of this")]
+        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector, int[] otherIndices)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
 
-        /// <summary>
-        /// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
-        /// </summary>
-        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector)
+		/// <summary>
+		/// See <see cref="IVector.AddIntoThisNonContiguouslyFrom(int[], IVectorView)"/>
+		/// </summary>
+		[Obsolete("Avoid use of this")]
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
 
 		/// <summary>
 		/// See <see cref="IVector.AddToIndex(int, double)"/>.
 		/// </summary>
-		public void AddToIndex(int index, double value)
-		{
-			int sparseIdx = FindSparseIndexOf(index);
-			CheckMutatedIndex(index, sparseIdx);
-			values[sparseIdx] = value;
-		}
+		[Obsolete("use this[index] += value instead")]
+		public void AddToIndex(int index, double value) => this[index] += value;
 
 		/// <summary>
 		/// See <see cref="IVectorView.Axpy(IVectorView, double)"/>.
@@ -282,7 +333,7 @@ namespace MGroup.LinearAlgebra.Vectors
         {
             if (otherVector is SparseVector otherSparse) AxpyIntoThis(otherSparse, otherCoefficient);
             else throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the other vector has the same sparsity pattern");
+                 "This operation is legal only if the otherVector vector has the same sparsity pattern");
         }
 
         /// <summary>
@@ -308,7 +359,7 @@ namespace MGroup.LinearAlgebra.Vectors
         {
             Preconditions.CheckVectorDimensions(this, otherVector);
             if (!HasSameIndexer(otherVector)) throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other vector has the same sparsity pattern");
+                "This operation is legal only if the otherVector vector has the same sparsity pattern");
 
             Blas.Daxpy(values.Length, otherCoefficient, otherVector.values, 0, 1, this.values, 0, 1);
         }
@@ -333,31 +384,9 @@ namespace MGroup.LinearAlgebra.Vectors
                 Blas.Daxpy(sparseLength, sourceCoefficient, otherSparse.values, start, 1, this.values, start, 1);
             }
             throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other vector has the same sparsity pattern");
+                "This operation is legal only if the otherVector vector has the same sparsity pattern");
         }
 
-        /// <summary>
-        /// See <see cref="IVector.Clear"/>.
-        /// </summary>
-        public void Clear() => Array.Clear(values, 0, values.Length);
-
-        /// <summary>
-        /// See <see cref="IVector.Copy(bool)"/>.
-        /// </summary>
-        public IVector Copy(bool copyIndexingData) => Copy();
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="SparseVector"/> by deep copying the entries as this instance.
-        /// </summary>
-        public SparseVector Copy()
-        {
-            int n = values.Length;
-            double[] valuesCopy = new double[n];
-            Array.Copy(values, valuesCopy, n);
-            int[] indicesCopy = new int[n];
-            Array.Copy(indices, indicesCopy, n);
-            return new SparseVector(n, valuesCopy, indicesCopy);
-        }
 
         /// <summary>
         /// See <see cref="IVector.CopyFrom(IVectorView)"/>
@@ -370,10 +399,12 @@ namespace MGroup.LinearAlgebra.Vectors
                 Array.Copy(otherSparse.values, this.values, this.Length);
             }
             throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the other vector has the same sparsity pattern");
+                 "This operation is legal only if the otherVector vector has the same sparsity pattern");
         }
 
-        /// <summary>
+/*		MUCH OF EFFORT FOR NOTHING(?)
+ * 
+		 /// <summary>
         /// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>
         /// </summary>
         public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
@@ -403,34 +434,24 @@ namespace MGroup.LinearAlgebra.Vectors
                 Array.Copy(otherSparse.values, start, this.values, start, sparseLength);
             }
             throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other vector has the same sparsity pattern");
+                "This operation is legal only if the otherVector vector has the same sparsity pattern");
         }
+*/
 
-        /// <summary>
-        /// See <see cref="IVectorView.CopyToArray"/>.
-        /// </summary>
-        public double[] CopyToArray()
-        {
-            double[] result = new double[Length];
-            for (int i = 0; i < values.Length; ++i) result[indices[i]] = values[i];
-            return result;
-        }
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="Vector"/> that contains the same non-zero entries as this 
-        /// <see cref="SparseVector"/>, while the rest entries are explicitly 0.
-        /// </summary>
-        public Vector CopyToFullVector() => Vector.CreateFromArray(CopyToArray(), false);
+		/// <summary>
+		/// Initializes a new instance of <see cref="Vector"/> that contains the same non-zero entries as this 
+		/// <see cref="SparseVector"/>, while the rest entries are explicitly 0.
+		/// </summary>
+		[Obsolete("use new Vector(this)")]
+		public Vector CopyToFullVector() => new Vector(this);
 
-        /// <summary>
-        /// Counts how many non zero entries are stored in the vector. This includes zeros that are explicitly stored.
-        /// </summary>
-        public int CountNonZeros() => values.Length;
+		/// <summary>
+		/// Counts how many non zero entries are stored in the vector. This includes zeros that are explicitly stored.
+		/// </summary>
+		[Obsolete("Use this.ToIndex - this.FromIndex instead")]
+        public int CountNonZeros() => ToIndex - FromIndex;
 
-        /// <summary>
-        /// See <see cref="IVectorView.CreateZeroVectorWithSameFormat"/>
-        /// </summary>
-        public IVector CreateZeroVectorWithSameFormat() => new SparseVector(Length, new double[indices.Length], indices);
 
         /// <summary>
         /// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoEntrywise(TVectorIn, Func{double, double, double})"/>.
@@ -470,7 +491,7 @@ namespace MGroup.LinearAlgebra.Vectors
                 }
             }
             throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the other vector has the same sparsity pattern");
+                 "This operation is legal only if the otherVector vector has the same sparsity pattern");
         }
 
         /// <summary>
@@ -495,130 +516,12 @@ namespace MGroup.LinearAlgebra.Vectors
             }
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoToAllEntriesIntoThis(Func{double, double})"/>
-        /// </summary>
-        public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
-        {
-            if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0))
-            {
-                for (int i = 0; i < values.Length; ++i) values[i] = unaryOperation(values[i]);
-            }
-            else throw new SparsityPatternModifiedException("This operation will change the sparsity pattern");
-        }
+		/// <summary>
+		/// Iterates over the non zero entries of the vector. This includes zeros that are explicitly stored.
+		/// </summary>
+		[Obsolete("use EnumerateStoredElements() instead")]
+		public IEnumerable<(int index, double value)> EnumerateNonZeros() => EnumerateStoredElements();
 
-        /// <summary>
-        /// See <see cref="IVectorView.DotProduct(IVectorView)"/>.
-        /// </summary>
-        public double DotProduct(IVectorView vector)
-        {
-            Preconditions.CheckVectorDimensions(this, vector);
-
-            if (vector is Vector dense) return SparseBlas.Ddoti(values.Length, values, indices, 0, dense.RawData, 0);
-            else if ((vector is SparseVector sparse) && HasSameIndexer(sparse))
-            {
-                return Blas.Ddot(values.Length, this.values, 0, 1, sparse.values, 0, 1);
-            }
-
-            double sum = 0;
-            for (int i = 0; i < values.Length; ++i) sum += values[i] * vector[indices[i]];
-            return sum;
-        }
-
-        /// <summary>
-        /// See <see cref="IIndexable1D.Equals(IIndexable1D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable1D other, double tolerance = 1e-13)
-        {
-            if (this.Length != other.Length) return false;
-            var comparer = new ValueComparer(tolerance);
-            int previousIndex = 0;
-            for (int i = 0; i < indices.Length; ++i)
-            {
-                int index = indices[i];
-                for (int j = previousIndex; j < index; ++j) // zero entries between the stored ones
-                {
-                    if (!comparer.AreEqual(0.0, other[j])) return false; 
-                }
-                if (!comparer.AreEqual(values[i], other[index])) return false; // Non zero entry
-                previousIndex = index + 1;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Iterates over the non zero entries of the vector. This includes zeros that are explicitly stored.
-        /// </summary>
-        public IEnumerable<(int index, double value)> EnumerateNonZeros()
-        {
-            for (int i = 0; i < values.Length; ++i)
-            {
-                yield return (indices[i], values[i]);
-            }
-        }
-
-        /// <summary>
-        /// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
-        /// </summary>
-        public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
-        {
-            Preconditions.CheckVectorDimensions(this, otherVector);
-            if (otherVector is SparseVector otherSparse) // In case both matrices have the exact same index arrays
-            {
-                if (HasSameIndexer(otherSparse))
-                {
-                    // Do not copy the index arrays, since they are already spread around. TODO: is this a good idea?
-                    double[] result = new double[this.values.Length];
-                    if (thisCoefficient == 1.0)
-                    {
-                        Array.Copy(this.values, result, this.values.Length);
-                        Blas.Daxpy(values.Length, otherCoefficient, otherSparse.values, 0, 1, result, 0, 1);
-                    }
-                    else if (otherCoefficient == 1.0)
-                    {
-                        Array.Copy(otherSparse.values, result, values.Length);
-                        Blas.Daxpy(values.Length, thisCoefficient, this.values, 0, 1, result, 0, 1);
-                    }
-                    else
-                    {
-                        Array.Copy(this.values, result, this.values.Length);
-                        BlasExtensions.Daxpby(values.Length, otherCoefficient, otherSparse.values, 0, 1,
-                            thisCoefficient, result, 0, 1);
-                    }
-                    return new SparseVector(Length, result, indices);
-                }
-            }
-
-            // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this vector)
-            return DenseStrategies.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
-        }
-
-        /// <summary>
-        /// See <see cref="IVector.LinearCombinationIntoThis(double, IVectorView, double)"/>
-        /// </summary>
-        public void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
-        {
-            Preconditions.CheckVectorDimensions(this, otherVector);
-            if ((otherVector is SparseVector otherSparse) && HasSameIndexer(otherSparse))
-            {
-                if (thisCoefficient == 1.0)
-                {
-                    Blas.Daxpy(values.Length, otherCoefficient, otherSparse.values, 0, 1, this.values, 0, 1);
-                }
-                else
-                {
-                    BlasExtensions.Daxpby(values.Length, otherCoefficient, otherSparse.values, 0, 1,
-                        thisCoefficient, this.values, 0, 1);
-                }
-            }
-            throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the other vector has the same sparsity pattern");
-        }
-
-        /// <summary>
-        /// See <see cref="IVectorView.Norm2"/>
-        /// </summary>
-        public double Norm2() => Blas.Dnrm2(values.Length, values, 0, 1);
 
         /// <summary>
         /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
@@ -632,61 +535,14 @@ namespace MGroup.LinearAlgebra.Vectors
             return finalize(aggregator);
         }
 
-        /// <summary>
-        /// See <see cref="IVector.Scale(double)"/>.
-        /// </summary>
-        IVector IVectorView.Scale(double scalar) => Scale(scalar);
+		[Obsolete("use this[index] = value")]
+        public void Set(int index, double value) => this[index] = value;
 
-        /// <summary>
-        /// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 
-        /// result[i] = <paramref name="scalar"/> * this[i]. 
-        /// The resulting vector is written to a new <see cref="SparseVector"/> and then returned.
-        /// </summary>
-        /// <param name="scalar">The scalar value that multiplies all entries of the vector.</param>
-        public SparseVector Scale(double scalar)
-        {
-            int nnz = this.values.Length;
-            double[] resultValues = new double[nnz];
-            Array.Copy(this.values, resultValues, nnz);
-            Blas.Dscal(nnz, scalar, resultValues, 0, 1);
-            return new SparseVector(Length, resultValues, this.indices); //TODO: perhaps I should also copy the indices
-        }
-
-        /// <summary>
-        /// See <see cref="IVector.ScaleIntoThis(double)>
-        /// </summary>
-        public void ScaleIntoThis(double scalar) => Blas.Dscal(values.Length, scalar, values, 0, 1);
-
-        /// <summary>
-        /// See <see cref="IVector.Set(int, double)"/>
-        /// </summary>
-        public void Set(int index, double value)
-        {
-            int sparseIdx = FindSparseIndexOf(index);
-			CheckMutatedIndex(index, sparseIdx);
-			values[sparseIdx] = value;
-		}
-
-        /// <summary>
-        /// Returns the index into <see cref="values"/> of the entry this[<paramref name="denseIdx"/>]. If this entry is a 
-        /// structural zero, -1 will be returned. 
-        /// </summary>
-        /// <param name="denseIdx"></param>
-        private int FindSparseIndexOf(int denseIdx)
-        {
-            Preconditions.CheckIndex1D(this, denseIdx);
-            return Array.BinarySearch<int>(indices, denseIdx); // only works if indices are sorted!!!
-        }
-
-        private bool HasSameIndexer(SparseVector other)
-        {
-            return this.indices == other.indices;
-        }
 
 		private void CheckMutatedIndex(int index, int sparseIdx)
 		{
 			if (sparseIdx < 0) throw new SparsityPatternModifiedException(
 				$"The entry at index = {index} is zero and not stored explicilty, therefore it cannot be modified.");
 		}
-    }
+	}
 }
