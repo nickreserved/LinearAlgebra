@@ -40,5 +40,18 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			}
 			return true;
 		}
+
+		/// <summary>
+		/// Shallow copy.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="original"></param>
+		/// <returns></returns>
+		public static T[] Copy<T>(T[] original)
+		{
+			var clone = new T[original.Length];
+			Array.Copy(original, clone, original.Length);
+			return clone;
+		}
 	}
 }

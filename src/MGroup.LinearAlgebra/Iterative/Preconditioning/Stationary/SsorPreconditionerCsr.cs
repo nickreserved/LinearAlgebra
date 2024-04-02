@@ -13,6 +13,16 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning.Stationary
 		private readonly double relaxationFactor;
 		private double[] workArray;
 
+		/// <summary>
+		/// Creates a new <see cref="SsorPreconditionerCsr"/> with the specified settings.
+		/// </summary>
+		/// <param name="relaxationFactor">
+		/// The w factor used in the SSOR preconditioning: [1/(w*(2-w) * (D+w*L) * inv(D) * (D+w*U)] * x = y.
+		/// There is an optimum value for each linear system, but it is unknown apriori. Usually values in [1.0, 2.0) are used.
+		/// </param>
+		/// <param name="numApplications">
+		/// How many times to apply the preconditioning at each iteration of the external iterative algorithm.
+		/// </param>
 		public SsorPreconditionerCsr(double relaxationFactor, int numApplications = 1)
 			: base(numApplications)
 		{

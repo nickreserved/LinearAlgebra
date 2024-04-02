@@ -2,42 +2,17 @@ namespace MGroup.LinearAlgebra.Tests.TestData.SparseLinearSystems
 {
 	using System;
 
-	internal class CartesianMesh2D
+	/// <summary>
+	/// Best dof ordering when numElementsX >= numElementsY.
+	/// </summary>
+	public class CartesianMesh2D : CartesianMeshBase
 	{
-		private readonly double dx;
-		private readonly double dy;
-
-		internal CartesianMesh2D(int numElementsX, int numElementsY, double lengthX, double lengthY)
+		public CartesianMesh2D(int numElementsX, int numElementsY, double lengthX, double lengthY)
+			: base(2, new int[] { numElementsX, numElementsY }, new double[] { lengthX, lengthY })
 		{
-			NumElementsX = numElementsX;
-			NumElementsY = numElementsY;
-			LengthX = lengthX;
-			LengthY = lengthY;
-			NumNodesX = NumElementsX + 1;
-			NumNodesY = NumElementsY + 1;
-			dx = LengthX / numElementsX;
-			dy = LengthY / numElementsY;
-			ElementIdRange = (0, NumElementsX * NumElementsY - 1);
-			NodeIdRange = (0, NumNodesX * NumNodesY - 1);
 		}
 
-		internal int NumElementsX { get; }
-
-		internal int NumElementsY { get; }
-
-		public double LengthX { get; }
-
-		public double LengthY { get; }
-
-		internal (int min, int max) ElementIdRange { get; }
-
-		internal (int min, int max) NodeIdRange { get; }
-
-		internal int NumNodesX { get; }
-
-		internal int NumNodesY { get; }
-
-		internal int[] GetNodeIdsOfElement(int[] elementIdx)
+		public override int[] GetNodeIdsOfElement(int[] elementIdx)
 		{
 			var nodeIds = new int[4];
 			nodeIds[0] = GetNodeId(new int[] { elementIdx[0], elementIdx[1] });
@@ -47,53 +22,29 @@ namespace MGroup.LinearAlgebra.Tests.TestData.SparseLinearSystems
 			return nodeIds;
 		}
 
-		internal double[] GetCoordsOfNode(int[] nodeIdx)
+		public override int GetElementId(int[] elementIdx)
 		{
-			double[] coords = { nodeIdx[0] * dx, nodeIdx[1] * dy };
-			return coords;
+			CheckElementIndex(elementIdx);
+			return numElementsPerAxis[1] * elementIdx[0] + elementIdx[1];
 		}
 
-		internal int GetElementId(int[] elementIdx)
+		public override int[] GetElementIndex(int elementId)
 		{
-			if ((elementIdx[0] < 0) || (elementIdx[0] >= NumElementsX) 
-				|| (elementIdx[1] < 0) || (elementIdx[1] >= NumElementsY))
-			{
-				throw new ArgumentException("There is no such element");
-			}
-
-			return NumElementsY * elementIdx[0] + elementIdx[1];
+			CheckElementId(elementId);
+			return new int[] { elementId / numElementsPerAxis[1], elementId % numElementsPerAxis[1] };
 		}
 
-		internal int[] GetElementIndex(int elementId)
+		public override int GetNodeId(int[] nodeIdx)
 		{
-			int maxElementId = NumElementsX * NumElementsY - 1;
-			if ((elementId < 0) || (elementId > maxElementId))
-			{
-				throw new ArgumentException("There is no such element");
-			}
-
-			return new int[] { elementId / NumElementsY, elementId % NumElementsY };
+			CheckNodeIndex(nodeIdx);
+			return numNodesPerAxis[1] * nodeIdx[0] + nodeIdx[1];
 		}
 
-		internal int GetNodeId(int[] nodeIdx)
+		public override int[] GetNodeIndex(int nodeId)
 		{
-			if ((nodeIdx[0] < 0) || (nodeIdx[0] >= NumNodesX) || (nodeIdx[1] < 0) || (nodeIdx[1] >= NumNodesY))
-			{
-				throw new ArgumentException("There is no such node");
-			}
-
-			return NumNodesY * nodeIdx[0] + nodeIdx[1];
+			CheckNodeId(nodeId);
+			return new int[] { nodeId / numNodesPerAxis[1], nodeId % numNodesPerAxis[1] };
 		}
 
-		internal int[] GetNodeIndex(int nodeId)
-		{
-			int maxNodeId = NumNodesX * NumNodesY - 1;
-			if ((nodeId < 0) || (nodeId > maxNodeId))
-			{
-				throw new ArgumentException("There is no such node");
-			}
-
-			return new int[] { nodeId / NumNodesY, nodeId % NumNodesY };
-		}
 	}
 }
