@@ -2,12 +2,14 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Text;
 	using System.Threading.Tasks;
 
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Matrices.Builders;
 	using MGroup.LinearAlgebra.Vectors;
 
 	public class SparseMatrix
@@ -80,6 +82,33 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 
 		public static Vector operator *(SparseMatrix matrix, Vector vector) => matrix.Multiply(vector);
 
+		public void AddSubmatrix(IIndexable2D subMatrix, int[] subMatrixRows, int[] globalMatrixRows,
+			int[] subMatrixCols, int[] globalMatrixCols)
+		{
+			int numRows = subMatrixRows.Length;
+			int numCols = subMatrixCols.Length;
+			Debug.Assert(numRows == globalMatrixRows.Length);
+			Debug.Assert(numCols == globalMatrixCols.Length);
+
+			for (int i = 0; i < numRows; ++i)
+			{
+				int subRow = subMatrixRows[i];
+				int globalRow = globalMatrixRows[i];
+				Debug.Assert((globalRow >= 0) && (globalRow < NumRows));
+
+				for (int j = 0; j < numCols; ++j)
+				{
+					int subCol = subMatrixCols[j];
+					int globalCol = globalMatrixCols[j];
+					Debug.Assert((globalCol >= 0) && (globalCol < NumColumns));
+
+					double subVal = subMatrix[subRow, subCol];
+					rows[globalRow].TryGetValue(globalCol, out double oldGlobalVal); // default value = 0.0, if the entry is new
+					rows[globalRow][globalCol] = subVal + oldGlobalVal;
+				}
+			}
+		}
+
 		public SparseMatrix Copy()
 		{
 			var clone = new SparseMatrix(NumRows, NumColumns);
@@ -90,6 +119,17 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			}
 
 			return clone;
+		}
+
+		public IEnumerable<(int row, int col, double value)> EnumerateNonZeros()
+		{
+			for (int i = 0; i < NumRows; ++i)
+			{
+				foreach (var colVal in rows[i])
+				{
+					yield return (i, colVal.Key, colVal.Value);
+				}
+			}
 		}
 
 		public SparseMatrix ExtractDiagonal()
@@ -140,6 +180,46 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 					}
 				}
 			}
+			return result;
+		}
+
+		public SparseMatrix ExtractSubmatrix(int[] rowsToKeep, int[] colsToKeep)
+		{
+			var oldToNewRows = new Dictionary<int, int>();
+			for (int i = 0; i < rowsToKeep.Length; ++i)
+			{
+				oldToNewRows[rowsToKeep[i]] = i;
+			}
+
+			var oldToNewCols = new Dictionary<int, int>();
+			for (int j = 0; j < colsToKeep.Length; ++j)
+			{
+				oldToNewCols[colsToKeep[j]] = j;
+			}
+
+			var result = new SparseMatrix(rowsToKeep.Length, colsToKeep.Length);
+			for (int I = 0; I < this.NumRows; ++I) // Traverse the existing sparse matrix and copy only the requested entries
+			{
+				bool keepRow = oldToNewRows.TryGetValue(I, out int i);
+				if (!keepRow)
+				{
+					continue;
+				}
+
+				foreach (var colValPair in this.rows[I])
+				{
+					int J = colValPair.Key;
+					bool keepCol = oldToNewCols.TryGetValue(J, out int j);
+					if (!keepCol)
+					{
+						continue;
+					}
+
+					double val = colValPair.Value;
+					result[i, j] = val;
+				}
+			}
+
 			return result;
 		}
 
