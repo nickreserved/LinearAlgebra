@@ -9,6 +9,7 @@ using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
 using MGroup.LinearAlgebra.Orthogonalization;
 using MGroup.LinearAlgebra.Eigensystems;
+using DotNumerics.Optimization.LBFGSB;
 
 //TODO: align data using mkl_malloc
 //TODO: add inplace option for factorizations and leave all subsequent operations (determinant, system solution, etc.) to them
@@ -86,6 +87,71 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			get { return data[colIdx * NumRows + rowIdx]; }
 			set { data[colIdx * NumRows + rowIdx] = value; }
+		}
+
+		/// <summary>
+		/// Concatenate multiple matrices layed out on a 2D gridm similarly to Matlab. E.g. Matlab's [A B C; D E F] 
+		/// is equivalent to Matrix.Concatenate(new double[,] {A, B, C} , {D, E, F}}.
+		/// </summary>
+		/// <param name="submatrices">The individual matrices that will be inserted into the result.</param>
+		public static Matrix Concatenate(Matrix[,] submatrices)
+		{
+			// Check that dimensions are compatible
+			for (int c = 0; c < submatrices.GetLength(1); ++c)
+			{
+				int numColumns = submatrices[0, c].NumColumns;
+				for (int r = 1; r < submatrices.GetLength(0); ++r)
+				{
+					if (submatrices[r, c].NumColumns != numColumns)
+					{
+						throw new NonMatchingDimensionsException($"Submatrix[0,{c}] has {numColumns} columns," +
+							$" while submatrix [{r},{c}] has {submatrices[r, c].NumColumns} columns");
+					}
+				}
+			}
+
+			for (int r = 0; r < submatrices.GetLength(0); ++r)
+			{
+				int numRows = submatrices[r, 0].NumRows;
+				for (int c = 1; c < submatrices.GetLength(1); ++c)
+				{
+					if (submatrices[r, c].NumRows != numRows)
+					{
+						throw new NonMatchingDimensionsException($"Submatrix[{r},0] has {numRows} rows," +
+							$" while submatrix [{r},{c}] has {submatrices[r, c].NumRows} rows");
+					}
+				}
+			}
+
+			// Find total dimensions;
+			int numColumnsTotal = 0;
+			for (int c = 0; c < submatrices.GetLength(1); ++c)
+			{
+				numColumnsTotal += submatrices[0, c].NumColumns;
+			}
+
+			int numRowsTotal = 0;
+			for (int r = 0; r < submatrices.GetLength(0); ++r)
+			{
+				numRowsTotal += submatrices[r, 0].NumRows;
+			}
+
+			// Copy the submatrices to the result
+			var result = Matrix.CreateZero(numRowsTotal, numColumnsTotal);
+			int colOffset = 0;
+			for (int c = 0; c < submatrices.GetLength(1); ++c)
+			{
+				int rowOffset = 0;
+				for (int r = 0; r < submatrices.GetLength(0); ++r)
+				{
+					result.SetSubmatrix(rowOffset, colOffset, submatrices[r, c]);
+					rowOffset += submatrices[r, c].NumRows;
+				}
+
+				colOffset += submatrices[0, c].NumColumns;
+			}
+
+			return result;
 		}
 
 		/// <summary>
