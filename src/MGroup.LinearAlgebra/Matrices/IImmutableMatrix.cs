@@ -12,14 +12,20 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherMatrix">A vector with the same number of Elements with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
-		IMutableMatrix Axpy(IImmutableMatrix otherMatrix, double otherCoefficient)
-			=> Copy().AxpyIntoThis(otherMatrix, otherCoefficient);
+		IMutableMatrix Axpy(IImmutableMatrix otherMatrix, double otherCoefficient);
 
-		IMutableMatrix Add(IImmutableMatrix otherMatrix)
-			=> Axpy(otherMatrix, +1.0);
+		static protected IMutableMatrix Axpy(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix, double otherCoefficient) => thisMatrix.Copy().AxpyIntoThis(otherMatrix, otherCoefficient);
 
-		IMutableMatrix Subtract(IImmutableMatrix otherMatrix)
-			=> Axpy(otherMatrix, -1.0);
+
+		IMutableMatrix Add(IImmutableMatrix otherMatrix);
+
+		static protected IMutableMatrix Add(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, 1);
+
+
+		IMutableMatrix Subtract(IImmutableMatrix otherMatrix);
+
+		static protected IMutableMatrix Subtract(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, -1);
+
 
 		/// <summary>
 		/// A linear combination between this and another one matrix.
@@ -28,19 +34,26 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherMatrix">A matrix with the same number of Elements with this matrix</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix * <paramref name="thisCoefficient"/> + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
-		public IMutableMatrix LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
-			=> Copy().LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
+		public IMutableMatrix LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient);
 
-		IMutableMatrix Scale(double coefficient)
-			=> Copy().ScaleIntoThis(coefficient);
+		static protected IMutableMatrix LinearCombination(IImmutableMatrix thisMatrix, double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
+			=> thisMatrix.Copy().LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
+
+
+		IMutableMatrix Scale(double coefficient);
+
+		static protected IMutableMatrix Scale(IImmutableMatrix thisMatrix, double coefficient) => thisMatrix.Copy().ScaleIntoThis(coefficient);
+
 
 		IMutableMatrix Copy();
+
 
 		/// <summary>
 		/// Creates a new matrix with all Elements set to zero, the same dimensions with this matrix and probably with the same format with this matrix.
 		/// </summary>
 		/// <returns>A new zero matrix with the same dimensions with this matrix</returns>
 		IMutableMatrix CreateZero();
+
 
 		/// <summary>
 		/// Check if this matrix and <paramref name="otherMatrix"/> are almost equal.
@@ -49,7 +62,6 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="tolerance">The maximum difference between corresponding Elements to considered equal</param>
 		/// <returns>True if both vectors are almost equal</returns>
 		bool Equals(IImmutableMatrix otherMatrix, double tolerance = 1e-7);
-
 
 
 		/// <summary>
@@ -68,6 +80,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			result.DoEntrywiseIntoThis(matrix, binaryOperation);
 			return result;
 		}
+
 
 		/// <summary>
 		/// Performs a unary operation on each entry: result[i] = <paramref name="unaryOperation"/>(this[i, j]).

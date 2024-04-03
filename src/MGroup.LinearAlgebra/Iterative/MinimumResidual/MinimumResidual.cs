@@ -366,9 +366,9 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         private static void CheckSymmetricMatrix(ILinearTransformation A, IMinimalImmutableVector y, IMinimalImmutableVector r1)
         {
             IMinimalMutableVector w = y.CreateZero();
-            A.Multiply(y, w);
+            A.MultiplyIntoThis(y, w);
             IMinimalMutableVector r2 = y.CreateZero();
-            A.Multiply(w, r2);
+            A.MultiplyIntoThis(w, r2);
             double s = w.DotProduct(w);
             double t = y.DotProduct(r2);
             double z = Math.Abs(s - t);
@@ -393,10 +393,10 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         private static void ShiftedMatrixVectorMult(ILinearTransformation matrix, IMinimalImmutableVector x, IMinimalMutableVector y, double shift)
         {
             //TODO: this should just be implemented as a wrapping LinearTransformation
-            if (shift == 0.0) matrix.Multiply(x, y);
+            if (shift == 0.0) matrix.MultiplyIntoThis(x, y);
             else
             {
-                matrix.Multiply(x, y);
+                matrix.MultiplyIntoThis(x, y);
                 y.AxpyIntoThis(x, -shift);
             }
         }

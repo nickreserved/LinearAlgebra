@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using MGroup.LinearAlgebra.Exceptions;
 
 //TODO: Use the generic interfaces IEntrywiseOperable1D, etc (and create some for axpy, linear combo), instead of implementing
-//      the extensions for each vector/matrix type and the IVectorView, etc. interfaces. However the extension method should be
+//      the extensions for each vector/matrix type and the IExtendedImmutableVector, etc. interfaces. However the extension method should be
 //      concise as possible. Having to declare the generic types (see the generic MultiplyEntrywise) is prohibitive, especially
 //      if IntelliSense does not suggest the generic extension method. How dids LINQ solve this issue?
 namespace MGroup.LinearAlgebra.Vectors
@@ -41,7 +41,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <paramref name="thisVector"/>[i] = <paramref name="thisVector"/>[i] + <paramref name="otherVector"/>[i], for 
 		/// 0 &lt;= i &lt; <paramref name="thisVector"/>.<see cref="IIndexable1D.Length"/> 
 		/// = <paramref name="otherVector"/>.<see cref="IIndexable1D.Length"/>.
-		/// The resulting vector overwrites the entries of this <see cref="IVector"/> instance.
+		/// The resulting vector overwrites the entries of this <see cref="IExtendedMutableVector"/> instance.
 		/// </summary>
 		/// <param name="thisVector">
 		/// A vector with the same <see cref="IIndexable1D.Length"/> as <paramref name="otherVector"/>.
@@ -81,7 +81,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Performs the following operation for <paramref name="length"/> consecutive entries starting from the provided 
 		/// indices: this[i] = this[i] + <paramref name="sourceVector"/>[i].
 		/// </summary>
-		/// <param name="destinationIndex">The index into this <see cref="IVector"/> where to start overwritting. Constraints:
+		/// <param name="destinationIndex">The index into this <see cref="IExtendedMutableVector"/> where to start overwritting. Constraints:
 		///     <paramref name="destinationIndex"/> + <paramref name="length"/> &lt;= this.<see cref="IIndexable1D.Length"/>.
 		///     </param>
 		/// <param name="sourceVector">The other vector operand.</param>
@@ -233,7 +233,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <paramref name="thisVector"/>[i] = <paramref name="thisVector"/>[i] - <paramref name="otherVector"/>[i], 
 		/// for 0 &lt;= i &lt; <paramref name="thisVector"/>.<see cref="IIndexable1D.Length"/> 
 		/// = <paramref name="otherVector"/>.<see cref="IIndexable1D.Length"/>.
-		/// The resulting vector overwrites the entries of this <see cref="IVector"/> instance.
+		/// The resulting vector overwrites the entries of this <see cref="IExtendedMutableVector"/> instance.
 		/// </summary>
 		/// <param name="thisVector">
 		/// A vector with the same <see cref="IIndexable1D.Length"/> as <paramref name="otherVector"/>.
@@ -252,7 +252,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Performs the following operation for <paramref name="length"/> consecutive entries starting from the provided 
 		/// indices: this[i] = this[i] - <paramref name="sourceVector"/>[i].
 		/// </summary>
-		/// <param name="destinationIndex">The index into this <see cref="IVector"/> where to start overwritting. Constraints:
+		/// <param name="destinationIndex">The index into this <see cref="IExtendedMutableVector"/> where to start overwritting. Constraints:
 		///     <paramref name="destinationIndex"/> + <paramref name="length"/> &lt;= this.<see cref="IIndexable1D.Length"/>.
 		///     </param>
 		/// <param name="sourceVector">The other vector operand.</param>

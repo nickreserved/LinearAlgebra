@@ -405,7 +405,7 @@ namespace MGroup.LinearAlgebra.Commons
 				{
 					for (int j = 0; j < lhsVector.Length; ++j)
 					{
-						rhsVector.Set(i, rhsVector[i] + matrix[j, i] * lhsVector[j]);
+						rhsVector[i] = rhsVector[i] + matrix[j, i] * lhsVector[j];
 					}
 				}
 			}
@@ -417,7 +417,7 @@ namespace MGroup.LinearAlgebra.Commons
 				{
 					for (int j = 0; j < lhsVector.Length; ++j)
 					{
-						rhsVector.Set(i, rhsVector[i] + matrix[i, j] * lhsVector[j]);
+						rhsVector[i] = rhsVector[i] + matrix[i, j] * lhsVector[j];
 					}
 				}
 			}

@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid
 			_gaussSeidelIteration.Initialize(matrix);
 		}
 
-		public void Smooth(IVectorView rhs, IVector lhs)
+		public void Smooth(IExtendedImmutableVector rhs, IExtendedMutableVector lhs)
 		{
 			CheckDisposed();
 			for (int t = 0; t < _numIterations; t++) 

@@ -17,12 +17,12 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 		{
 		}
 
-		public abstract void Apply(IGaussSeidelIteration _gsIteration, IVectorView rhs, IVector lhs);
+		public abstract void Apply(IGaussSeidelIteration _gsIteration, IExtendedImmutableVector rhs, IExtendedMutableVector lhs);
 
 
 		private class BackwardSweep : GaussSeidelSweepDirection
 		{
-			public override void Apply(IGaussSeidelIteration _gsIteration, IVectorView rhs, IVector lhs)
+			public override void Apply(IGaussSeidelIteration _gsIteration, IExtendedImmutableVector rhs, IExtendedMutableVector lhs)
 			{
 				_gsIteration.GaussSeidelBackwardIteration(rhs, lhs);
 			}
@@ -30,7 +30,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 
 		private class ForwardSweep : GaussSeidelSweepDirection
 		{
-			public override void Apply(IGaussSeidelIteration _gsIteration, IVectorView rhs, IVector lhs)
+			public override void Apply(IGaussSeidelIteration _gsIteration, IExtendedImmutableVector rhs, IExtendedMutableVector lhs)
 			{
 				_gsIteration.GaussSeidelForwardIteration(rhs, lhs);
 			}
@@ -38,7 +38,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 
 		private class SymmetricSweep : GaussSeidelSweepDirection
 		{
-			public override void Apply(IGaussSeidelIteration _gsIteration, IVectorView rhs, IVector lhs)
+			public override void Apply(IGaussSeidelIteration _gsIteration, IExtendedImmutableVector rhs, IExtendedMutableVector lhs)
 			{
 				_gsIteration.GaussSeidelForwardIteration(rhs, lhs);
 				_gsIteration.GaussSeidelBackwardIteration(rhs, lhs);

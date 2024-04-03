@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Interpolation
@@ -7,9 +7,9 @@ namespace MGroup.LinearAlgebra.Interpolation
     {
         public int Degree { get; private set; }
 
-        public IVector KnotValueVector { get; private set; }
+        public IExtendedMutableVector KnotValueVector { get; private set; }
 
-        public IVector ParametricCoordinates { get; private set; }
+        public IExtendedMutableVector ParametricCoordinates { get; private set; }
 
         public double[,] BSPLineValues { get; private set; }
 
@@ -17,7 +17,7 @@ namespace MGroup.LinearAlgebra.Interpolation
 
 		public double [,] BSPLineSecondDerivativeValues { get; private set; }
 
-        public BSPLines1D(int degree, IVector knotValueVector, IVector parametricCoordinates)
+        public BSPLines1D(int degree, IExtendedMutableVector knotValueVector, IExtendedMutableVector parametricCoordinates)
         {
             if (degree <= 0)
             {

@@ -710,9 +710,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+        /// See <see cref="IMatrixView.Multiply(IExtendedImmutableVector, bool)"/>.
         /// </summary>
-        public IVector Multiply(IVectorView vector, bool transposeThis = false)
+        public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
         {
             if (vector is Vector dense) return Multiply(dense, transposeThis);
 
@@ -751,9 +751,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
         /// </summary>
-        public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+        public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis = false)
         {
 			if (this.values.Length == 0)
 			{

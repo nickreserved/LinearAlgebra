@@ -24,7 +24,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <returns>A new array with the Elements of vector</returns>
 		double[] CopyToArray();
-		public static double[] CopyToArray(IExtendedImmutableVector thisVector) => thisVector.CopyToArray(0, thisVector.Length);
+		protected static double[] CopyToArray(IExtendedImmutableVector thisVector) => thisVector.CopyToArray(0, thisVector.Length);
 
 		/// <summary>
 		/// Return Elements from a contiguous part of this vector to a new array.
@@ -33,7 +33,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="toIndex">Index <paramref name="toIndex"/>, of this vector, will be the last+1 element of returned array</param>
 		/// <returns>A new array with Elements of this vector from range [<paramref name="fromIndex"/>, <paramref name="toIndex"/>)</returns>
 		double[] CopyToArray(int fromIndex, int toIndex);
-		public static double[] CopyToArray(IExtendedImmutableVector thisVector, int fromIndex, int toIndex)
+		protected static double[] CopyToArray(IExtendedImmutableVector thisVector, int fromIndex, int toIndex)
 		{
 			var result = new double[toIndex - fromIndex];
 			thisVector.CopyToArray(fromIndex, result, 0, result.Length);

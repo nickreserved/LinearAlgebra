@@ -46,7 +46,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <summary>
 		/// A list of columns that form a basis for the null space of the original matrix. 
 		/// </summary>
-        public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IVectorView
+        public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IExtendedImmutableVector
 
 		/// <summary>
 		/// The internal Elements containing the factorization of a matrix. Only the upper triangle (including the diagonal) 

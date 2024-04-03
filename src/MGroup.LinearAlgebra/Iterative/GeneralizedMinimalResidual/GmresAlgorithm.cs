@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
         private double relativeTolerance;
         private int maximumIterations;
         private IMaxIterationsProvider innerIterationsProvider;
-        protected IVector residual;
+        protected IMinimalMutableVector residual;
 
         public GmresAlgorithm(double absoluteTolerance, double relativeTolerance, int maximumIterations,
             IMaxIterationsProvider innerIterationsProvider)
@@ -31,22 +31,22 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
             this.innerIterationsProvider = innerIterationsProvider;
         }
 
-        public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner,IVectorView rhs, IVector solution,
-            bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
+        public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IMinimalImmutableVector rhs, IMinimalMutableVector solution,
+            bool initialGuessIsZero, Func<IMinimalMutableVector> zeroVectorInitializer)
         {
             return Solve(new ExplicitMatrixTransformation(matrix), preconditioner,rhs, solution, initialGuessIsZero,
                 zeroVectorInitializer);
         }
 
 
-        public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IVectorView rhs, IVector solution,
-            bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
+        public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalImmutableVector rhs, IMinimalMutableVector solution,
+            bool initialGuessIsZero, Func<IMinimalMutableVector> zeroVectorInitializer)
         {
             Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
             Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
             var innerIterations = innerIterationsProvider.GetMaxIterations(matrix.NumRows);
-            IVector[] v =new Vector[innerIterations+1];
+			IMinimalMutableVector[] v =new Vector[innerIterations+1];
             var y = Vector.CreateZero(innerIterations + 1);
             var c= Vector.CreateZero(innerIterations + 1);
             var s = Vector.CreateZero(innerIterations + 1);
@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 
             for ( var iteration = 0; iteration < maximumIterations; iteration++)
             {
-                preconditioner.SolveLinearSystem(residual, residual);
+                preconditioner.Apply(residual, residual);
                 //var residual = ExactResidual.Calculate(matrix, rhs, solution);
 
                 residualNorm = residual.Norm2();
@@ -80,8 +80,8 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
                     indexIteration = innerIteration;
                     v[innerIteration + 1] = Vector.CreateZero(v[innerIteration].Length);
 
-                    matrix.Multiply(v[innerIteration], v[innerIteration + 1]);
-                    preconditioner.SolveLinearSystem(v[innerIteration + 1], v[innerIteration + 1]);
+                    matrix.MultiplyIntoThis(v[innerIteration], v[innerIteration + 1]);
+                    preconditioner.Apply(v[innerIteration + 1], v[innerIteration + 1]);
 
                     var av = v[innerIteration + 1].Norm2();
 

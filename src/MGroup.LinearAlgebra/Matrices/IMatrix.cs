@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MGroup.LinearAlgebra.Matrices
 {
@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Matrices
     /// are used on sparse or triangular storage matrix formats.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    public interface IMatrix: IMatrixView, IEntrywiseOperable2D<IMatrixView>
+    public interface IMatrix: IMatrixView, IEntrywiseOperable2D<IMatrixView>, IMutableMatrix
     {
         /// <summary>
         /// Performs the following operation for all (i, j):
@@ -24,12 +24,11 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
         ///     is not permitted by the matrix storage format.</exception>
         void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient);
-
-        /// <summary>
-        /// Sets all entries to 0. For sparse or block matrices: the indexing arrays will not be mutated. Therefore the sparsity  
-        /// pattern will be preserved. The non-zero entries will be set to 0, but they will still be stored explicitly. 
-        /// </summary>
-        void Clear();
+		IMutableMatrix IMutableMatrix.AxpyIntoThis(IImmutableMatrix otherMatrix, double otherCoefficient)
+		{
+			AxpyIntoThis((IMatrixView)otherMatrix, otherCoefficient);
+			return this;
+		}
 
         /// <summary>
         /// Performs the following operation for all (i, j):
@@ -47,27 +46,26 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
         ///     is not permitted by the matrix storage format.</exception>
         void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
+		IMutableMatrix IMutableMatrix.LinearCombinationIntoThis(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
+		{
+			LinearCombinationIntoThis(thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
+			return this;
+		}
 
-        /// <summary>
-        /// Performs the following operation for all (i, j): this[i, j] = <paramref name="scalar"/> * this[i, j].
-        /// The resulting matrix overwrites the entries of this.
-        /// </summary>
-        /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
-        void ScaleIntoThis(double scalar);
 
-        /// <summary>
-        /// Setter that will work as expected for general dense matrices. For sparse matrices it will throw a 
-        /// <see cref="Exceptions.SparsityPatternModifiedException"/> if a structural zero entry is written to.
-        /// For symmetric matrices, this will set both (<paramref name="rowIdx"/>, <paramref name="colIdx"/>) and 
-        /// (<paramref name="colIdx"/>, <paramref name="rowIdx"/>).
-        /// </summary>
-        /// <param name="rowIdx">The row index: 0 &lt;= rowIdx &lt; <see cref="IIndexable2D.NumRows"/></param>
-        /// <param name="colIdx">The column index: 0 &lt;= colIdx &lt; <see cref="IIndexable2D.NumColumns"/></param>
-        /// <param name="value">The new value of this[<paramref name="rowIdx"/>, <paramref name="colIdx"/>].</param>
-        /// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> or <paramref name="colIdx"/> violate 
-        ///     the described constraints.</exception>
-        /// <exception cref="Exceptions.SparsityPatternModifiedException"> Thrown if a structural zero entry of a sparse matrix 
-        ///     format is written to.</exception>
-        void SetEntryRespectingPattern(int rowIdx, int colIdx, double value);
+		/// <summary>
+		/// Setter that will work as expected for general dense matrices. For sparse matrices it will throw a 
+		/// <see cref="Exceptions.SparsityPatternModifiedException"/> if a structural zero entry is written to.
+		/// For symmetric matrices, this will set both (<paramref name="rowIdx"/>, <paramref name="colIdx"/>) and 
+		/// (<paramref name="colIdx"/>, <paramref name="rowIdx"/>).
+		/// </summary>
+		/// <param name="rowIdx">The row index: 0 &lt;= rowIdx &lt; <see cref="IIndexable2D.NumRows"/></param>
+		/// <param name="colIdx">The column index: 0 &lt;= colIdx &lt; <see cref="IIndexable2D.NumColumns"/></param>
+		/// <param name="value">The new value of this[<paramref name="rowIdx"/>, <paramref name="colIdx"/>].</param>
+		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> or <paramref name="colIdx"/> violate 
+		///     the described constraints.</exception>
+		/// <exception cref="Exceptions.SparsityPatternModifiedException"> Thrown if a structural zero entry of a sparse matrix 
+		///     format is written to.</exception>
+		void SetEntryRespectingPattern(int rowIdx, int colIdx, double value);
     }
 }

@@ -129,7 +129,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			UpdateDirectionVector(precondResidual, direction);
 
 			// q0 = A * d0
-			Matrix.Multiply(direction, matrixTimesDirection);
+			Matrix.MultiplyIntoThis(direction, matrixTimesDirection);
 			DirectionTimesMatrixTimesDirection = direction.DotProduct(matrixTimesDirection);
 
 			// Update the direction vectors cache
@@ -197,7 +197,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				UpdateDirectionVector(precondResidual, direction);
 
 				// q = A * d
-				Matrix.Multiply(direction, matrixTimesDirection);
+				Matrix.MultiplyIntoThis(direction, matrixTimesDirection);
 				DirectionTimesMatrixTimesDirection = direction.DotProduct(matrixTimesDirection);
 
 				// Update the direction vectors cache

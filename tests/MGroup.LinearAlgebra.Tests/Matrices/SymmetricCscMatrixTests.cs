@@ -39,13 +39,13 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 					SparsePosDef10by10.SymmetricCscRowIndices, SparsePosDef10by10.SymmetricCscColOffsets,
 					true);
 
-				// Multiply() - untransposed
+				// MultiplyIntoThis() - untransposed
 				var x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 				var bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-				IVector bComputed = A.Multiply(x, false);
+				IExtendedMutableVector bComputed = A.Multiply(x, false);
 				comparer.AssertEqual(bExpected, bComputed);
 
-				// Multiply() - transposed
+				// MultiplyIntoThis() - transposed
 				x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 				bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs); // same as before, since the matrix is symmetric
 				bComputed = A.Multiply(x, true);

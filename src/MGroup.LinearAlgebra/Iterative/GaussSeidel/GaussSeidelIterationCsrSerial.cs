@@ -26,33 +26,32 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			inactive = true;
 		}
 
-		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
+		public void GaussSeidelBackwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
 		{
 			CheckActive();
 
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
 				BackwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
-					rhsDense.RawData, lhsDense.RawData);
+					rhsDense.Elements, lhsDense.Elements);
 			}
 			else
 			{
 				double[] lhs = lhsVector.CopyToArray();
 				double[] rhs = rhsVector.CopyToArray();
-				BackwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets, 
-					rhs, lhs);
-				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
+				BackwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets, rhs, lhs);
+				lhsVector.CopyFrom(new Vector(lhs));
 			}
 		}
 
-		public void GaussSeidelForwardIteration(IVectorView rhsVector, IVector lhsVector)
+		public void GaussSeidelForwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
 		{
 			CheckActive();
 
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
 				ForwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
-					rhsDense.RawData, lhsDense.RawData);
+					rhsDense.Elements, lhsDense.Elements);
 			}
 			else
 			{
@@ -60,7 +59,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 				double[] rhs = rhsVector.CopyToArray();
 				ForwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets, 
 					rhs, lhs);
-				lhsVector.CopyFrom(Vector.CreateFromArray(lhs));
+				lhsVector.CopyFrom(new Vector(lhs));
 			}
 		}
 

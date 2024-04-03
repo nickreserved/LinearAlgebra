@@ -35,7 +35,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 				nullSpaceMatrix.SetSubcolumn(j, x);
 
 				// Check that each vector belongs to the nullspace
-				IVector Ax = unfactorizedMatrix.Multiply(x);
+				IExtendedMutableVector Ax = unfactorizedMatrix.Multiply(x);
 				double normAx = Ax.Norm2() / Ax.Length;
 				//comparer.AssertEqual(0.0, normAx);
 			}

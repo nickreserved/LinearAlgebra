@@ -6,21 +6,28 @@ namespace MGroup.LinearAlgebra.Matrices
 
 	public interface IMutableMatrix : IImmutableMatrix
 	{
-		IMutableMatrix AxpyIntoThis(IImmutableMatrix otherMatrix, double otherCoefficient)
-			=> LinearCombinationIntoThis(+1.0, otherMatrix, otherCoefficient);
+		IMutableMatrix AxpyIntoThis(IImmutableMatrix otherMatrix, double otherCoefficient);
 
-		IMutableMatrix AddIntoThis(IImmutableMatrix otherMatrix)
-			=> AxpyIntoThis(otherMatrix, +1.0);
 
-		IMutableMatrix SubtractIntoThis(IImmutableMatrix otherMatrix)
-			=> AxpyIntoThis(otherMatrix, -1.0);
+		IMutableMatrix AddIntoThis(IImmutableMatrix otherMatrix);
+
+		static protected IMutableMatrix AddIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, 1);
+
+
+		IMutableMatrix SubtractIntoThis(IImmutableMatrix otherMatrix);
+		
+		static protected IMutableMatrix SubtractIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, -1);
+
 
 		IMutableMatrix LinearCombinationIntoThis(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient);
 		
+
 		IMutableMatrix ScaleIntoThis(double coefficient);
 
+
 		/// <summary>
-		/// Set all matrix Elements to zero.
+		/// Sets all matrix elements to 0. For sparse or block matrices: the indexing arrays will not be mutated. Therefore the sparsity  
+		/// pattern will be preserved. The non-zero entries will be set to 0, but they will still be stored explicitly. 
 		/// </summary>
 		void Clear();
 

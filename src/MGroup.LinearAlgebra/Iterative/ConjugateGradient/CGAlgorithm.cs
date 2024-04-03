@@ -196,7 +196,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             for (Iteration = 0; Iteration < maxIterations; ++Iteration)
             {
                 // q = A * d
-                Matrix.Multiply(direction, matrixTimesDirection);
+                Matrix.MultiplyIntoThis(direction, matrixTimesDirection);
 
                 // α = δnew / (d * q)
                 StepSize = ResDotRes / (direction.DotProduct(matrixTimesDirection));

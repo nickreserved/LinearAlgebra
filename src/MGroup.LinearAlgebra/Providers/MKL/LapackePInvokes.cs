@@ -145,7 +145,7 @@ namespace MGroup.LinearAlgebra.Providers.MKL
         internal static extern int Dorgqr(int matrixLayout, int m, int n, int k, double[] A, int ldA, double[] Tau);
 
         /// <summary>
-        /// Multiply an <paramref name="m"/>-by-<paramref name="n"/> (or vector) by the orthogonal matrix Q created by 
+        /// MultiplyIntoThis an <paramref name="m"/>-by-<paramref name="n"/> (or vector) by the orthogonal matrix Q created by 
         /// <see cref="Dgelqf(int, int, int, double[], int, double[])"/> or its transpose.
         /// </summary>
         /// <param name="matrixLayout">Specifies whether the matrix storage layout is row major (<see cref="LAPACK_ROW_MAJOR"/>) 
@@ -185,7 +185,7 @@ namespace MGroup.LinearAlgebra.Providers.MKL
             int m, int n, int k, double[] A, int ldA, double[] Tau, double[] C, int ldC);
 
         /// <summary>
-        /// Multiply an <paramref name="m"/>-by-<paramref name="n"/> matrix (or vector) by the orthogonal matrix Q created by 
+        /// MultiplyIntoThis an <paramref name="m"/>-by-<paramref name="n"/> matrix (or vector) by the orthogonal matrix Q created by 
         /// <see cref="Dgeqrf(int, int, int, double[], int, double[])"/> or its transpose.
         /// </summary>
         /// <param name="matrixLayout">Specifies whether the matrix storage layout is row major (<see cref="LAPACK_ROW_MAJOR"/>) 

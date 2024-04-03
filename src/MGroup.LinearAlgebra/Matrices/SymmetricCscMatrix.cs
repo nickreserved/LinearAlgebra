@@ -484,9 +484,9 @@ namespace MGroup.LinearAlgebra.Matrices
 			=> DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
 
 		/// <summary>
-		/// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+		/// See <see cref="IMatrixView.Multiply(IExtendedImmutableVector, bool)"/>.
 		/// </summary>
-		public IVector Multiply(IVectorView vector, bool transposeThis = false)
+		public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
 		{
 			var result = Vector.CreateZero(NumRows);
 			CsrMultiplications.SymmetricCsrTimesVector(NumRows, values, colOffsets, rowIndices, vector, result.RawData);
@@ -494,9 +494,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+		/// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
 		/// </summary>
-		public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis)
+		public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis)
 		{
 			rhsVector.Clear(); // TODO: add this as an optional flag or convert the method to axpy like.
 			if (rhsVector is Vector denseVector)

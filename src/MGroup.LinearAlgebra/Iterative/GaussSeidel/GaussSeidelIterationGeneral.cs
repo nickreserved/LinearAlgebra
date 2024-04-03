@@ -25,12 +25,12 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			this.inactive = true;
 		}
 
-		public void GaussSeidelBackwardIteration(IVectorView rhsVector, IVector lhsVector)
+		public void GaussSeidelBackwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
 		{
 			CheckActive();
 
-			IVector x = lhsVector;
-			IVectorView b = rhsVector;
+			IExtendedMutableVector x = lhsVector;
+			IExtendedImmutableVector b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
 			int n = matrix.NumRows;
 			for (int i = n - 1; i >= 0; --i)
@@ -49,16 +49,16 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 					sum -= matrix[i, j] * x[j];
 				}
 
-				x.Set(i, sum / diagEntry);
+				x[i] = sum / diagEntry;
 			}
 		}
 
-		public void GaussSeidelForwardIteration(IVectorView rhsVector, IVector lhsVector)
+		public void GaussSeidelForwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
 		{
 			CheckActive();
 
-			IVector x = lhsVector;
-			IVectorView b = rhsVector;
+			IExtendedMutableVector x = lhsVector;
+			IExtendedImmutableVector b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
 			int n = matrix.NumRows;
 			for (int i = 0; i < n; ++i)
@@ -77,7 +77,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 					sum -= matrix[i, j] * x[j];
 				}
 
-				x.Set(i, sum / diagEntry);
+				x[i] = sum / diagEntry;
 			}
 		}
 

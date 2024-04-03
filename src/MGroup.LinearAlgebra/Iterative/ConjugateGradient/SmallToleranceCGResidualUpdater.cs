@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: once the problem with small tolerance has occured once, can we assume that it will always happen? Then we could avoid
@@ -27,7 +27,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             this.residualTolerance = residualTolerance;
         }
 
-        public void UpdateResidual(CGAlgorithm cg, IVector residual, out double resDotRes)
+        public void UpdateResidual(CGAlgorithm cg, IMinimalMutableVector residual, out double resDotRes)
         {
             // Update the residual vector normally: r = r - α * A*d
             residual.AxpyIntoThis(cg.MatrixTimesDirection, -cg.StepSize);

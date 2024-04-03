@@ -86,7 +86,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			{
 				var v1 = vector.CreateZero();
 				Preconditioner.Apply(kernel[i - 1], v1);
-				Matrix.Multiply(v1, kernel[i]);
+				Matrix.MultiplyIntoThis(v1, kernel[i]);
 			}
 		}
 
@@ -271,7 +271,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		private void CalculateAndPrintExactResidual()
 		{
 			var res = precondResidual.CreateZero();
-			Matrix.Multiply(solution, res);
+			Matrix.MultiplyIntoThis(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();
 			Debug.WriteLine($"Iteration {iteration}: norm(r) = {norm}");

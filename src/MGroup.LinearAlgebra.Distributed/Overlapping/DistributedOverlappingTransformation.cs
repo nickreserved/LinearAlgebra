@@ -27,21 +27,27 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		/// </param>
 		public delegate void MultiplyLocalVector(int computeNodeID, Vector input, Vector output);
 
-		private readonly MultiplyLocalVector multiplyMatrixVectorPerComputeNode;
+		private readonly MultiplyLocalVector MultiplyMatrixVectorPerComputeNode;
 
-		public DistributedOverlappingTransformation(DistributedOverlappingIndexer indexer,
+		public DistributedOverlappingTransformation(int numRows, int numColumns, DistributedOverlappingIndexer indexer,
 			MultiplyLocalVector multiplyMatrixVectorPerComputeNode)
 		{
-			this.Indexer = indexer;
-			this.Environment = indexer.Environment;
-			this.multiplyMatrixVectorPerComputeNode = multiplyMatrixVectorPerComputeNode;
+			NumRows = numRows;
+			NumColumns = numColumns;
+			Indexer = indexer;
+			Environment = indexer.Environment;
+			MultiplyMatrixVectorPerComputeNode = multiplyMatrixVectorPerComputeNode;
 		}
 
 		public IComputeEnvironment Environment { get; }
 
 		public DistributedOverlappingIndexer Indexer { get; }
 
-		public void Multiply(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
+		public int NumRows { get; }
+
+		public int NumColumns { get; }
+
+		public void MultiplyIntoThis(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
 			=> Multiply((DistributedOverlappingVector) inputVector, (DistributedOverlappingVector) outputVector);
 
 		public void Multiply(DistributedOverlappingVector inputVector, DistributedOverlappingVector outputVector)
@@ -54,7 +60,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			{
 				Vector localX = inputVector.LocalVectors[nodeID];
 				Vector localY = outputVector.LocalVectors[nodeID];
-				multiplyMatrixVectorPerComputeNode(nodeID, localX, localY);
+				MultiplyMatrixVectorPerComputeNode(nodeID, localX, localY);
 			};
 			Environment.DoPerNode(multiplyLocal);
 			#region debug

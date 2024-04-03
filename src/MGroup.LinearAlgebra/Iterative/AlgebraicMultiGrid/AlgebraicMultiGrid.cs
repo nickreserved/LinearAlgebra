@@ -28,8 +28,8 @@
 
 //		private double resDotRes;
 //		private double residualNormRatio;
-//		private IVector solution;
-//		private IVector residual;
+//		private IExtendedMutableVector solution;
+//		private IExtendedMutableVector residual;
 
 //		// <summary>
 //		// Internal iterative solver used for smoothing
@@ -39,17 +39,17 @@
 //		// <summary>
 //		// The offset position R_i:
 //		// </summary>
-//		private IVector[] offsetPositionVectors;
+//		private IExtendedMutableVector[] offsetPositionVectors;
 
 //		// <summary>
 //		// The solution vectors x_i on level i, with x_0 being the main sought solution on level 0
 //		// </summary>
-//		private IVector[] solutionAtLevel;
+//		private IExtendedMutableVector[] solutionAtLevel;
 
 //		// <summary>
 //		// The rhs vectors b_i on level i, with b_0 being the main rhs on level 0
 //		// </summary>
-//		private IVector[] rhsAtLevel;
+//		private IExtendedMutableVector[] rhsAtLevel;
 
 //		// <summary>
 //		// The system matrices A_i for each level i, with A_0 being the main system matrix at level 0
@@ -71,12 +71,12 @@
 //		/// <summary>
 //		/// The right hand side of the linear system b = A * x.
 //		/// </summary>
-//		public IVectorView Rhs { get; private set; }
+//		public IExtendedImmutableVector Rhs { get; private set; }
 
 //		/// <summary>
 //		/// The current approximation to the solution of the linear system A * x = b
 //		/// </summary>
-//		public IVectorView Solution => solution;
+//		public IExtendedImmutableVector Solution => solution;
 
 //		/// <summary>
 //		/// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -135,7 +135,7 @@
 //		/// <exception cref="NonMatchingDimensionsException">
 //		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 //		/// </exception>
-//		public IterativeStatistics Solve(ILinearTransformation matrix, IVectorView rhs, IVector solution)
+//		public IterativeStatistics Solve(ILinearTransformation matrix, IExtendedImmutableVector rhs, IExtendedMutableVector solution)
 //		{
 //			//TODO: these will also be checked by the matrix vector multiplication.
 //			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
@@ -150,7 +150,7 @@
 //			return SolveInternal(maxIterationsProvider.GetMaxIterations(matrix.NumColumns));
 //		}
 
-//		public IterativeStatistics Solve(IMatrixView matrix, IVectorView rhs, IVector solution)
+//		public IterativeStatistics Solve(IMatrixView matrix, IExtendedImmutableVector rhs, IExtendedMutableVector solution)
 //			=> Solve(new ExplicitMatrixTransformation(matrix), rhs, solution);
 
 //		private IterativeStatistics SolveInternal(int maxiterations)
@@ -185,7 +185,7 @@
 //			throw new NotImplementedException();
 
 //			matrixAtLevel[0] = Matrix;
-//			rhsAtLevel[0] = Rhs as IVector;
+//			rhsAtLevel[0] = Rhs as IExtendedMutableVector;
 //		}
 
 //		// <summary>
@@ -237,24 +237,24 @@
 //			// Requires clustering info
 //			// TODO: update x by interpolation matrix
 //			// x_{i+1} = I_i^{i+1} x_i N^{i+1} ???
-//			solutionAtLevel[level + 1] = restrictionMatrixAtLevel[level].Multiply(solutionAtLevel[level]);
+//			solutionAtLevel[level + 1] = restrictionMatrixAtLevel[level].MultiplyIntoThis(solutionAtLevel[level]);
 
 //			// r_i = x_i - I^{i}_{i+1} x_{i+1}
 //			offsetPositionVectors[level].AddIntoThis(solutionAtLevel[level]);
 //			offsetPositionVectors[level].AxpyIntoThis(
-//				restrictionMatrixAtLevel[level].Multiply(solutionAtLevel[level], offsetPositionVectors[level]),
+//				restrictionMatrixAtLevel[level].MultiplyIntoThis(solutionAtLevel[level], offsetPositionVectors[level]),
 //				-1.0);
 
 //			// b_{i+1} = I^{i}_{i+1} (b_i - A_i r_i)
 //			var diff = ExactResidual.Calculate(matrixAtLevel[level], rhsAtLevel[level], offsetPositionVectors[level]);
 //			diff.ScaleIntoThis(-1.0);
-//			rhsAtLevel[level + 1] = restrictionMatrixAtLevel[level].Multiply(diff);
+//			rhsAtLevel[level + 1] = restrictionMatrixAtLevel[level].MultiplyIntoThis(diff);
 //		}
 
 //		private void ProlongationMapping(int level)
 //		{
 //			// apply prolongation operator X_i = P_i * X_{i+1} + R_i
-//			prolongationMatrixAtLevel[level].Multiply(solutionAtLevel[level], solutionAtLevel[level - 1]);
+//			prolongationMatrixAtLevel[level].MultiplyIntoThis(solutionAtLevel[level], solutionAtLevel[level - 1]);
 //			solutionAtLevel[level - 1].AddIntoThis(offsetPositionVectors[level]);
 //		}
 

@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Matrices
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public interface IMatrixView: 
-		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, ΙDiagonalAccessible
+		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, ΙDiagonalAccessible, IImmutableMatrix
 	{
         /// <summary>
         /// Performs the following operation for all (i, j):
@@ -28,6 +28,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
         ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
         IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient);
+		IMutableMatrix IImmutableMatrix.Axpy(IImmutableMatrix otherMatrix, double otherCoefficient) => Axpy((IMatrixView) otherMatrix, otherCoefficient);
 
         /// <summary>
         /// Copies this <see cref="IMatrixView"/> object. A new matrix of the same type as this object is initialized and 
@@ -38,10 +39,11 @@ namespace MGroup.LinearAlgebra.Matrices
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         IMatrix Copy(bool copyIndexingData = false);
+		IMutableMatrix IImmutableMatrix.Copy() => Copy(false);
 
-        /// Copies this <see cref="IMatrixView"/> object. The new matrix will have all its entries explicitly stored.
-        /// </summary>
-        Matrix CopyToFullMatrix();
+		/// Copies this <see cref="IMatrixView"/> object. The new matrix will have all its entries explicitly stored.
+		/// </summary>
+		Matrix CopyToFullMatrix();
 
         /// Performs the following operation for all (i, j):
         /// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
@@ -56,19 +58,20 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
         ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
         IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
+		IMutableMatrix IImmutableMatrix.LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient) => LinearCombination(thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
 
-        /// <summary>
-        /// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
-        /// </summary>
-        /// <param name="other">A matrix such that the <see cref="IIndexable2D.NumColumns"/> of oper(<paramref name="other"/>) 
-        ///     are equal to the <see cref="IIndexable2D.NumRows"/> of oper(this).</param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <param name="transposeOther">If true, oper(<paramref name="other"/>) = transpose(<paramref name="other"/>). 
-        ///     Otherwise oper(<paramref name="other"/>) = <paramref name="other"/>.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
-        ///     different <see cref="IIndexable2D.NumColumns"/> than the <see cref="IIndexable2D.NumRows"/> of 
-        ///     oper(this).</exception>
-        Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
+		/// <summary>
+		/// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
+		/// </summary>
+		/// <param name="other">A matrix such that the <see cref="IIndexable2D.NumColumns"/> of oper(<paramref name="other"/>) 
+		///     are equal to the <see cref="IIndexable2D.NumRows"/> of oper(this).</param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <param name="transposeOther">If true, oper(<paramref name="other"/>) = transpose(<paramref name="other"/>). 
+		///     Otherwise oper(<paramref name="other"/>) = <paramref name="other"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
+		///     different <see cref="IIndexable2D.NumColumns"/> than the <see cref="IIndexable2D.NumRows"/> of 
+		///     oper(this).</exception>
+		Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false);
 
         /// <summary>
         /// Performs the matrix-matrix multiplication: oper(this) * oper(<paramref name="other"/>).
@@ -98,7 +101,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="vector"/> is different than the 
         /// <see cref="IIndexable2D.NumColumns"/> of oper(this).
         /// </exception>
-        IVector Multiply(IVectorView vector, bool transposeThis = false);
+        IMinimalMutableVector Multiply(IMinimalImmutableVector vector, bool transposeThis = false);
 
         /// <summary>
         /// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
@@ -133,15 +136,16 @@ namespace MGroup.LinearAlgebra.Matrices
         /// The resulting matrix is written in a new object and then returned.
         /// </summary>
         /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
-        IMatrix Scale(double scalar);
+        new IMatrix Scale(double scalar);
+		IMutableMatrix IImmutableMatrix.Scale(double scalar) => Scale(scalar);
 
-        /// <summary>
-        /// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
-        /// implementations of <see cref="IMatrixView"/> may offer more efficient transpositions, that do not copy the entries.
-        /// If the transposed matrix will be used only for multiplications, <see cref="MultiplyLeft(IMatrixView, bool, bool)"/>,
-        /// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IVectorView, bool)"/> are more 
-        /// effient generally.
-        /// </summary>
-        IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.
+		/// <summary>
+		/// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
+		/// implementations of <see cref="IMatrixView"/> may offer more efficient transpositions, that do not copy the entries.
+		/// If the transposed matrix will be used only for multiplications, <see cref="MultiplyLeft(IMatrixView, bool, bool)"/>,
+		/// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IExtendedImmutableVector, bool)"/> are more 
+		/// effient generally.
+		/// </summary>
+		IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.
     }
 }

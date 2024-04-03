@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, double[] rhs)
+			IExtendedImmutableVector lhs, double[] rhs)
 		{
 			for (int i = 0; i < numCsrRows; ++i)
 			{
@@ -75,7 +75,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, IVector rhs)
+			IExtendedImmutableVector lhs, IExtendedMutableVector rhs)
 		{
 			for (int i = 0; i < numCsrRows; ++i)
 			{
@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Commons
 					dot += csrValues[k] * lhs[csrColIndices[k]];
 				}
 
-				rhs.Set(i, dot);
+				rhs[i] = dot;
 			}
 		}
 
@@ -134,7 +134,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTransTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, double[] rhs)
+			IExtendedImmutableVector lhs, double[] rhs)
 		{
 			// A^T * x = linear combination of columns of A^T = rows of A, with the entries of x as coefficients
 			for (int i = 0; i < numCsrRows; ++i)
@@ -150,7 +150,7 @@ namespace MGroup.LinearAlgebra.Commons
 		}
 
 		internal static void CsrTransTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, IVector rhs)
+			IExtendedImmutableVector lhs, IExtendedMutableVector rhs)
 		{
 			var temp = new double[rhs.Length];
 			CsrTransTimesVector(numCsrRows, csrValues, csrRowOffsets, csrColIndices, lhs, temp);
@@ -317,7 +317,7 @@ namespace MGroup.LinearAlgebra.Commons
 		/// <param name="lhs">The left hand side vector.</param>
 		/// <param name="rhs">The right hand side vector. Will not be cleared</param>
 		internal static void SymmetricCsrTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
-			IVectorView lhs, double[] rhs)
+			IExtendedImmutableVector lhs, double[] rhs)
 		{
 			// A * x = (L+D+U) * x.
 			// D * x is a simple vector dot product

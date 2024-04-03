@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 
 		/// <summary>
 		/// Solves the linear system A * x = b, where A = <paramref name="matrix"/> and b = <paramref name="rhs"/>.
-		/// Initially x = <paramref name="initialGuess"/> and then it converges to the solution.
+		/// Initially x = <paramref name="solution"/> and then it converges to the solution.
 		/// </summary>
 		/// <param name="matrix">
 		/// The matrix A of the linear system A * x = b. A must be symmetric positive definite or strictly diagonally dominant 
@@ -44,25 +44,25 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		/// </param>
 		/// <param name="rhs">
 		/// The right hand side vector b of the linear system A * x = b. Constraints:
-		/// <paramref name="rhs"/>.<see cref="IIndexable1D.Length"/> 
-		/// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.
+		/// <paramref name="rhs"/>.<see cref="IMinimalImmutableVector.Length"/> 
+		/// == <paramref name="matrix"/>.<see cref="ILinearTransformation.NumRows"/>.
 		/// </param>
 		/// <param name="solution">
 		/// The vector from which to start refining the solution vector x. Constraints:
-		/// <paramref name="solution"/>.<see cref="IIndexable1D.Length"/>
-		/// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumColumns"/>.
+		/// <paramref name="solution"/>.<see cref="IMinimalImmutableVector.Length"/>
+		/// == <paramref name="matrix"/>.<see cref="ILinearTransformation.NumColumns"/>.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public IterativeStatistics Solve(IMatrixView matrix, IVectorView rhs, IVector solution)
+		public IterativeStatistics Solve(IMatrixView matrix, IExtendedImmutableVector rhs, IExtendedMutableVector solution)
 		{
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, solution, rhs);
 
 			gsIteration.Initialize(matrix);
 
 			int maxIterations = maxIterationsProvider.GetMaxIterations(matrix.NumRows);
-			var previousSolution = solution.CreateZeroVectorWithSameFormat();
+			var previousSolution = solution.CreateZero();
 			double convergenceMetric = double.NaN;
 			int iter = 0;
 			while (iter < maxIterations)

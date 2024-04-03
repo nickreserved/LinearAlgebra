@@ -14,44 +14,52 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="otherVector">A otherVector with the same number of Elements with this otherVector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns>thisVector + <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></returns>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.
 		IMinimalMutableVector Axpy(IMinimalImmutableVector otherVector, double otherCoefficient);
-		static public IMinimalMutableVector Axpy(IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector, double otherCoefficient) => thisVector.Copy().AxpyIntoThis(otherVector, otherCoefficient);
+		protected static IMinimalMutableVector Axpy(IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector, double otherCoefficient) => thisVector.Copy().AxpyIntoThis(otherVector, otherCoefficient);
 
 		/// <summary>
 		/// Add this vector and vector <paramref name="otherVector"/> and return the result.
 		/// </summary>
 		/// <param name="otherVector">The other vector for addition</param>
 		/// <returns>The sum of this vector and <paramref name="otherVector"/></returns>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.
 		IMinimalMutableVector Add(IMinimalImmutableVector otherVector);
-		static public IMinimalMutableVector Add(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) => thisVector.Axpy(otherVector, 1);
+		protected static IMinimalMutableVector Add(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) => thisVector.Axpy(otherVector, 1);
 
 		/// <summary>
 		/// Subtract from this vector the vector <paramref name="otherVector"/> and return the result.
 		/// </summary>
 		/// <param name="otherVector">The vector which subtracted from this vector</param>
 		/// <returns>The difference from this vector, of vector <paramref name="otherVector"/></returns>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.
 		IMinimalMutableVector Subtract(IMinimalImmutableVector otherVector);
-		static public IMinimalMutableVector Subtract(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) => thisVector.Axpy(otherVector, -1);
+		protected static IMinimalMutableVector Subtract(IMinimalMutableVector thisVector, IMinimalImmutableVector otherVector) => thisVector.Axpy(otherVector, -1);
 
 		/// <summary>
 		/// Dot product of this vector with <paramref name="otherVector"/>
 		/// </summary>
 		/// <param name="otherVector">The other vector for dot product</param>
 		/// <returns>The scalar dot product of two vectors</returns>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.
 		double DotProduct(IMinimalImmutableVector otherVector);
 
 		/// <summary>
 		/// Returns the square of this otherVector <c>this * this</c>
 		/// </summary>
 		double Square();
-		static public double Square(IMinimalImmutableVector thisVector) => thisVector.DotProduct(thisVector);
+		protected static double Square(IMinimalImmutableVector thisVector) => thisVector.DotProduct(thisVector);
 
 		/// <summary>
 		/// Return the negative of this vector.
 		/// </summary>
 		/// <returns>Return the negative of this vector.</returns>
 		IMinimalMutableVector Negative();
-		static public IMinimalMutableVector Negative(IMinimalMutableVector thisVector) => thisVector.Copy().NegativeIntoThis();
+		protected static IMinimalMutableVector Negative(IMinimalMutableVector thisVector) => thisVector.Copy().NegativeIntoThis();
 
 		/// <summary>
 		/// Return the multiplication of this vector and scalar <paramref name="coefficient"/>
@@ -59,7 +67,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="coefficient">The scalar for multiplacation with this vector</param>
 		/// <returns>The multiplication of this vector with scalar <paramref name="coefficient"/></returns>
 		IMinimalMutableVector Scale(double coefficient);
-		static public IMinimalMutableVector Scale(IMinimalMutableVector thisVector, double coefficient) => thisVector.Copy().ScaleIntoThis(coefficient);
+		protected static IMinimalMutableVector Scale(IMinimalMutableVector thisVector, double coefficient) => thisVector.Copy().ScaleIntoThis(coefficient);
 
 		/// <summary>
 		/// A linear combination between this and another one otherVector.
@@ -68,8 +76,10 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="otherVector">A otherVector with the same number of Elements with this otherVector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherVector"/></param>
 		/// <returns>thisVector * <paramref name="thisCoefficient"/> + <paramref name="otherVector"/> * <paramref name="otherCoefficient"/></returns>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.
 		IMinimalMutableVector LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient); // => Copy().LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
-		static public IMinimalMutableVector LinearCombination(IMinimalMutableVector thisVector, double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => thisVector.Copy().LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		protected static IMinimalMutableVector LinearCombination(IMinimalMutableVector thisVector, double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => thisVector.Copy().LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
 
 		/// <summary>
 		/// Number of Elements in vector.
@@ -81,18 +91,19 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <returns>The length of vector which is the square root of Square()</returns>
 		double Norm2();
-		static public double Norm2(IMinimalMutableVector thisVector) => Math.Sqrt(thisVector.Square());
+		protected static double Norm2(IMinimalMutableVector thisVector) => Math.Sqrt(thisVector.Square());
 
 		/// <summary>
-		/// Return a copy of this vector.
+		/// Return a copy of this vector, of the same type.
 		/// </summary>
 		/// <returns>A copy of this vector</returns>
 		IMinimalMutableVector Copy();
-		static public IMinimalMutableVector Copy(IMinimalMutableVector thisVector) => thisVector.CreateZero().CopyFrom(thisVector);
+		protected static IMinimalMutableVector Copy(IMinimalMutableVector thisVector) => thisVector.CreateZero().CopyFrom(thisVector);
 
 		/// <summary>
 		/// Creates a new otherVector with all Elements set to zero, the same number of Elements with this otherVector and probably with the same format with this otherVector.
 		/// </summary>
+		/// For sparse vectors it returns an empty vector (with 0 stored non-zero elements).
 		/// <returns>A new zero otherVector with the same number of Elements with this otherVector</returns>
 		IMinimalMutableVector CreateZero();
 
@@ -122,7 +133,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.
 		/// </exception>
 		IMinimalMutableVector DoEntrywise(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation);
-		public static IMinimalMutableVector DoEntrywise(IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => thisVector.Copy().DoEntrywiseIntoThis(otherVector, binaryOperation);
+		protected static IMinimalMutableVector DoEntrywise(IMinimalImmutableVector thisVector, IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => thisVector.Copy().DoEntrywiseIntoThis(otherVector, binaryOperation);
 
 		/// <summary>
 		/// Performs a unary operation on each stored entry: result[i] = <paramref name="unaryOperation"/>(this[i]).
@@ -130,7 +141,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="unaryOperation">A method that takes 1 argument and returns 1 result.</param>
 		IMinimalMutableVector DoToAllEntries(Func<double, double> unaryOperation);
-		public static IMinimalMutableVector DoToAllEntries(IMinimalImmutableVector thisVector, Func<double, double> unaryOperation) => thisVector.Copy().DoToAllEntries(unaryOperation);
+		protected static IMinimalMutableVector DoToAllEntries(IMinimalImmutableVector thisVector, Func<double, double> unaryOperation) => thisVector.Copy().DoToAllEntries(unaryOperation);
 
 
 

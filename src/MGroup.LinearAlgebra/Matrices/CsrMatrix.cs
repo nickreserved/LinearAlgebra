@@ -762,9 +762,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IVectorView, bool)"/>.
+        /// See <see cref="IMatrixView.Multiply(IExtendedImmutableVector, bool)"/>.
         /// </summary>
-        public IVector Multiply(IVectorView vector, bool transposeThis = false)
+        public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
         {
             if (vector is Vector casted) return Multiply(casted, transposeThis);
 
@@ -803,9 +803,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IVectorView, IVector, bool)"/>.
+        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
         /// </summary>
-        public void MultiplyIntoResult(IVectorView lhsVector, IVector rhsVector, bool transposeThis = false)
+        public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis = false)
         {
 			if (this.values.Length == 0)
 			{
@@ -896,7 +896,7 @@ namespace MGroup.LinearAlgebra.Matrices
         ///     <paramref name="result"/>.<see cref="IIndexable1D.Length"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if the arguments do not satisfy the described 
         ///     constraints.</exception>
-        public void MultiplyVectorSection(IVectorView vectorRight, int vectorStart, Vector result, int resultStart)
+        public void MultiplyVectorSection(IExtendedImmutableVector vectorRight, int vectorStart, Vector result, int resultStart)
         {
             Preconditions.CheckMultiplicationDimensionsSection(this, vectorRight, vectorStart, result, resultStart);
 			if (this.values.Length == 0)

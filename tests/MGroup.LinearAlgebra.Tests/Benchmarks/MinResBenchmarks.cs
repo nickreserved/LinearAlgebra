@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
     /// </summary>
     public static class MinResBenchmarks
     {
-        private static void CheckSolution(IVector solutionExpected, IVector solutionComputed)
+        private static void CheckSolution(IExtendedMutableVector solutionExpected, IExtendedMutableVector solutionComputed)
         {
             double error = solutionComputed.Subtract(solutionExpected).Norm2() / solutionExpected.Norm2();
             Console.WriteLine("Normalized solution error = |computed - expected| / |expected| = " + error);
@@ -26,13 +26,13 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
             var minres = new MinRes(A.NumRows, 1e-10, 0, true, false);
 
             // Without preconditioning
-            (IVector xSimple, MinresStatistics statsSimple) = minres.Solve(A, b);
+            (IExtendedMutableVector xSimple, MinresStatistics statsSimple) = minres.Solve(A, b);
             Console.Write(statsSimple);
             if (xSimple != null) CheckSolution(xExpected, xSimple);
             Console.WriteLine();
 
             // With preconditioning
-            (IVector xPrec, MinresStatistics statsPrec) = minres.Solve(A, b, M);
+            (IExtendedMutableVector xPrec, MinresStatistics statsPrec) = minres.Solve(A, b, M);
             Console.Write(statsPrec);
             if (xPrec != null) CheckSolution(xExpected, xPrec);
             Console.WriteLine();
@@ -48,13 +48,13 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
             var minres = new MinRes(A.NumRows, 1e-10, 0, true, false);
 
             // Without preconditioning
-            (IVector xSimple, MinresStatistics statsSimple) = minres.Solve(A, b);
+            (IExtendedMutableVector xSimple, MinresStatistics statsSimple) = minres.Solve(A, b);
             Console.Write(statsSimple);
             if (xSimple != null) CheckSolution(xExpected, xSimple);
             Console.WriteLine();
 
             // With preconditioning
-            (IVector xPrec, MinresStatistics statsPrec) = minres.Solve(A, b, M);
+            (IExtendedMutableVector xPrec, MinresStatistics statsPrec) = minres.Solve(A, b, M);
             Console.Write(statsPrec);
             if (xPrec != null) CheckSolution(xExpected, xPrec);
             Console.WriteLine();
@@ -71,14 +71,14 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
 
             // Without preconditioning
             Console.WriteLine("Sparse pos-def system WITHOUT preconditioning:");
-            (IVector xSimple, MinresStatistics statsSimple) = minres.Solve(A, b);
+            (IExtendedMutableVector xSimple, MinresStatistics statsSimple) = minres.Solve(A, b);
             Console.Write(statsSimple);
             if (xSimple != null) CheckSolution(xExpected, xSimple);
             Console.WriteLine();
 
             // With preconditioning
             Console.WriteLine("Sparse pos-def system WITH preconditioning:");
-            (IVector xPrec, MinresStatistics statsPrec) = minres.Solve(A, b, M);
+            (IExtendedMutableVector xPrec, MinresStatistics statsPrec) = minres.Solve(A, b, M);
             Console.Write(statsPrec);
             if (xPrec != null) CheckSolution(xExpected, xPrec);
             Console.WriteLine();

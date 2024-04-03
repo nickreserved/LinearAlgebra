@@ -23,6 +23,10 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public ConcurrentDictionary<int, TMatrix> LocalMatrices { get; } = new ConcurrentDictionary<int, TMatrix>();
 		public bool CheckForCompatibility { get; set; } = true;
 
+		public int NumRows => throw new NotImplementedException();
+
+		public int NumColumns => throw new NotImplementedException();
+
 
 
 		/// <summary>
@@ -101,14 +105,14 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix * <paramref name="thisCoefficient"/> + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
 		IMutableMatrix IImmutableMatrix.LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
-			=> LinearCombination(thisCoefficient, otherMatrix, otherCoefficient);/*TODO: remove line when C#9*/
+			=> LinearCombination(thisCoefficient, otherMatrix, otherCoefficient);
 
 
 		public DistributedOverlappingMatrix<TMatrix> Scale(double coefficient)
 			=> Copy().ScaleIntoThis(coefficient);
 
 		IMutableMatrix IImmutableMatrix.Scale(double coefficient)
-			=> Scale(coefficient);/*TODO: remove line when C#9*/
+			=> Scale(coefficient);
 
 
 		public DistributedOverlappingMatrix<TMatrix> AxpyIntoThis(DistributedOverlappingMatrix<TMatrix> otherMatrix, double otherCoefficient)
@@ -128,7 +132,21 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			=> AxpyIntoThis((DistributedOverlappingMatrix<TMatrix>)otherMatrix, otherCoefficient);
 
 		IMutableMatrix IMutableMatrix.AxpyIntoThis(IImmutableMatrix otherMatrix, double otherCoefficient)
-			=> AxpyIntoThis((DistributedOverlappingMatrix<TMatrix>)otherMatrix, otherCoefficient);/*TODO: remove line when C#9*/
+			=> AxpyIntoThis((DistributedOverlappingMatrix<TMatrix>)otherMatrix, otherCoefficient);
+
+
+		public DistributedOverlappingMatrix<TMatrix> AddIntoThis(DistributedOverlappingMatrix<TMatrix> otherMatrix) => AxpyIntoThis(otherMatrix, 1);
+
+		public DistributedOverlappingMatrix<TMatrix> AddIntoThis(IImmutableMatrix otherMatrix) => AddIntoThis((DistributedOverlappingMatrix<TMatrix>)otherMatrix);
+
+		IMutableMatrix IMutableMatrix.AddIntoThis(IImmutableMatrix otherMatrix) => AddIntoThis(otherMatrix);
+
+
+		public DistributedOverlappingMatrix<TMatrix> SubtractIntoThis(DistributedOverlappingMatrix<TMatrix> otherMatrix) => AxpyIntoThis(otherMatrix, -1);
+
+		public DistributedOverlappingMatrix<TMatrix> SubtractIntoThis(IImmutableMatrix otherMatrix) => SubtractIntoThis((DistributedOverlappingMatrix<TMatrix>)otherMatrix);
+
+		IMutableMatrix IMutableMatrix.SubtractIntoThis(IImmutableMatrix otherMatrix) => SubtractIntoThis(otherMatrix);
 
 
 		public DistributedOverlappingMatrix<TMatrix> LinearCombinationIntoThis(double thisCoefficient, DistributedOverlappingMatrix<TMatrix> otherMatrix, double otherCoefficient)
@@ -148,7 +166,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			=> LinearCombinationIntoThis(thisCoefficient, (DistributedOverlappingMatrix<TMatrix>)otherMatrix, otherCoefficient);
 
 		IMutableMatrix IMutableMatrix.LinearCombinationIntoThis(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
-			=> LinearCombinationIntoThis(thisCoefficient, (DistributedOverlappingMatrix<TMatrix>)otherMatrix, otherCoefficient);/*TODO: remove line when C#9*/
+			=> LinearCombinationIntoThis(thisCoefficient, (DistributedOverlappingMatrix<TMatrix>)otherMatrix, otherCoefficient);
 
 
 		public void Multiply(DistributedOverlappingVector inputVector, DistributedOverlappingVector outputVector)
@@ -162,7 +180,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				var localA = LocalMatrices[nodeID];
 				var localX = inputVector.LocalVectors[nodeID];
 				var localY = outputVector.LocalVectors[nodeID];
-				localA.Multiply(localX, localY);
+				localA.MultiplyIntoThis(localX, localY);
 			};
 			Environment.DoPerNode(multiplyLocal);
 
@@ -172,8 +190,8 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		public void Multiply(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
 			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
 
-		void ILinearTransformation.Multiply(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
-			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);/*TODO: remove line when C#9*/
+		void ILinearTransformation.MultiplyIntoThis(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
+			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
 
 
 		public DistributedOverlappingMatrix<TMatrix> ScaleIntoThis(double coefficient)
@@ -182,7 +200,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return this;
 		}
 
-		IMutableMatrix IMutableMatrix.ScaleIntoThis(double coefficient) => ScaleIntoThis(coefficient);/*TODO: remove line when C#9*/
+		IMutableMatrix IMutableMatrix.ScaleIntoThis(double coefficient) => ScaleIntoThis(coefficient);
 
 
 		public void Clear()
@@ -196,7 +214,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return copy;
 		}
 
-		IMutableMatrix IImmutableMatrix.Copy() => Copy();/*TODO: remove line when C#9*/
+		IMutableMatrix IImmutableMatrix.Copy() => Copy();
 
 
 		public DistributedOverlappingMatrix<TMatrix> CreateZero()
@@ -206,7 +224,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return copy;
 		}
 
-		IMutableMatrix IImmutableMatrix.CreateZero() => CreateZero();/*TODO: remove line when C#9*/
+		IMutableMatrix IImmutableMatrix.CreateZero() => CreateZero();
 
 
 		bool Equals(DistributedOverlappingMatrix<TMatrix> otherMatrix, double tolerance = 1e-7)
@@ -257,7 +275,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			=> DoEntrywise((DistributedOverlappingMatrix<TMatrix>)otherMatrix, binaryOperation);
 
 		IMutableMatrix IImmutableMatrix.DoEntrywise(IImmutableMatrix otherMatrix, Func<double, double, double> binaryOperation)
-			=> DoEntrywise(otherMatrix, binaryOperation); /*TODO: remove line when C#9*/
+			=> DoEntrywise(otherMatrix, binaryOperation);
 
 
 		public DistributedOverlappingMatrix<TMatrix> DoToAllEntries(Func<double, double> unaryOperation)
@@ -267,7 +285,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return matrix;
 		}
 
-		IMutableMatrix IImmutableMatrix.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation); /*TODO: remove line when C#9*/
+		IMutableMatrix IImmutableMatrix.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
 
 
 

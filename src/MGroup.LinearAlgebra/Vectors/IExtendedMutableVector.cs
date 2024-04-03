@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		new IExtendedMutableVector SubtractIntoThis(IMinimalImmutableVector otherVector);
 		IMinimalMutableVector IMinimalMutableVector.SubtractIntoThis(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector);
 
-		new IExtendedMutableVector NegativeIntoThis() => (IExtendedMutableVector)((IMinimalMutableVector)this).NegativeIntoThis();
+		new IExtendedMutableVector NegativeIntoThis();
 		IMinimalMutableVector IMinimalMutableVector.NegativeIntoThis() => NegativeIntoThis();
 
 		new IExtendedMutableVector ScaleIntoThis(double coefficient);

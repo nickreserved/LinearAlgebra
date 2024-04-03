@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 			_numIterations = numIterations;
 		}
 
-		public void SolveLinearSystem(IVectorView rhsVector, IVector lhsVector)
+		public void Apply(IMinimalImmutableVector rhsVector, IMinimalMutableVector lhsVector)
 		{
 			Vector rhs = (Vector)rhsVector;
 			Vector solution = (Vector)lhsVector;
@@ -97,7 +97,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 
 			public IMultigridSmootherBuilder SmootherBuilder { get; set; }
 
-			public IPreconditioner CreatePreconditionerFor(IMatrixView matrix)
+			public IPreconditioner CreatePreconditionerFor(ILinearTransformation matrix)
 			{
 				if (_prolongation == null)
 				{

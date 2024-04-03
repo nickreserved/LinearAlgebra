@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			for (iteration = 0; iteration < maxIterations; ++iteration)
 			{
 				// q = A * d
-				Matrix.Multiply(direction, matrixTimesDirection);
+				Matrix.MultiplyIntoThis(direction, matrixTimesDirection);
 
 				// α = δnew / (d * q)
 				stepSize = resDotPrecondRes / direction.DotProduct(matrixTimesDirection);
@@ -117,7 +117,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		private void CalculateAndPrintExactResidual()
 		{
 			var res = Rhs.CreateZero();
-			Matrix.Multiply(solution, res);
+			Matrix.MultiplyIntoThis(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();
 			Debug.WriteLine($"Iteration {iteration}: norm(r) = {norm}");

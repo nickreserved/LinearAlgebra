@@ -1,3 +1,4 @@
+#if (false)
 using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -114,7 +115,7 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.AxpyIntoThis(IVectorView, double)"/>
+        /// See <see cref="IExtendedMutableVector.AxpyIntoThis(IExtendedImmutableVector, double)"/>
         /// </summary>
         override public AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
         {
@@ -137,9 +138,9 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.AxpySubvectorIntoThis(int, IVectorView, double, int, int)"/>
+        /// See <see cref="IExtendedMutableVector.AxpySubvectorIntoThis(int, IExtendedImmutableVector, double, int, int)"/>
         /// </summary>
-        public void AxpySubvectorIntoThis(int destinationIndex, IVectorView sourceVector, double sourceCoefficient, 
+        public void AxpySubvectorIntoThis(int destinationIndex, IExtendedImmutableVector sourceVector, double sourceCoefficient, 
             int sourceIndex, int length)
         {
             Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
@@ -156,7 +157,7 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.Clear"/>.
+        /// See <see cref="IExtendedMutableVector.Clear"/>.
         /// </summary>
         public void Clear() //TODO: Is Array.Clear faster here?
         {
@@ -165,9 +166,9 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.Copy(bool)"/>
+        /// See <see cref="IExtendedMutableVector.Copy(bool)"/>
         /// </summary>
-        public IVector Copy(bool copyIndexingData = false)
+        public IExtendedMutableVector Copy(bool copyIndexingData = false)
             => Copy();
 
         /// <summary>
@@ -177,9 +178,9 @@ namespace MGroup.LinearAlgebra.Vectors
         
 
         /// <summary>
-        /// See <see cref="IVector.CopyFrom(IVectorView)"/>
+        /// See <see cref="IExtendedMutableVector.CopyFrom(IExtendedImmutableVector)"/>
         /// </summary>
-        public void CopyFrom(IVectorView sourceVector)
+        public void CopyFrom(IExtendedImmutableVector sourceVector)
         {
             Preconditions.CheckVectorDimensions(this, sourceVector);
             if (sourceVector is Vector2 casted)
@@ -195,15 +196,15 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.CopyNonContiguouslyFrom(IVectorView, int[])"/>
+        /// See <see cref="IExtendedMutableVector.CopyNonContiguouslyFrom(IExtendedImmutableVector, int[])"/>
         /// </summary>
-        public void CopyNonContiguouslyFrom(IVectorView otherVector, int[] otherIndices)
+        public void CopyNonContiguouslyFrom(IExtendedImmutableVector otherVector, int[] otherIndices)
             => DenseStrategies.CopyNonContiguouslyFrom(this, otherVector, otherIndices);
 
         /// <summary>
-        /// See <see cref="IVector.CopySubvectorFrom(int, IVectorView, int, int)"/>
+        /// See <see cref="IExtendedMutableVector.CopySubvectorFrom(int, IExtendedImmutableVector, int, int)"/>
         /// </summary>
-        public void CopySubvectorFrom(int destinationIndex, IVectorView sourceVector, int sourceIndex, int length)
+        public void CopySubvectorFrom(int destinationIndex, IExtendedImmutableVector sourceVector, int sourceIndex, int length)
         {
             Preconditions.CheckSubvectorDimensions(this, destinationIndex, length);
             Preconditions.CheckSubvectorDimensions(sourceVector, sourceIndex, length);
@@ -219,20 +220,20 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.CopyNonContiguouslyFrom(int[], IVectorView, int[])"/>
+        /// See <see cref="IExtendedMutableVector.CopyNonContiguouslyFrom(int[], IExtendedImmutableVector, int[])"/>
         /// </summary>
-        public void CopyNonContiguouslyFrom(int[] thisIndices, IVectorView otherVector, int[] otherIndices)
+        public void CopyNonContiguouslyFrom(int[] thisIndices, IExtendedImmutableVector otherVector, int[] otherIndices)
             => DenseStrategies.CopyNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
 
         /// <summary>
-        /// See <see cref="IVectorView.CopyToArray"/>.
+        /// See <see cref="IExtendedImmutableVector.CopyToArray"/>.
         /// </summary>
         public double[] CopyToArray() => new double[] { data[0], data[1] };
 
         /// <summary>
-        /// See <see cref="IVectorView.CreateZeroVectorWithSameFormat"/>
+        /// See <see cref="IExtendedImmutableVector.CreateZeroVectorWithSameFormat"/>
         /// </summary>
-        public IVector CreateZeroVectorWithSameFormat() => new Vector2(new double[2]);
+        public IExtendedMutableVector CreateZeroVectorWithSameFormat() => new Vector2(new double[2]);
 
         /// <summary>
         /// Performs the operation: result = this[0] * other[1] - this[1] * other[0]. The result is a scalar value.  
@@ -253,7 +254,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// <summary>
         /// See <see cref="IEntrywiseOperable1D{TVectorIn}.DoEntrywiseIntoThis(TVectorIn, Func{double, double, double})"/>
         /// </summary>
-        public void DoEntrywiseIntoThis(IVectorView otherVector, Func<double, double, double> binaryOperation)
+        public void DoEntrywiseIntoThis(IExtendedImmutableVector otherVector, Func<double, double, double> binaryOperation)
         {
             if (otherVector is Vector2 casted) DoEntrywiseIntoThis(casted, binaryOperation);
             else
@@ -276,7 +277,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// <summary>
         /// See <see cref="IEntrywiseOperableView1D{TVectorIn, TVectorOut}.DoToAllEntries(Func{double, double})"/>.
         /// </summary>
-        IVector IEntrywiseOperableView1D<IVectorView, IVector>.DoToAllEntries(Func<double, double> unaryOperation) 
+        IExtendedMutableVector IEntrywiseOperableView1D<IExtendedImmutableVector, IExtendedMutableVector>.DoToAllEntries(Func<double, double> unaryOperation) 
             => DoToAllEntries(unaryOperation);
 
         /// <summary>
@@ -297,9 +298,9 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVectorView.DotProduct(IVectorView)"/>.
+        /// See <see cref="IExtendedImmutableVector.DotProduct(IExtendedImmutableVector)"/>.
         /// </summary>
-        public double DotProduct(IVectorView vector)
+        public double DotProduct(IExtendedImmutableVector vector)
         {
             if (vector is Vector2 casted) return DotProduct(casted);
             else
@@ -344,9 +345,9 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVectorView.LinearCombination(double, IVectorView, double)"/>.
+        /// See <see cref="IExtendedImmutableVector.LinearCombination(double, IExtendedImmutableVector, double)"/>.
         /// </summary>
-        public IVector LinearCombination(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+        public IExtendedMutableVector LinearCombination(double thisCoefficient, IExtendedImmutableVector otherVector, double otherCoefficient)
         {
             if (otherVector is Vector2 casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
             else if (thisCoefficient == 1.0) return Axpy(otherVector, otherCoefficient);
@@ -380,9 +381,9 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.LinearCombinationIntoThis(double, IVectorView, double)"/>
+        /// See <see cref="IExtendedMutableVector.LinearCombinationIntoThis(double, IExtendedImmutableVector, double)"/>
         /// </summary>
-        public void LinearCombinationIntoThis(double thisCoefficient, IVectorView otherVector, double otherCoefficient)
+        public void LinearCombinationIntoThis(double thisCoefficient, IExtendedImmutableVector otherVector, double otherCoefficient)
         {
             if (otherVector is Vector2 casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
             else if (thisCoefficient == 1.0) AxpyIntoThis(otherVector, otherCoefficient);
@@ -414,7 +415,7 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVectorView.Norm2"/>
+        /// See <see cref="IExtendedImmutableVector.Norm2"/>
         /// </summary>
         public double Norm2() => Math.Sqrt(data[0] * data[0] + data[1] * data[1]);
 
@@ -430,9 +431,9 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVectorView.Scale(double)"/>.
+        /// See <see cref="IExtendedImmutableVector.Scale(double)"/>.
         /// </summary>
-        IVector IVectorView.Scale(double scalar) => Scale(scalar);
+        IExtendedMutableVector IExtendedImmutableVector.Scale(double scalar) => Scale(scalar);
 
         /// <summary>
         /// Performs the operation: result[i] = <paramref name="scalar"/> * this[i],
@@ -453,7 +454,7 @@ namespace MGroup.LinearAlgebra.Vectors
         }
 
         /// <summary>
-        /// See <see cref="IVector.Set(int, double)"/>
+        /// See <see cref="IExtendedMutableVector.Set(int, double)"/>
         /// </summary>
         public void Set(int index, double value)
         {
@@ -482,3 +483,4 @@ namespace MGroup.LinearAlgebra.Vectors
         }
     }
 }
+#endif
