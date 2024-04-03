@@ -17,6 +17,12 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 	public class StationaryPrecondIntegrationPdeTests
 	{
 		[Fact]
+		private static void TestJacobiGmresFdm2D()
+		{
+			SolveProblemFd2D(new JacobiPreconditioner(1E-10), 1E-7, 276);
+		}
+
+		[Fact]
 		private static void TestJacobiPcgFem2D()
 		{
 			SolveProblemFem2D(new JacobiPreconditioner(1E-10), 1E-7, 86);
@@ -26,6 +32,28 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 		private static void TestJacobiPcgFem3D()
 		{
 			SolveProblemFem3D(new JacobiPreconditioner(1E-10), 1E-7, 138);
+		}
+
+		[Theory]
+		[InlineData(true, 218)]
+		[InlineData(false, 223)]
+		private static void TestGaussSeidelGmresFdm2D(bool forwardDirection, int numIterationsExpected)
+		{
+			SolveProblemFd2D(new GaussSeidelPreconditionerCsr(forwardDirection, numApplications: 1), 1E-7, numIterationsExpected);
+		}
+
+		[Theory]
+		[InlineData(true, 205)]
+		[InlineData(false, 206)]
+		private static void TestSorGmresFdm2D(bool forwardDirection, int numIterationsExpected)
+		{
+			SolveProblemFd2D(new SorPreconditionerCsr(1.8, forwardDirection, numApplications: 1), 1E-7, numIterationsExpected);
+		}
+
+		[Fact]
+		private static void TestSsorGmresFdm2D()
+		{
+			SolveProblemFd2D(new SsorPreconditionerCsr(1.9, numApplications: 1), 1E-7, 37);
 		}
 
 		[Fact]
@@ -40,6 +68,12 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 			SolveProblemFem3D(new SsorPreconditionerCsr(1.2, numApplications: 1), 1E-7, 104);
 		}
 
+		private static void SolveProblemFd2D(IPreconditioner preconditioner, double residualTol, int numIterations)
+		{
+			var model = new FdmPoisson2D(101);
+			(SparseMatrix A, Vector xExpected, Vector b) = model.CreateLinearSystem();
+			SolveWithGmres(A, xExpected, b, preconditioner, residualTol, numIterations);
+		}
 
 		private static void SolveProblemFem2D(IPreconditioner preconditioner, double residualTol, int numIterations)
 		{
@@ -57,6 +91,25 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.Preconditioning.Stationary
 			model.ElasticityModulus = 2E7;
 			(SparseMatrix A, Vector xExpected, Vector b) = model.CreateLinearSystem();
 			SolveWithPcg(A, xExpected, b, preconditioner, residualTol, numIterations);
+		}
+
+		private static void SolveWithGmres(SparseMatrix A, Vector xExpected, Vector b,
+			IPreconditioner preconditioner, double residualTol, int numIterations)
+		{
+			var csrA = DokRowMajor.CreateFromSparsePattern(A.NumRows, A.NumColumns, A.EnumerateNonZeros()).BuildCsrMatrix(true);
+			var xComputed = Vector.CreateZero(xExpected.Length);
+
+			var builder = new GmresAlgorithm.Builder();
+			builder.RelativeTolerance = residualTol;
+			builder.AbsoluteTolerance = residualTol * 100;
+			builder.MaximumIterations = 10 * A.NumRows;
+			var gmres = builder.Build();
+			preconditioner.UpdateMatrix(csrA, true);
+			var stats = gmres.Solve(csrA, preconditioner, b, xComputed, true, () => Vector.CreateZero(b.Length));
+
+			var comparer = new MatrixComparer(1E-5);
+			comparer.AssertEqual(xExpected, xComputed);
+			Assert.InRange(stats.NumIterationsRequired, 0, numIterations);
 		}
 
 		private static void SolveWithPcg(SparseMatrix A, Vector xExpected, Vector b,
