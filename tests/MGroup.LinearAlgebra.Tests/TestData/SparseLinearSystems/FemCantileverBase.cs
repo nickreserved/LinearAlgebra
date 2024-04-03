@@ -15,11 +15,11 @@ namespace MGroup.LinearAlgebra.Tests.TestData.SparseLinearSystems
 		private readonly int dim;
 		protected readonly CartesianMeshBase mesh;
 
-		protected FemCantileverBase(int dim, CartesianMeshBase mesh, double thickness)
+		protected FemCantileverBase(int dim, CartesianMeshBase mesh, double height, double thickness)
 		{
 			this.dim = dim;
 			this.mesh = mesh;
-			MomentOfInertia = thickness * Math.Pow(mesh.NumNodesPerAxis[1], 3) / 12.0;
+			MomentOfInertia = thickness * Math.Pow(height, 3) / 12.0;
 			NumDofsAll = dim * mesh.NumNodesTotal;
 			NumDofsFree = dim * (mesh.NumNodesPerAxis[0] - 1); // nodes with x = 0 are constrained
 			NumDofsFree *= mesh.NumNodesTotal / mesh.NumNodesPerAxis[0];

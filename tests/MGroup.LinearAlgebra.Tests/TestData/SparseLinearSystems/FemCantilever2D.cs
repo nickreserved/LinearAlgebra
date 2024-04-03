@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData.SparseLinearSystems
 	public class FemCantilever2D : FemCantileverBase
 	{
 		public FemCantilever2D(CartesianMesh2D mesh, double thickness)
-			: base(2, mesh, thickness)
+			: base(2, mesh, mesh.LengthPerAxis[1], thickness)
 		{
 		}
 
@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData.SparseLinearSystems
 		protected override double[] CalcKnownDisplacementsForNode(double[] coords)
 		{
 			double x = coords[0];
-			double z = coords[1];
+			double z = coords[1] - 0.5 * mesh.LengthPerAxis[1];
 			(double u, double w) = base.CalcDisplacementsEulerBernoulli(x, z);
 			return new double[] { u, w };
 		}
