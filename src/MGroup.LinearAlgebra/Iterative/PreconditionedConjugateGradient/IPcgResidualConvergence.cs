@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: This comment is from when corrections were also applied during checking convergence.This strategy can modify(correct) 
@@ -14,9 +14,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     /// <summary>
     /// Calculates the ratio norm2(f(r)) / norm2(g(r0)), where f and g are vector functions of the residual vector. This ratio
     /// will be used by Preconditioned Conjugate Gradient to check convergence.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
-    public interface IPcgResidualConvergence
+    public interface IPcgResidualConvergence : ISettingsCopiable<IPcgResidualConvergence>
     {
         /// <summary>
         /// Calculates the ratio norm2(f(r)) / norm2(g(r0)), where f and g are vector functions of the residual vector.

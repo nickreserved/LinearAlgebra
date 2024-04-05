@@ -1,9 +1,5 @@
 namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
-
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
@@ -13,6 +9,8 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 	public class SolutionNeverConvergesCriterion : ISolutionConvergenceCriterion
 	{
 		public double CalculateConvergenceMetric(IVectorView currentSolution, IVectorView previousSolution) => double.MaxValue;
+
+		public ISolutionConvergenceCriterion CopyWithInitialSettings() => new SolutionNeverConvergesCriterion();
 
 		public string DescribeConvergenceCriterion(double tolerance)
 			=> "No convergence criterion specified. Iterative solution algorithm stops, when max iterations are reached.";

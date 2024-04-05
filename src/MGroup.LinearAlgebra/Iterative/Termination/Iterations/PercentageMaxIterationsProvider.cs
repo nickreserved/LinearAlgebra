@@ -1,13 +1,10 @@
-﻿using System;
-
-using MGroup.LinearAlgebra.Commons;
-
 namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
 {
+	using System;
+
 	/// <summary>
 	/// A <see cref="IMaxIterationsProvider"/> implementation that will use a percentage of the matrix order as the max number
 	/// of iterations.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	public class PercentageMaxIterationsProvider : IMaxIterationsProvider
 	{
@@ -27,6 +24,9 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
 				+ $" but was {maxIterationsOverMatrixOrder}");
 			this.maxIterationsOverMatrixOrder = maxIterationsOverMatrixOrder;
 		}
+
+		public IMaxIterationsProvider CopyWithInitialSettings() 
+			=> new PercentageMaxIterationsProvider(maxIterationsOverMatrixOrder);
 
 		/// <summary>
 		/// See <see cref="IMaxIterationsProvider.GetMaxIterations(int)"/>

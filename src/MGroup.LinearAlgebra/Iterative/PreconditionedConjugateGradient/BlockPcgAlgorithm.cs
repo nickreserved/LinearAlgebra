@@ -53,9 +53,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		internal IVector[] DirectionKernels { get => directionKernels; }
 
 		private BlockPcgAlgorithm(int blockSize, double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
-			IPcgResidualConvergence pcgConvergence, IBlockPcgResidualUpdater residualUpdater, 
-			IPcgBetaParameterCalculation betaCalculation) : 
-			base(residualTolerance, maxIterationsProvider, pcgConvergence, residualUpdater)
+			IPcgResidualConvergence pcgConvergence, IBlockPcgResidualUpdater residualUpdater,
+			IPcgBetaParameterCalculation betaCalculation)
+			: base(residualTolerance, maxIterationsProvider, pcgConvergence)
 		{
 			this.blockSize = blockSize;
 			this.betaCalculation = betaCalculation;
@@ -281,7 +281,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// Constructs <see cref="BlockPcgAlgorithm"/> instances, allows the user to specify some or all of the required parameters 
 		/// and provides defaults for the rest.
 		/// </summary>
-		public class Builder : PcgBuilderBase
+		public class Factory : PcgFactoryBase
 		{
 			/// <summary>
 			/// Specifies how to calculate the beta parameter of PCG, which is used to update the direction vector. 
@@ -290,28 +290,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 			/// <summary>
 			/// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
-			/// This parameter returns <see cref="Builder.BlockResidualUpdater"/>
 			/// </summary>
-			public override IPcgResidualUpdater ResidualUpdater
-			{
-				get => BlockResidualUpdater;
-				set
-				{
-					if (value is IBlockPcgResidualUpdater)
-					{
-						BlockResidualUpdater = (IBlockPcgResidualUpdater)value;
-					}
-					else
-					{
-						throw new ArgumentException($"Block PCG builder needs a descendent of {typeof(IBlockPcgResidualUpdater)} while value is {value.GetType()}.");
-					}
-				}
-			}
-
-			/// <summary>
-			/// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
-			/// </summary>
-			public IBlockPcgResidualUpdater BlockResidualUpdater { get; set; } = new RegularBlockPcgResidualUpdater();
+			public IBlockPcgResidualUpdater ResidualUpdater { get; set; } = new RegularBlockPcgResidualUpdater();
 
 			/// <summary>
 			/// Specifies how to calculate the beta parameter of PCG, which is used to update the direction vector. 
@@ -323,8 +303,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			/// </summary>
 			public BlockPcgAlgorithm Build()
 			{
-				return new BlockPcgAlgorithm(BlockSize, ResidualTolerance, MaxIterationsProvider, Convergence, BlockResidualUpdater, 
-					BetaCalculation);
+				return new BlockPcgAlgorithm(BlockSize, ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(), 
+					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings(), 
+					BetaCalculation.CopyWithInitialSettings());
 			}
 		}
 	}

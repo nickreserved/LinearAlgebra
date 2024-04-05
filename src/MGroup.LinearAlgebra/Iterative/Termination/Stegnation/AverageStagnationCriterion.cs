@@ -1,14 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-using MGroup.LinearAlgebra.Reduction;
-using MGroup.LinearAlgebra.Vectors;
-
 //ERROR: If there is one sharp increase in the error (outlier), followed by decreases then the current approach will incorrectly 
 //       detect it as stagnation.
 namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 {
+	using System;
+	using System.Collections.Generic;
+
+	using MGroup.LinearAlgebra.Reduction;
+	using MGroup.LinearAlgebra.Vectors;
+
 	public class AverageStagnationCriterion : IStagnationCriterion
 	{
 		private readonly int iterationSpan;
@@ -22,11 +21,14 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 			residualDotProductsHistory = new List<double>();
 		}
 
+		public IStagnationCriterion CopyWithInitialSettings() 
+			=> new AverageStagnationCriterion(iterationSpan, relativeImprovementTolerance);
+
 		public bool HasStagnated()
 		{
-			var errorReductions = CalcRelativeErrorReductions();
+			double[] errorReductions = CalcRelativeErrorReductions();
 			if (errorReductions == null) return false; // Not enough data yet
-			var relativeImprovement = Vector.CreateFromArray(errorReductions).Average();
+			double relativeImprovement = Vector.CreateFromArray(errorReductions).Average();
 			if (relativeImprovementTolerance == -1)
 			{
 				relativeImprovementTolerance = 1E-3 * CalcInitialErrorReduction();
@@ -51,9 +53,9 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 			var t = 0;
 			while (t < iterationSpan)
 			{
-				var current = residualDotProductsHistory[t];
-				var next = residualDotProductsHistory[t + 1];
-				var reduction = (current - next) / current;
+				double current = residualDotProductsHistory[t];
+				double next = residualDotProductsHistory[t + 1];
+				double reduction = (current - next) / current;
 				if (reduction > 0) return reduction;
 				else ++t;
 			}
@@ -63,15 +65,15 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 
 		private double[] CalcRelativeErrorReductions()
 		{
-			var numIterations = residualDotProductsHistory.Count;
+			int numIterations = residualDotProductsHistory.Count;
 			if (numIterations <= iterationSpan) return null;
 
-			var relativeReductions = new double[iterationSpan];
+			double[] relativeReductions = new double[iterationSpan];
 			for (var t = 0; t < iterationSpan; ++t)
 			//for (int t = numIterations - iterationSpan - 1; t < numIterations - 1; ++t)
 			{
-				var current = residualDotProductsHistory[t + numIterations - iterationSpan - 1];
-				var next = residualDotProductsHistory[t + numIterations - iterationSpan];
+				double current = residualDotProductsHistory[t + numIterations - iterationSpan - 1];
+				double next = residualDotProductsHistory[t + numIterations - iterationSpan];
 				relativeReductions[t] = (current - next) / current;
 			}
 

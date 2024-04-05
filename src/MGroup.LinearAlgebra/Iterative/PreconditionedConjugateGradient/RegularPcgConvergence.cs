@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,16 +12,17 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 {
     /// <summary>
     /// Implements the most common way to check the convergence of CG: sqrt(r*inv(M)*r) / sqrt(r0*inv(M)*r0) &lt;= tolerance.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     public class RegularPcgConvergence : IPcgResidualConvergence
     {
         private double denominator;
 
-        /// <summary>
-        /// See <see cref="IPcgResidualConvergence.EstimateResidualNormRatio(PcgAlgorithmBase)"/>
-        /// </summary>
-        public double EstimateResidualNormRatio(PcgAlgorithmBase pcg) => Math.Sqrt(pcg.ResDotPrecondRes) / denominator;
+		public IPcgResidualConvergence CopyWithInitialSettings() => new RegularPcgConvergence();
+
+		/// <summary>
+		/// See <see cref="IPcgResidualConvergence.EstimateResidualNormRatio(PcgAlgorithmBase)"/>
+		/// </summary>
+		public double EstimateResidualNormRatio(PcgAlgorithmBase pcg) => Math.Sqrt(pcg.ResDotPrecondRes) / denominator;
 
         /// <summary>
         /// See <see cref="IPcgResidualConvergence.Initialize(PcgAlgorithmBase)"/>

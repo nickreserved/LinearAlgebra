@@ -8,7 +8,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     /// <summary>
     /// Abstraction to update the residual vector r 
     /// </summary>
-    public interface IBlockPcgResidualUpdater : IPcgResidualUpdater
+    public interface IBlockPcgResidualUpdater : ISettingsCopiable<IBlockPcgResidualUpdater>
     {
         /// <summary>
         /// Update the residual vector r.

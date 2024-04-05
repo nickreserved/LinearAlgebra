@@ -1,13 +1,13 @@
-﻿//TODO: At some point I should change my Skyline format to match the one used in MKL. Then the SparseBLAS operations can be 
+//TODO: At some point I should change my Skyline format to match the one used in MKL. Then the SparseBLAS operations can be 
 //      interchangeable.
 namespace MGroup.LinearAlgebra.Providers.Managed
 {
-    /// <summary>
-    /// Provides managed C# implementations of the linear algebra operations defined by <see cref="IBlasProvider"/>.
-    /// Uses custom C# code (usually unoptimized).
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    internal class ManagedSparseBlasProvider : ISparseBlasProvider
+	/// <summary>
+	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="ISparseBlasProvider"/>.
+	/// Uses custom C# code (usually unoptimized).
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	internal class ManagedSparseBlasProvider : ISparseBlasProvider
     {
         internal static ManagedSparseBlasProvider UniqueInstance { get; } = new ManagedSparseBlasProvider();
 

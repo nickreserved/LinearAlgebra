@@ -1,9 +1,5 @@
 namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
-
 	using MGroup.LinearAlgebra.Vectors;
 
 	/// <summary>
@@ -15,8 +11,8 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 		{
 			//TODO: The next can be optimized to not create a new vector (using SubtractIntoThis) in some cases.
 			//		E.g. in Gauss-Seidel the previousSolution vector is no longer necessary and can be overwritten.
-			var num = previousSolution.Subtract(currentSolution).Norm2();
-			var den = currentSolution.Norm2();
+			double num = previousSolution.Subtract(currentSolution).Norm2();
+			double den = currentSolution.Norm2();
 			if (den != 0)
 			{
 				return num / den;
@@ -26,6 +22,8 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Convergence
 				return num;
 			}
 		}
+
+		public ISolutionConvergenceCriterion CopyWithInitialSettings() => new RelativeSolutionConvergenceCriterion();
 
 		public string DescribeConvergenceCriterion(double convergenceTolerance) => "norm2(x - x_previous) / norm2(x) < " + convergenceTolerance;
 	}

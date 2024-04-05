@@ -1,11 +1,10 @@
-using System;
-
 namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
 {
+	using System;
+
 	/// <summary>
 	/// A <see cref="IMaxIterationsProvider"/> implementation that will use a fixed number of iterations, regardless of the 
 	/// matrix order.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	public class FixedMaxIterationsProvider : IMaxIterationsProvider
 	{
@@ -20,6 +19,8 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
 			if (maxIterations < 1) throw new ArgumentException($"Max iterations must be > 0, but were {maxIterations}");
 			this.maxIterations = maxIterations;
 		}
+
+		public IMaxIterationsProvider CopyWithInitialSettings() => new FixedMaxIterationsProvider(maxIterations);
 
 		/// <summary>
 		/// See <see cref="IMaxIterationsProvider.GetMaxIterations(int)"/>.

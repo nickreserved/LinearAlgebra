@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 {
+	using System;
+	using System.Collections.Generic;
+
 	public class SimpleStagnationCriterion : IStagnationCriterion
 	{
 		private readonly int iterationSpan;
@@ -17,13 +16,16 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 			residualDotProductsHistory = new List<double>();
 		}
 
+		public IStagnationCriterion CopyWithInitialSettings() 
+			=> new SimpleStagnationCriterion(iterationSpan, relativeImprovementTolerance);
+
 		public bool HasStagnated()
 		{
-			var numIterations = residualDotProductsHistory.Count;
+			int numIterations = residualDotProductsHistory.Count;
 			if (numIterations < iterationSpan) return false; // Not enough data yet
-			var oldError = residualDotProductsHistory[numIterations - iterationSpan];
-			var newError = residualDotProductsHistory[numIterations - 1];
-			var relativeReduction = (oldError - newError) / oldError;
+			double oldError = residualDotProductsHistory[numIterations - iterationSpan];
+			double newError = residualDotProductsHistory[numIterations - 1];
+			double relativeReduction = (oldError - newError) / oldError;
 			if (relativeImprovementTolerance == -1)
 			{
 				relativeImprovementTolerance = 1E-3 * CalcInitialErrorReduction();
@@ -45,12 +47,12 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 
 		private double CalcInitialErrorReduction()
 		{
-			var t = 0;
+			int t = 0;
 			while (t < iterationSpan)
 			{
-				var current = residualDotProductsHistory[t];
-				var next = residualDotProductsHistory[t + 1];
-				var reduction = (current - next) / current;
+				double current = residualDotProductsHistory[t];
+				double next = residualDotProductsHistory[t + 1];
+				double reduction = (current - next) / current;
 				if (reduction > 0) return reduction;
 				else ++t;
 			}

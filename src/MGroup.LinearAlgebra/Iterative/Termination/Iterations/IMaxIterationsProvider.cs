@@ -1,10 +1,9 @@
-﻿namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
+namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
 {
 	/// <summary>
 	/// Determines the maximum number of iterations that will be run by an iterative algorithm.
-	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	public interface IMaxIterationsProvider
+	public interface IMaxIterationsProvider : ISettingsCopiable<IMaxIterationsProvider>
 	{
 		/// <summary>
 		/// Returns the max number of iterations appropriate for the specified order of the linear system's matrix.

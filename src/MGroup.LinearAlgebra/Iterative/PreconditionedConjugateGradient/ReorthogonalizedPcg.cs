@@ -15,18 +15,18 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	/// Implements the untransformed Preconditioned Conjugate Gradient algorithm for solving linear systems with symmetric 
 	/// positive definite matrices. The implementation is based on the algorithm presented in pages 51-54 of the PhD dissertation 
 	/// "Seismic soil-structure interaction with finite elements and the method of substructures", George Stavroulakis, 2014
-	/// Authors: Serafeim Bakalakos, George Stavroulakis 
 	/// </summary>
 	public class ReorthogonalizedPcg : PcgAlgorithmBase
 	{
 		private const string name = "Reorthogonalized PCG";
-
+		private readonly IPcgResidualUpdater residualUpdater;
 
 		private ReorthogonalizedPcg(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
-			IPcgResidualConvergence residualConvergence, IPcgResidualUpdater residualCorrection) :
-			base(residualTolerance, maxIterationsProvider, residualConvergence, residualCorrection)
+			IPcgResidualConvergence residualConvergence, IPcgResidualUpdater residualUpdater)
+			: base(residualTolerance, maxIterationsProvider, residualConvergence)
 		{
 			Convergence = residualConvergence; //TODO: Now there are 2 convergence properties. One here and one in base class. Fix it.
+			this.residualUpdater = residualUpdater;
 		}
 
 		public IPcgResidualConvergence Convergence { get; set; }
@@ -233,21 +233,26 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// Constructs <see cref="ReorthogonalizedPcg"/> instances, allows the user to specify some or all of the 
 		/// required parameters and provides defaults for the rest.
-		/// Author: Serafeim Bakalakos
 		/// </summary>
-		public class Builder : PcgBuilderBase
+		public class Factory : PcgFactoryBase
 		{
-			public Builder()
+			public Factory()
 			{
 				Convergence = new RhsNormalizedConvergence();
 			}
+
+			/// <summary>
+			/// Specifies how often the residual vector will be corrected by an exact (but costly) calculation.
+			/// </summary>
+			public virtual IPcgResidualUpdater ResidualUpdater { get; set; } = new RegularPcgResidualUpdater();
 
 			/// <summary>
 			/// Creates a new instance of <see cref="ReorthogonalizedPcg"/>.
 			/// </summary>
 			public ReorthogonalizedPcg Build()
 			{
-				return new ReorthogonalizedPcg(ResidualTolerance, MaxIterationsProvider, Convergence, ResidualUpdater);
+				return new ReorthogonalizedPcg(ResidualTolerance, MaxIterationsProvider.CopyWithInitialSettings(), 
+					Convergence.CopyWithInitialSettings(), ResidualUpdater.CopyWithInitialSettings());
 			}
 		}
 	}

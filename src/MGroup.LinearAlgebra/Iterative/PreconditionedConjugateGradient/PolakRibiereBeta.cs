@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Vectors;
 
 //TODO: See B5 of painless CG. We can avoid a vector copy per iteration, by doing the old-new dot product before updating s.
 //      Not sure if that is correct.
@@ -28,5 +28,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
             residualOld.CopyFrom(pcg.Residual);
             return (nominator > 0.0) ? nominator / pcg.ResDotPrecondResOld : 0.0;
         }
-    }
+
+		public IPcgBetaParameterCalculation CopyWithInitialSettings() => new PolakRibiereBeta();
+	}
 }
