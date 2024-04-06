@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 	/// <summary>
 	/// Implements the untransformed Preconditioned Conjugate Gradient algorithm for solving linear systems with symmetric 
 	/// positive definite matrices. The implementation is based on the algorithm presented in pages 51-54 of the PhD dissertation 
-	/// "Seismic soil-structure interaction with finite Elements and the method of substructures", George Stavroulakis, 2014
+	/// "Seismic soil-structure interaction with finite Values and the method of substructures", George Stavroulakis, 2014
 	/// Authors: Serafeim Bakalakos, George Stavroulakis 
 	/// </summary>
 	public class ReorthogonalizedPcg : PcgAlgorithmBase
@@ -52,7 +52,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// The initial approximation to the solution vector, which PCG will improve. It will be overwritten by this method.
 		/// </param>
 		/// <exception cref="InvalidOperationException">Thrown if there are no direction vectors stored yet.</exception>
-		public void CalculateInitialSolutionFromStoredDirections(IMinimalImmutableVector rhsNew, IMinimalMutableVector initialSolution)
+		public void CalculateInitialSolutionFromStoredDirections(IMinimalReadOnlyVector rhsNew, IMinimalVector initialSolution)
 		{
 			//TODO: An implementation by G. Stavroulakis discarded the last stored direction vector at this point. Why?
 			//reorthoCache.RemoveNewDirectionVectorData(1);
@@ -82,8 +82,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			DirectionTimesMatrixTimesDirection = 0.0;
 		}
 
-		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalImmutableVector rhs,
-			IMinimalMutableVector solution, bool initialGuessIsZero)
+		public override IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalReadOnlyVector rhs,
+			IMinimalVector solution, bool initialGuessIsZero)
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
 			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
@@ -218,7 +218,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			};
 		}
 
-		private void UpdateDirectionVector(IMinimalImmutableVector preconditionedResidual, IMinimalMutableVector direction)
+		private void UpdateDirectionVector(IMinimalReadOnlyVector preconditionedResidual, IMinimalVector direction)
 		{
 			// d = s - sum(β_i * d_i), 0 <= i < numStoredDirections
 			// β_i = (s * q_i) / (d_i * q_i)

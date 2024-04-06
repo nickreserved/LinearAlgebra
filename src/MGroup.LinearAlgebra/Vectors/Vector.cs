@@ -10,7 +10,7 @@ using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Reduction;
 using static MGroup.LinearAlgebra.LibrarySettings;
 
-//TODO: align Elements using mkl_malloc
+//TODO: align Values using mkl_malloc
 //TODO: tensor product, vector2D, vector3D
 //TODO: remove legacy vector conversions
 //TODO: add complete error checking for CopyNonContiguouslyFrom and AddNonContiguouslyFrom. Also update the documentation.
@@ -29,19 +29,21 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="elements">Array of elements provided as is in vector.
 		/// Any later change to a vector element, also modifies corresponding element of this array.
 		/// If you don't want that, use (double[]) elements.Clone()</param>
-		public Vector(double[] elements) =>  Elements = elements;
+		public Vector(double[] elements) =>  Values = elements;
 
 		/// <summary>
 		/// Construct a vector from another.
 		/// </summary>
 		/// <param name="vector">Source vector. Its contents copied to the newly created this vector.</param>
-		public Vector(IExtendedImmutableVector vector) => Elements = vector.CopyToArray();
+		public Vector(IExtendedReadOnlyVector vector) => Values = vector.CopyToArray();
 
-		override public double[] Elements { get; }
+		public override double[] Values { get; }
 
-		override public int FromIndex { get => 0; }
+		public override int FromIndex { get => 0; }
 
-		override public int Length { get => Elements.Length; }
+		public override int Length { get => Values.Length; }
+
+		public override ref double this[int index] => ref Values[/*FromIndex +*/ index]; // Avoid one virtual property for performance
 
 
 
@@ -50,38 +52,38 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		override public Vector View(int fromIndex, int toIndex) => (Vector)base.View(fromIndex, toIndex);
 		override public PermutatedVectorView View(int[] indices) => (PermutatedVectorView)base.View(indices);
-		override public Vector AddIntoThis(IMinimalImmutableVector otherVector) => (Vector)base.AddIntoThis(otherVector);
+		override public Vector AddIntoThis(IMinimalReadOnlyVector otherVector) => (Vector)base.AddIntoThis(otherVector);
 		override public Vector Clear() => (Vector)base.Clear();
-		override public Vector CopyFrom(IMinimalImmutableVector otherVector) => (Vector)base.CopyFrom(otherVector);
+		override public Vector CopyFrom(IMinimalReadOnlyVector otherVector) => (Vector)base.CopyFrom(otherVector);
 		override public Vector DoToAllEntriesIntoThis(Func<double, double> unaryOperation) => (Vector)base.DoToAllEntriesIntoThis(unaryOperation);
 		override public Vector LinearCombinationIntoThis(double thisCoefficient, AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
-		override public Vector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
-		override public Vector NegativeIntoThis() => (Vector)base.NegativeIntoThis();
+		override public Vector LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		override public Vector NegateIntoThis() => (Vector)base.NegateIntoThis();
 		override public Vector SetAll(double value) => (Vector)base.SetAll(value);
-		override public Vector SubtractIntoThis(IMinimalImmutableVector otherVector) => (Vector)base.SubtractIntoThis(otherVector);
+		override public Vector SubtractIntoThis(IMinimalReadOnlyVector otherVector) => (Vector)base.SubtractIntoThis(otherVector);
 		override public Vector AxpyIntoThis(AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
 		override public Vector AxpyIntoThis(SparseVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
-		override public Vector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
+		override public Vector AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
 		override public Vector DoEntrywiseIntoThis(SparseVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
 		override public Vector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
-		override public Vector DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
+		override public Vector DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
 		override public Vector ScaleIntoThis(double coefficient) => (Vector)base.ScaleIntoThis(coefficient);
 		*/
 
 
 
-		// -------- OPERATORS FROM IMinimalImmutableVector
+		// -------- OPERATORS FROM IMinimalReadOnlyVector
 
 		public static Vector operator -(Vector x) => x.Negative();
 		public static Vector operator +(Vector x, Vector y) => x.Add(y);
-		public static Vector operator +(Vector x, IMinimalImmutableVector y) => x.Add(y);
-		public static Vector operator +(IMinimalImmutableVector y, Vector x) => x.Add(y);
+		public static Vector operator +(Vector x, IMinimalReadOnlyVector y) => x.Add(y);
+		public static Vector operator +(IMinimalReadOnlyVector y, Vector x) => x.Add(y);
 		public static Vector operator -(Vector x, Vector y) => x.Subtract(y);
-		public static Vector operator -(Vector x, IMinimalImmutableVector y) => x.Subtract(y);
-		public static Vector operator -(IMinimalImmutableVector y, Vector x) => (Vector) (x - y).NegativeIntoThis();
+		public static Vector operator -(Vector x, IMinimalReadOnlyVector y) => x.Subtract(y);
+		public static Vector operator -(IMinimalReadOnlyVector y, Vector x) => (Vector) (x - y).NegativeIntoThis();
 		public static double operator *(Vector x, Vector y) => x.DotProduct(y);
-		public static double operator *(Vector x, IMinimalImmutableVector y) => x.DotProduct(y);
-		public static double operator *(IMinimalImmutableVector x, Vector y) => x.DotProduct(y);
+		public static double operator *(Vector x, IMinimalReadOnlyVector y) => x.DotProduct(y);
+		public static double operator *(IMinimalReadOnlyVector x, Vector y) => x.DotProduct(y);
 		public static Vector operator *(Vector x, double y) => x.Scale(y);
 		public static Vector operator *(double y, Vector x) => x.Scale(y);
 
@@ -120,7 +122,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-
+		// ------------ STATICALLY CONSTRUCT VECTOR
 
 
 
@@ -141,7 +143,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="original">The original vector to copy.</param>
 		[Obsolete("Use new Vector(original.CopyToArray()) or new Vector(original)")]
-		public static Vector CreateFromVector(IExtendedImmutableVector original) => new Vector(original);
+		public static Vector CreateFromVector(IExtendedReadOnlyVector original) => new Vector(original);
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Vector"/> with all entries being equal to <paramref name="value"/>.
@@ -168,13 +170,16 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
+		// ----------- OBSOLETE SUBVECTOR OPERATIONS
+
+
 
 		[Obsolete("Use this.View(thisIndices).AddIntoThis(otherVector.View(otherIndices))")]
 		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, AbstractFullyPopulatedVector otherVector, int[] otherIndices)
 			=> View(thisIndices).AddIntoThis(otherVector.View(otherIndices));
 
 		[Obsolete("Use this.View(thisIndices).AddIntoThis(otherVector)")]
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector)
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalReadOnlyVector otherVector)
 			=> View(thisIndices).AddIntoThis(otherVector);
 
 		/// <summary>
@@ -198,25 +203,11 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// violate the described constraints.
 		/// </exception>
 		[Obsolete("Use this.View(destinationIdx, destinationIdx + length).AddIntoThis(sourceVector.View(sourceIdx, sourceIdx + length))")]
-		public void AddSubvectorIntoThis(int destinationIdx, IExtendedImmutableVector sourceVector, int sourceIdx, int length)
+		public void AddSubvectorIntoThis(int destinationIdx, IExtendedReadOnlyVector sourceVector, int sourceIdx, int length)
 			=> View(destinationIdx, destinationIdx + length).AddIntoThis(sourceVector.View(sourceIdx, sourceIdx + length));
 
-		/// <summary>
-		/// Creates a new <see cref="Vector"/> that contains all entries of this followed by all entries of 
-		/// <paramref name="last"/>.
-		/// </summary>
-		/// <param name="last">The vector whose entries will be appended after all entries of this vector.</param>
-		[Obsolete("Use View with some lines more")]
-		public Vector Append(Vector last)
-		{
-			var result = new Vector(new double[Length + last.Length]);
-			result.View(0, Length).CopyFrom(this);
-			result.View(Length, result.Length).CopyFrom(last);
-			return result;
-		}
-
 		[Obsolete("Use this.View(destinationIndex, destinationIndex + length).AxpyIntoThis(sourceVector.View(sourceIndex, sourceIndex + length), sourceCoefficient)")]
-		public void AxpySubvectorIntoThis(int destinationIndex, IExtendedImmutableVector sourceVector, double sourceCoefficient, int sourceIndex, int length)
+		public void AxpySubvectorIntoThis(int destinationIndex, IExtendedReadOnlyVector sourceVector, double sourceCoefficient, int sourceIndex, int length)
 			=> View(destinationIndex, destinationIndex + length).AxpyIntoThis(sourceVector.View(sourceIndex, sourceIndex + length), sourceCoefficient);
 
 
@@ -238,7 +229,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisIndices"/> violates the described constraints.
 		/// </exception>
 		[Obsolete("Use this.View(thisIndices).CopyFrom(otherVector)")]
-		public void CopyNonContiguouslyFrom(int[] thisIndices, IMinimalImmutableVector otherVector)
+		public void CopyNonContiguouslyFrom(int[] thisIndices, IMinimalReadOnlyVector otherVector)
 			=> View(thisIndices).CopyFrom(otherVector);
 
 		[Obsolete("Use this.CopyFrom(otherVector.View(otherIndices))")]
@@ -246,11 +237,8 @@ namespace MGroup.LinearAlgebra.Vectors
 			=> CopyFrom(otherVector.View(otherIndices));
 
 		[Obsolete("Use this.View(destinationIndex, destinationIndex + length).CopyFrom(sourceVector.View(sourceIndex, sourceIndex + length))")]
-		public void CopySubvectorFrom(int destinationIndex, IExtendedImmutableVector sourceVector, int sourceIndex, int length)
+		public void CopySubvectorFrom(int destinationIndex, IExtendedReadOnlyVector sourceVector, int sourceIndex, int length)
 			=> View(destinationIndex, destinationIndex + length).CopyFrom(sourceVector.View(sourceIndex, sourceIndex + length));
-
-		[Obsolete("Use this.CreateZero()")]
-		public Vector CreateZeroVectorWithSameFormat() => CreateZero();
 
 		[Obsolete("Use this.Copy(indices)")]
 		public Vector GetSubvector(int[] indices) => Copy(indices);
@@ -258,96 +246,18 @@ namespace MGroup.LinearAlgebra.Vectors
 		[Obsolete("Use this.Copy(startInclusive, endExclusive)")]
 		public Vector GetSubvector(int startInclusive, int endExclusive) => Copy(startInclusive, endExclusive);
 
-
 		/// <summary>
-		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 
-		/// result[i] = this[i] * <paramref name="vector"/>[i]. 
-		/// The resulting vector is written to a new <see cref="Vector"/> and then returned.
+		/// Creates a new <see cref="Vector"/> that contains all entries of this followed by all entries of 
+		/// <paramref name="last"/>.
 		/// </summary>
-		/// <param name="vector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
-		[Obsolete("Use this.DoEntrywise(vector, (x, y) => x * y)")]
-		public Vector MultiplyEntrywise(Vector vector) => DoEntrywise(vector, (x, y) => x * y);
-
-		/// <summary>
-		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 
-		/// this[i] = this[i] * <paramref name="vector"/>[i]. 
-		/// The resulting vector overwrites the entries of this <see cref="Vector"/> instance.
-		/// </summary>
-		/// <param name="vector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
-		[Obsolete("Use this.DoEntrywiseIntoThis(vector, (x, y) => x * y)")]
-		public void MultiplyEntrywiseIntoThis(Vector vector) => DoEntrywiseIntoThis(vector, (x, y) => x * y);
-
-
-		/// <summary>
-		/// This method is used to remove duplicate values of a Knot Value Vector and return the multiplicity up to
-		/// the requested Knot. The multiplicity of a single Knot can be derived using the exported multiplicity vector. 
-		/// The entries of this <see cref="Vector"/> will be sorted.
-		/// </summary>
-		public Vector[] RemoveDuplicatesFindMultiplicity()
+		/// <param name="last">The vector whose entries will be appended after all entries of this vector.</param>
+		[Obsolete("Use View with some lines more")]
+		public Vector Append(Vector last)
 		{
-			Array.Sort(Elements);
-			HashSet<double> set = new HashSet<double>();
-			int indexSingles = 0;
-			double[] singles = new double[Elements.Length];
-
-			int[] multiplicity = new int[Elements.Length];
-			int counterMultiplicity = 0;
-
-			for (int i = 0; i < Elements.Length; i++)
-			{
-				// If same integer is already present then add method will return
-				// FALSE
-				if (set.Add(Elements[i]) == true)
-				{
-					singles[indexSingles] = Elements[i];
-
-					multiplicity[indexSingles] = counterMultiplicity;
-					indexSingles++;
-
-				}
-				else
-				{
-					counterMultiplicity++;
-				}
-			}
-			int numberOfZeros = 0;
-			for (int i = Elements.Length - 1; i >= 0; i--)
-			{
-				if (singles[i] == 0)
-				{
-					numberOfZeros++;
-				}
-				else
-				{
-					break;
-				}
-			}
-			Vector[] singlesMultiplicityVectors = new Vector[2];
-
-			singlesMultiplicityVectors[0] = new Vector(new double[Elements.Length - numberOfZeros]);
-			for (int i = 0; i < Elements.Length - numberOfZeros; i++)
-			{
-				singlesMultiplicityVectors[0][i] = singles[i];
-			}
-
-			singlesMultiplicityVectors[1] = new Vector(new double[Elements.Length - numberOfZeros]);
-			for (int i = 0; i < Elements.Length - numberOfZeros; i++)
-			{
-				singlesMultiplicityVectors[1][i] = multiplicity[i];
-			}
-
-			return singlesMultiplicityVectors;
-		}
-
-		/// <summary>
-		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
-		/// </summary>
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
-		{
-			double accumulator = identityValue;
-			for (int i = 0; i < Elements.Length; ++i) accumulator = processEntry(Elements[i], accumulator);
-			// no zeros implied
-			return finalize(accumulator);
+			var result = new Vector(new double[Length + last.Length]);
+			result.View(0, Length).CopyFrom(this);
+			result.View(Length, result.Length).CopyFrom(last);
+			return result;
 		}
 
 		/// <summary>
@@ -374,12 +284,126 @@ namespace MGroup.LinearAlgebra.Vectors
 			else return Copy(indices);
 		}
 
+
+
+		// ----------- REMAININGS FROM IVECTORVIEW
+
+
+		[Obsolete("Use this.CreateZero()")]
+		public Vector CreateZeroVectorWithSameFormat() => CreateZero();
+
+		//TODO: I must include this in IMinimalReadOnlyVector
+		/// <summary>
+		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
+		/// </summary>
+		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		{
+			double accumulator = identityValue;
+			for (int i = 0; i < Values.Length; ++i) accumulator = processEntry(Values[i], accumulator);
+			// no zeros implied
+			return finalize(accumulator);
+		}
+
+
+		// -------------- REMAININGS FROM VECTOR
+
 		/// <summary>
 		/// The internal array that stores the entries of the vector. 
 		/// It should only be used for passing the raw array to linear algebra libraries.
 		/// </summary>
-		[Obsolete("Use Elements")]
-		public double[] RawData => Elements;
+		[Obsolete("Use Values")]
+		public double[] RawData => Values;
 
+
+
+		// ----------- ENTRYWISE OPERATIONS
+
+
+		/// <summary>
+		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 
+		/// result[i] = this[i] * <paramref name="vector"/>[i]. 
+		/// The resulting vector is written to a new <see cref="Vector"/> and then returned.
+		/// </summary>
+		/// <param name="vector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
+		[Obsolete("Use this.DoEntrywise(vector, (x, y) => x * y)")]
+		public Vector MultiplyEntrywise(Vector vector) => DoEntrywise(vector, (x, y) => x * y);
+
+		/// <summary>
+		/// Performs the following operation for 0 &lt;= i &lt; this.<see cref="Length"/>: 
+		/// this[i] = this[i] * <paramref name="vector"/>[i]. 
+		/// The resulting vector overwrites the entries of this <see cref="Vector"/> instance.
+		/// </summary>
+		/// <param name="vector">A vector with the same <see cref="Length"/> as this <see cref="Vector"/> instance.</param>
+		[Obsolete("Use this.DoEntrywiseIntoThis(vector, (x, y) => x * y)")]
+		public void MultiplyEntrywiseIntoThis(Vector vector) => DoEntrywiseIntoThis(vector, (x, y) => x * y);
+
+
+
+
+
+
+		// ------------ VERY BAD PLACE FOR THAT ALIEN OPERATION
+
+
+		/// <summary>
+		/// This method is used to remove duplicate values of a Knot Value Vector and return the multiplicity up to
+		/// the requested Knot. The multiplicity of a single Knot can be derived using the exported multiplicity vector. 
+		/// The entries of this <see cref="Vector"/> will be sorted.
+		/// </summary>
+		public Vector[] RemoveDuplicatesFindMultiplicity()
+		{
+			Array.Sort(Values);
+			HashSet<double> set = new HashSet<double>();
+			int indexSingles = 0;
+			double[] singles = new double[Values.Length];
+
+			int[] multiplicity = new int[Values.Length];
+			int counterMultiplicity = 0;
+
+			for (int i = 0; i < Values.Length; i++)
+			{
+				// If same integer is already present then add method will return
+				// FALSE
+				if (set.Add(Values[i]) == true)
+				{
+					singles[indexSingles] = Values[i];
+
+					multiplicity[indexSingles] = counterMultiplicity;
+					indexSingles++;
+
+				}
+				else
+				{
+					counterMultiplicity++;
+				}
+			}
+			int numberOfZeros = 0;
+			for (int i = Values.Length - 1; i >= 0; i--)
+			{
+				if (singles[i] == 0)
+				{
+					numberOfZeros++;
+				}
+				else
+				{
+					break;
+				}
+			}
+			Vector[] singlesMultiplicityVectors = new Vector[2];
+
+			singlesMultiplicityVectors[0] = new Vector(new double[Values.Length - numberOfZeros]);
+			for (int i = 0; i < Values.Length - numberOfZeros; i++)
+			{
+				singlesMultiplicityVectors[0][i] = singles[i];
+			}
+
+			singlesMultiplicityVectors[1] = new Vector(new double[Values.Length - numberOfZeros]);
+			for (int i = 0; i < Values.Length - numberOfZeros; i++)
+			{
+				singlesMultiplicityVectors[1][i] = multiplicity[i];
+			}
+
+			return singlesMultiplicityVectors;
+		}
 	}
 }

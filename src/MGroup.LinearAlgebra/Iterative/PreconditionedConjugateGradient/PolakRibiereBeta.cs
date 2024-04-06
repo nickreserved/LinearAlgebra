@@ -12,10 +12,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     /// </summary>
     public class PolakRibiereBeta : IPcgBetaParameterCalculation
     {
-        private IMinimalMutableVector residualOld;
+        private IMinimalVector residualOld;
 
         /// <summary>
-        /// See <see cref="IPcgBetaParameterCalculation.Initialize(IMinimalImmutableVector)"/>.
+        /// See <see cref="IPcgBetaParameterCalculation.Initialize(IMinimalReadOnlyVector)"/>.
         /// </summary>
         public void Initialize(PcgAlgorithmBase pcg) => residualOld = pcg.Residual.Copy();
 

@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra
         /// <summary>
         /// Copies a vector to an 1D dimensional int[] array. Only the integer part of each double entry is retained.
         /// </summary>
-        public static int[] ToIntArray(this IExtendedImmutableVector vector) //TODO: Also for IIndexable1D
+        public static int[] ToIntArray(this IExtendedReadOnlyVector vector) //TODO: Also for IIndexable1D
             => vector.CopyToArray().ToIntArray();
 
         /// <summary>

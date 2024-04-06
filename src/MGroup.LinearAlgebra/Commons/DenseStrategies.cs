@@ -16,7 +16,7 @@ namespace MGroup.LinearAlgebra.Commons
 	/// </summary>
 	public static class DenseStrategies
 	{
-		public static void AddNonContiguouslyFrom(IExtendedMutableVector thisVector, int[] thisIndices, IExtendedImmutableVector otherVector,
+		public static void AddNonContiguouslyFrom(IExtendedVector thisVector, int[] thisIndices, IExtendedReadOnlyVector otherVector,
 			int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Commons
 				thisVector[thisIndices[i]] += otherVector[otherIndices[i]];
 		}
 
-		public static void AddNonContiguouslyFrom(IExtendedMutableVector thisVector, int[] thisIndices, IExtendedImmutableVector otherVector)
+		public static void AddNonContiguouslyFrom(IExtendedVector thisVector, int[] thisIndices, IExtendedReadOnlyVector otherVector)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return true;
 		}
 
-		public static void CopyNonContiguouslyFrom(IExtendedMutableVector thisVector, IExtendedImmutableVector otherVector, int[] otherIndices)
+		public static void CopyNonContiguouslyFrom(IExtendedVector thisVector, IExtendedReadOnlyVector otherVector, int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -66,7 +66,7 @@ namespace MGroup.LinearAlgebra.Commons
 				thisVector[i] = otherVector[otherIndices[i]];
 		}
 
-		public static void CopyNonContiguouslyFrom(IExtendedMutableVector thisVector, int[] thisIndices, IExtendedImmutableVector otherVector, int[] otherIndices)
+		public static void CopyNonContiguouslyFrom(IExtendedVector thisVector, int[] thisIndices, IExtendedReadOnlyVector otherVector, int[] otherIndices)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -109,7 +109,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return Matrix.CreateFromArray(result, m, n, false);
 		}
 
-		public static Vector DoEntrywise(IExtendedImmutableVector vector1, IExtendedImmutableVector vector2,
+		public static Vector DoEntrywise(IExtendedReadOnlyVector vector1, IExtendedReadOnlyVector vector2,
 			Func<double, double, double> binaryOperation)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -233,7 +233,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static Vector LinearCombination(IExtendedImmutableVector vector1, double coefficient1, IExtendedImmutableVector vector2, double coefficient2)
+		public static Vector LinearCombination(IExtendedReadOnlyVector vector1, double coefficient1, IExtendedReadOnlyVector vector2, double coefficient2)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -358,7 +358,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static Vector Multiply(IMatrixView matrix, IExtendedImmutableVector vector, bool transposeMatrix)
+		public static Vector Multiply(IMatrixView matrix, IExtendedReadOnlyVector vector, bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -392,7 +392,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void MultiplyIntoResult(IMatrixView matrix, IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector,
+		public static void MultiplyIntoResult(IMatrixView matrix, IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector,
 			bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -437,7 +437,7 @@ namespace MGroup.LinearAlgebra.Commons
 			int n = matrix.NumColumns;
 			double[,] u = matrix.CopyToArray2D();
 			//double[,] u = new double[m, n];
-			//double[,] a = Elements as double[,];
+			//double[,] a = Values as double[,];
 			//Array.Copy(a, u, a.GetLength(0) * a.GetLength(1));
 
 			bool matu = false;

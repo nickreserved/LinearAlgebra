@@ -3,7 +3,7 @@
 namespace MGroup.LinearAlgebra.Exceptions
 {
     /// <summary>
-    /// The exception that is thrown when trying to build a matrix after clearing the internal Elements of the matrix builder.
+    /// The exception that is thrown when trying to build a matrix after clearing the internal Values of the matrix builder.
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public class EmptyMatrixBuilderException: Exception

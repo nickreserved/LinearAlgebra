@@ -10,23 +10,23 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// A fully populated with elements vector.
 	/// </summary>
 	/// Fully populated does not mean contiguous stored elements.
-	public abstract class AbstractFullyPopulatedVector : IExtendedMutableVector
+	public abstract class AbstractFullyPopulatedVector : IExtendedVector
 	{
 		/// <summary>
 		/// Returns a reference to the element at <paramref name="index"/>.
 		/// </summary>
 		/// <param name="index">The index of the element to return.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="index"/> is lower than 0 or greater or equal to size of the vector</exception>
-		abstract public ref double this[int index] { get; }
-		[Obsolete("Intention of this property, is for sparse vectors and it is highly inefficient. Please stop use it RIGHT NOW")]
-		double IExtendedMutableVector.this[int index]
+		public abstract ref double this[int index] { get; }
+		[Obsolete("This property is EXTREMELY inefficient on sparce vectors")]
+		double IExtendedVector.this[int index]
 		{
-			get { return this[index]; }
+			get => this[index];
 			set { this[index] = value; }
 		}
 
-		abstract public int Length { get; }
-		int IMinimalImmutableVector.Length => Length;
+		public abstract int Length { get; }
+		int IMinimalReadOnlyVector.Length => Length;
 
 		/// <summary>
 		/// Provides a vector from scattered elements of this vector.
@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="indices">Element with that indices of this vector, form the returned vector.
 		/// Not all indices from this vector needed and the same indices can exist more than once.</param>
 		/// <returns>A vector from this vector with elements for given indices</returns>
-		virtual public Vector Copy(int[] indices) => new Vector(CopyToArray(indices));
+		public virtual Vector Copy(int[] indices) => new Vector(CopyToArray(indices));
 
 		/// <summary>
 		/// Return scattered elements from this vector to a new array.
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="indices">Element with that indices of this vector, form the returned array.
 		/// Not all indices from this vector needed and the same indices can exist more than once.</param>
 		/// <returns>A new array with elements from this vector for given indices</returns>
-		virtual public double[] CopyToArray(int[] indices)
+		public virtual double[] CopyToArray(int[] indices)
 		{
 			var result = new double[indices.Length];
 			for (int i = 0; i < indices.Length; ++i)
@@ -57,10 +57,18 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="arrayIndex">Index of first element in target <paramref name="array"/> where elements of this vector will be written</param>
 		/// <param name="indices">Element with that indices of this vector, form the returned array.
 		/// Not all indices from this vector needed and the same indices can exist more than once.</param>
-		virtual public void CopyToArray(double[] array, int arrayIndex, int[] indices)
+		public virtual void CopyToArray(double[] array, int arrayIndex, int[] indices)
 		{
 			for (int i = 0; i < indices.Length; ++i)
 				array[i + arrayIndex] = this[indices[i]];
+		}
+		
+		public virtual double[] CopyToArray() => CopyToArray(0, Length);
+		public virtual double[] CopyToArray(int fromIndex, int toIndex) => IExtendedReadOnlyVector.CopyToArray(this, fromIndex, toIndex);
+		public virtual void CopyToArray(int fromIndex, double[] array, int arrayIndex, int length)
+		{
+			for (int i = 0; i < length; ++i)
+				array[arrayIndex + i] = this[fromIndex + i];
 		}
 
 		/// <summary>
@@ -72,14 +80,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Not all indices from this vector needed and the same indices can exist more than once.
 		/// It is not guaranteed that this method will not modify indices. If you want this array intact, keep a copy.</param>
 		/// <returns>A vector view of this vector with elements for given indices</returns>
-		abstract public AbstractFullyPopulatedVector View(int[] indices);
+		public abstract AbstractFullyPopulatedVector View(int[] indices);
 
 		/// <summary>
 		/// Calculates the tensor product of this vector with <paramref name="otherVector"/>:
 		/// result[i, j] = this[i] * otherVector[j], for all valid i, j.
 		/// </summary>
 		/// <param name="otherVector">The other vector.</param>
-		virtual public Matrix TensorProduct(AbstractFullyPopulatedVector otherVector)
+		public virtual Matrix TensorProduct(AbstractFullyPopulatedVector otherVector)
 		{
 			var result = Matrix.CreateZero(Length, otherVector.Length);
 			for (int i = 0; i < this.Length; ++i)
@@ -90,71 +98,55 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// ------------------- COVARIANT RETURN TYPE FROM IExtendedImmutableVector
+		// ------------------- COVARIANT RETURN TYPE FROM IExtendedReadOnlyVector
 
-		virtual public Vector Copy(int fromIndex, int toIndex) => new Vector(CopyToArray(fromIndex, toIndex));
-		IExtendedMutableVector IExtendedImmutableVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex);
+		public virtual Vector Copy(int fromIndex, int toIndex) => new Vector(CopyToArray(fromIndex, toIndex));
+		IExtendedVector IExtendedReadOnlyVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex);
 
-		virtual public Vector Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => (Vector)IMinimalImmutableVector.Axpy(this, otherVector, otherCoefficient);
-		IExtendedMutableVector IExtendedImmutableVector.Axpy(IMinimalImmutableVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient);
+		public virtual Vector Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.Axpy(this, otherVector, otherCoefficient);
+		IExtendedVector IExtendedReadOnlyVector.Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient);
 
-		virtual public Vector Add(IMinimalImmutableVector otherVector) => (Vector)IMinimalImmutableVector.Add(this, otherVector);
-		IExtendedMutableVector IExtendedImmutableVector.Add(IMinimalImmutableVector otherVector) => Add(otherVector);
+		public virtual Vector Add(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Add(this, otherVector);
+		IExtendedVector IExtendedReadOnlyVector.Add(IMinimalReadOnlyVector otherVector) => Add(otherVector);
 
-		virtual public Vector Subtract(IMinimalImmutableVector otherVector) => (Vector)IMinimalImmutableVector.Subtract(this, otherVector);
-		IExtendedMutableVector IExtendedImmutableVector.Subtract(IMinimalImmutableVector otherVector) => (Vector)IMinimalImmutableVector.Subtract(this, otherVector);
+		public virtual Vector Subtract(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Subtract(this, otherVector);
+		IExtendedVector IExtendedReadOnlyVector.Subtract(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Subtract(this, otherVector);
 
-		virtual public Vector Negative() => (Vector)IMinimalImmutableVector.Negative(this);
-		IExtendedMutableVector IExtendedImmutableVector.Negative() => Negative();
+		public virtual Vector Negative() => (Vector)IMinimalReadOnlyVector.Negate(this);
+		IExtendedVector IExtendedReadOnlyVector.Negate() => Negative();
 
-		virtual public Vector Scale(double coefficient) => (Vector)IMinimalImmutableVector.Scale(this, coefficient);
-		IExtendedMutableVector IExtendedImmutableVector.Scale(double coefficient) => Scale(coefficient);
+		public virtual Vector Scale(double coefficient) => (Vector)IMinimalReadOnlyVector.Scale(this, coefficient);
+		IExtendedVector IExtendedReadOnlyVector.Scale(double coefficient) => Scale(coefficient);
 
-		virtual public Vector LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => (Vector)IMinimalImmutableVector.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
-		IExtendedMutableVector IExtendedImmutableVector.LinearCombination(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient);
+		public virtual Vector LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
+		IExtendedVector IExtendedReadOnlyVector.LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient);
 
-		virtual public Vector DoEntrywise(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => (Vector)IMinimalImmutableVector.DoEntrywise(this, otherVector, binaryOperation);
-		IExtendedMutableVector IExtendedImmutableVector.DoEntrywise(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);
+		public virtual Vector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)IMinimalReadOnlyVector.DoEntrywise(this, otherVector, binaryOperation);
+		IExtendedVector IExtendedReadOnlyVector.DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);
 
-		virtual public Vector DoToAllEntries(Func<double, double> unaryOperation) => (Vector)IMinimalImmutableVector.DoToAllEntries(this, unaryOperation);
-		IExtendedMutableVector IExtendedImmutableVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
+		public virtual Vector DoToAllEntries(Func<double, double> unaryOperation) => (Vector)IMinimalReadOnlyVector.DoToAllEntries(this, unaryOperation);
+		IExtendedVector IExtendedReadOnlyVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
 
-		virtual public double[] CopyToArray() => IExtendedImmutableVector.CopyToArray(this);
-		virtual public double[] CopyToArray(int fromIndex, int toIndex) => IExtendedImmutableVector.CopyToArray(this, fromIndex, toIndex);
-		virtual public void CopyToArray(int fromIndex, double[] array, int arrayIndex, int length)
-		{
-			for (int i = 0; i < length; ++i)
-				array[arrayIndex + i] = this[fromIndex + i];
-		}
+		public virtual Vector Copy() => new Vector(CopyToArray());
+		IExtendedVector IExtendedReadOnlyVector.Copy() => Copy();
 
-		virtual public Vector Copy() => new Vector(CopyToArray());
-		IExtendedMutableVector IExtendedImmutableVector.Copy() => Copy();
-
-		virtual public Vector CreateZero() => new Vector(new double[Length]);
-		IExtendedMutableVector IExtendedImmutableVector.CreateZero() => CreateZero();
+		public virtual Vector CreateZero() => new Vector(new double[Length]);
+		IExtendedVector IExtendedReadOnlyVector.CreateZero() => CreateZero();
 
 
 
-		// ------------------- COVARIANT RETURN TYPE FROM IExtendedMutableVector
+		// ------------------- COVARIANT RETURN TYPE FROM IExtendedVector
 
-		abstract public AbstractFullyPopulatedVector View(int fromIndex, int toIndex);
-		IExtendedMutableVector IExtendedMutableVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex);
+		public abstract AbstractFullyPopulatedVector View(int fromIndex, int toIndex);
+		IExtendedVector IExtendedVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex);
 
-		virtual public AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
-		{
-			Preconditions.CheckVectorDimensions(this, otherVector);
-			if (otherCoefficient == 1)
-				for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
-					this[otherVector.Indices[i]] += otherVector.Values[i];
-			else if (otherCoefficient == -1)
-				for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
-					this[otherVector.Indices[i]] -= otherVector.Values[i];
-			else if (otherCoefficient != 0)
-				for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
-					this[otherVector.Indices[i]] += otherCoefficient * otherVector.Values[i];
-			return this;
-		}
-		virtual public AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
+
+
+		// ------------------- COVARIANT RETURN TYPE FROM IMinimalVector
+
+		public virtual AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
+			=> AbstractSparseVector.AxpyIntoDenseVector(this, otherVector, otherCoefficient);
+		public virtual AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (otherCoefficient == 1)
@@ -168,109 +160,87 @@ namespace MGroup.LinearAlgebra.Vectors
 					this[i] += otherCoefficient * otherVector[i];
 			return this;
 		}
-		virtual public AbstractFullyPopulatedVector AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient)
+		public virtual void AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient)
 		{
 			// Runtime Identification is_a_bad_thing™
 			// Another (better) solution is otherVector.Scale(otherCoefficient).Add(this); because 'this' is already identified
 			// but it needs an implementation for any type of vector
-			if (otherVector is AbstractSparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
-			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return AxpyIntoThis(fullyPopulatedVector, otherCoefficient);
-			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
+			if (otherVector is AbstractSparseVector sparseVector) AxpyIntoThis(sparseVector, otherCoefficient);
+			else if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) AxpyIntoThis(fullyPopulatedVector, otherCoefficient);
+			else throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
 		}
-		IExtendedMutableVector IExtendedMutableVector.AxpyIntoThis(IMinimalImmutableVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient);
 
-		virtual public AbstractFullyPopulatedVector AddIntoThis(IMinimalImmutableVector otherVector) => (AbstractFullyPopulatedVector) IMinimalMutableVector.AddIntoThis(this, otherVector);
-		IExtendedMutableVector IExtendedMutableVector.AddIntoThis(IMinimalImmutableVector otherVector) => AddIntoThis(otherVector);
+		public virtual void AddIntoThis(IMinimalReadOnlyVector otherVector) => IMinimalVector.AddIntoThis(this, otherVector);
 
-		virtual public AbstractFullyPopulatedVector SubtractIntoThis(IMinimalImmutableVector otherVector) => (AbstractFullyPopulatedVector)IMinimalMutableVector.SubtractIntoThis(this, otherVector);
-		IExtendedMutableVector IExtendedMutableVector.SubtractIntoThis(IMinimalImmutableVector otherVector) => SubtractIntoThis(otherVector);
+		public virtual void SubtractIntoThis(IMinimalReadOnlyVector otherVector) => IMinimalVector.SubtractIntoThis(this, otherVector);
 
-		virtual public AbstractFullyPopulatedVector NegativeIntoThis()
+		public virtual void NegateIntoThis()
 		{
 			for (int i = 0; i < Length; ++i)
 				this[i] = -this[i];
-			return this;
 		}
-		IExtendedMutableVector IExtendedMutableVector.NegativeIntoThis() => NegativeIntoThis();
 
-		virtual public AbstractFullyPopulatedVector ScaleIntoThis(double coefficient)
+		public virtual void ScaleIntoThis(double coefficient)
 		{
 			for (int i = 0; i < Length; ++i)
 				this[i] *= coefficient;
-			return this;
 		}
-		IExtendedMutableVector IExtendedMutableVector.ScaleIntoThis(double coefficient) => ScaleIntoThis(coefficient);
 
-		virtual public AbstractFullyPopulatedVector LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => (AbstractFullyPopulatedVector)IMinimalMutableVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
-		IExtendedMutableVector IExtendedMutableVector.LinearCombinationIntoThis(double thisCoefficient, IMinimalImmutableVector otherVector, double otherCoefficient) => LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		public virtual void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => IMinimalVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
 
-		virtual public AbstractFullyPopulatedVector CopyFrom(IMinimalImmutableVector otherVector)
+		public virtual AbstractFullyPopulatedVector CopyFrom(AbstractSparseVector otherVector) => AbstractSparseVector.CopyToDenseVector(this, otherVector);
+		public virtual AbstractFullyPopulatedVector CopyFrom(AbstractFullyPopulatedVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			for (int i = 0; i < Length; ++i)
-				this[i] = ((AbstractFullyPopulatedVector)otherVector)[i];
+				this[i] = otherVector[i];
 			return this;
 		}
-		IExtendedMutableVector IExtendedMutableVector.CopyFrom(IMinimalImmutableVector otherVector) => CopyFrom(otherVector);
+		public virtual void CopyFrom(IMinimalReadOnlyVector otherVector)
+		{
+			// Runtime Identification is_a_bad_thing™
+			if (otherVector is AbstractSparseVector sparseVector) CopyFrom(sparseVector);
+			else if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) CopyFrom(fullyPopulatedVector);
+			else throw new NotImplementedException("CopyFrom(NotSupportedVector)");
+		}
 
-		virtual public AbstractFullyPopulatedVector Clear() => (AbstractFullyPopulatedVector)IMinimalMutableVector.Clear(this);
-		IExtendedMutableVector IExtendedMutableVector.Clear() => Clear();
+		public virtual void Clear() => IMinimalVector.Clear(this);
 
-		virtual public AbstractFullyPopulatedVector SetAll(double value)
+		public virtual void SetAll(double value)
 		{
 			for (int i = 0; i < Length; ++i)
 				this[i] = value;
-			return this;
 		}
-		IExtendedMutableVector IExtendedMutableVector.SetAll(double value) => SetAll(value);
 
-		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
-		{
-			Preconditions.CheckVectorDimensions(this, otherVector);
-			for (int i = 0, j = otherVector.FromIndex; i < Length; ++i)
-				this[i] = binaryOperation(this[i],
-					j >= otherVector.ToIndex || i < otherVector.Indices[j]
-					? 0
-					: otherVector.Values[j++]);
-			return this;
-		}
-		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation)
+		public virtual AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
+			=> AbstractSparseVector.DoEntrywiseIntoDenseVector(this, otherVector, binaryOperation);
+		public virtual AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			for (int i = 0; i < Length; ++i)
 				this[i] = binaryOperation(this[i], otherVector[i]);
 			return this;
 		}
-		virtual public AbstractFullyPopulatedVector DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation)
+		public virtual void DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			// Runtime Identification is_a_bad_thing™
-			if (otherVector is AbstractSparseVector sparseVector) return DoEntrywiseIntoThis(sparseVector, binaryOperation);
-			else if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return DoEntrywiseIntoThis(fullyPopulatedVector, binaryOperation);
+			if (otherVector is AbstractSparseVector sparseVector) DoEntrywiseIntoThis(sparseVector, binaryOperation);
+			else if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) DoEntrywiseIntoThis(fullyPopulatedVector, binaryOperation);
 			else throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
 		}
-		IExtendedMutableVector IExtendedMutableVector.DoEntrywiseIntoThis(IMinimalImmutableVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywiseIntoThis(otherVector, binaryOperation);
 
-		virtual public AbstractFullyPopulatedVector DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
+		public virtual void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
 			for (int i = 0; i < Length; ++i)
 				this[i] = unaryOperation(this[i]);
-			return this;
 		}
-		IExtendedMutableVector IExtendedMutableVector.DoToAllEntriesIntoThis(Func<double, double> unaryOperation) => DoToAllEntriesIntoThis(unaryOperation);
 
 
 
-		// ------------------- COVARIANT RETURN TYPE FROM IMinimalImmutableVector
+		// ------------------- COVARIANT RETURN TYPE FROM IMinimalReadOnlyVector
 
-		virtual public double DotProduct(AbstractSparseVector otherVector)
-		{
-			Preconditions.CheckVectorDimensions(this, otherVector);
-			double result = 0;
-			for (int i = otherVector.FromIndex; i < otherVector.ToIndex; ++i)
-				result += this[otherVector.Indices[i]] * otherVector.Values[i];
-			return result;
-		}
-		virtual public double DotProduct(AbstractFullyPopulatedVector otherVector)
+		public virtual double DotProduct(AbstractSparseVector otherVector) => otherVector.DotProduct(this);
+		public virtual double DotProduct(AbstractFullyPopulatedVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			double result = 0;
@@ -278,7 +248,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				result += this[i] * otherVector[i];
 			return result;
 		}
-		virtual public double DotProduct(IMinimalImmutableVector otherVector)
+		public virtual double DotProduct(IMinimalReadOnlyVector otherVector)
 		{
 			// Runtime Identification is_a_bad_thing™
 			// Another (better) solution is otherVector.DotProduct(this); because 'this' is already identified
@@ -288,7 +258,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			throw new NotImplementedException("DotProduct(NotSupportedVector)");
 		}
 		
-		virtual public bool IsZero(double tolerance = 1e-7)
+		public virtual bool IsZero(double tolerance = 1e-7)
 		{
 			if (tolerance != 0)
 			{
@@ -303,22 +273,12 @@ namespace MGroup.LinearAlgebra.Vectors
 			return true;
 		}
 
-		virtual public double Square() => IMinimalImmutableVector.Square(this);
+		public virtual double Square() => IMinimalReadOnlyVector.Square(this);
 
-		virtual public double Norm2() => IMinimalImmutableVector.Norm2(this);
+		public virtual double Norm2() => IMinimalReadOnlyVector.Norm2(this);
 
-		virtual public bool Equals(AbstractSparseVector otherVector, double tolerance = 1E-07)
-		{
-			if (Length != otherVector.Length) return false;
-			var cmp = new ValueComparer(tolerance);
-			for (int i = 0, j = 0; i < Length; ++i)
-				if (!cmp.AreEqual(this[i],
-						j >= otherVector.ToIndex || i < otherVector.Indices[j]
-						? 0
-						: otherVector.Values[j++])) return false;
-			return true;
-		}
-		virtual public bool Equals(AbstractFullyPopulatedVector otherVector, double tolerance = 1E-07)
+		public virtual bool Equals(AbstractSparseVector otherVector, double tolerance = 1E-07) => otherVector.Equals(this, tolerance);
+		public virtual bool Equals(AbstractFullyPopulatedVector otherVector, double tolerance = 1E-07)
 		{
 			if (Length != otherVector.Length) return false;
 			var cmp = new ValueComparer(tolerance);
@@ -326,42 +286,12 @@ namespace MGroup.LinearAlgebra.Vectors
 				if (!cmp.AreEqual(this[i], otherVector[i])) return false;
 			return true;
 		}
-		virtual public bool Equals(IMinimalImmutableVector otherVector, double tolerance = 1E-07)
+		public virtual bool Equals(IMinimalReadOnlyVector otherVector, double tolerance = 1E-07)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractSparseVector sparseVector) return Equals(sparseVector, tolerance);
 			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return Equals(fullyPopulatedVector, tolerance);
 			throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
 		}
-
-		/// <summary>
-		/// Returns the Z component of the cross product of this vector with <paramref name="otherVector"/>.
-		/// This is the cross product of 2 dimensional vectors.
-		/// </summary>
-		/// For calculation uses the 2 first components of this vector with 2 first components of <paramref name="otherVector"/>.
-		/// <param name="otherVector">The other vector</param>
-		/// <returns>The Z component of the cross product</returns>
-		public double CrossProductZ(AbstractFullyPopulatedVector otherVector) => this[0] * otherVector[1] - this[1] * otherVector[0];
-		/// <summary>
-		/// Returns the X component of the cross product of this vector with <paramref name="otherVector"/>.
-		/// </summary>
-		/// For calculation uses the 2nd and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
-		/// <param name="otherVector">The other vector</param>
-		/// <returns>The X component of the cross product</returns>
-		public double CrossProductX(AbstractFullyPopulatedVector otherVector) => -this[1] * otherVector[2] + this[2] * otherVector[1];
-		/// <summary>
-		/// Returns the Y component of the cross product of this vector with <paramref name="otherVector"/>.
-		/// </summary>
-		/// For calculation uses the 1st and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
-		/// <param name="otherVector">The other vector</param>
-		/// <returns>The Y component of the cross product</returns>
-		public double CrossProductY(AbstractFullyPopulatedVector otherVector) => this[0] * otherVector[2] - this[2] * otherVector[0];
-		/// <summary>
-		/// Returns the cross product of this vector with <paramref name="otherVector"/>.
-		/// This is the cross product of 3 dimensional vectors.
-		/// </summary>
-		/// <param name="otherVector">The other vector</param>
-		/// <returns>The cross product</returns>
-		public Vector CrossProduct(AbstractFullyPopulatedVector otherVector) => new Vector(new double[] { CrossProductX(otherVector), CrossProductY(otherVector), CrossProductZ(otherVector) });
 	}
 }

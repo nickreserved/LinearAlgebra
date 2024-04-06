@@ -26,7 +26,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
     /// Each column corresponds to a freedom degree of one of the subdomains. Columns that correspond to freedom degrees with 
     /// multiplicity = 2 will have 1 non zero entry (1 or -1). Columns that correspond to freedom degrees with multiplicity > 2, 
     /// will have at most 2 non zero entries (1 and/or -1). The other columns do not correspond to boundary dofs and will be 
-    /// empty. The internal Elements structures that store the non-zero entries are row major.
+    /// empty. The internal Values structures that store the non-zero entries are row major.
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public class SignedBooleanMatrixRowMajor: IMappingMatrix, ISparseMatrix

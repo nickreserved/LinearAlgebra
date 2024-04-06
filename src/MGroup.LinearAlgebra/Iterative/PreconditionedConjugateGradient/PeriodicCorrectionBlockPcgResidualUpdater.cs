@@ -15,9 +15,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
         private int numIterationsBeforeCorrection = int.MinValue;
 
 		/// <summary>
-		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalMutableVector)"/>
+		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalVector)"/>
 		/// </summary>
-		public void UpdateResidual(BlockPcgAlgorithm pcg, IMinimalMutableVector residual)
+		public void UpdateResidual(BlockPcgAlgorithm pcg, IMinimalVector residual)
 		{
 			//TODO: perhaps this should be done in an Initialize() method
 			if (numIterationsBeforeCorrection == int.MinValue)
@@ -38,9 +38,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		}
 
 		/// <summary>
-		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalMutableVector)"/>
+		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalVector)"/>
 		/// </summary>
-		public void UpdateResidual(PcgAlgorithmBase pcg, IMinimalMutableVector residual)
+		public void UpdateResidual(PcgAlgorithmBase pcg, IMinimalVector residual)
         {
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)

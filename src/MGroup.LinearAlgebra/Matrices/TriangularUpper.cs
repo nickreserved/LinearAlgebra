@@ -10,7 +10,7 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 //TODO: Perhaps I should use row major for lower triangular, upper triangular or both.
 //TODO: Perhaps I should have an abstract class that handles everything except the lower/upper specific stuff and concrete
 //  private classes Lower, Upper. The indexer would be faster.
-//TODO: align Elements using mkl_malloc
+//TODO: align Values using mkl_malloc
 namespace MGroup.LinearAlgebra.Matrices
 {
     /// <summary>
@@ -22,8 +22,8 @@ namespace MGroup.LinearAlgebra.Matrices
     public class TriangularUpper: IMatrix
     {
         /// <summary>
-        /// Packed storage, column major order: U[i, j] = Elements[i + j*(2*n-j-1)/2] for 0 &lt;= j &lt;= i &lt; n.
-        /// Although not used here, lower triangular would be: L[i, j] = Elements[i + j*(j+1)/2] for 0 &lt;= i &lt;= j &lt; n.
+        /// Packed storage, column major order: U[i, j] = Values[i + j*(2*n-j-1)/2] for 0 &lt;= j &lt;= i &lt; n.
+        /// Although not used here, lower triangular would be: L[i, j] = Values[i + j*(j+1)/2] for 0 &lt;= i &lt;= j &lt; n.
         /// </summary>
         private readonly double[] data;
 
@@ -85,7 +85,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <summary>
         /// Initializes a new instance of <see cref="TriangularUpper"/> by copying the upper triangle of the provided 2D array.
         /// </summary>
-        /// <param name="array2D">A 2-dimensional array containing the Elements of the matrix. Constraints: 
+        /// <param name="array2D">A 2-dimensional array containing the Values of the matrix. Constraints: 
         ///     <paramref name="array2D"/>.GetLength(0) == <paramref name="array2D"/>.GetLength(1).</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="array2D"/>.GetLength(0) != 
         ///     <paramref name="array2D"/>.GetLength(1).</exception>
@@ -106,7 +106,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// internal array.
         /// </summary>
         /// <param name="order">The number of rows/columns of the new square matrix.</param>
-        /// <param name="array1D">An 1-dimensional array containing the Elements of the upper triangle of the matrix in column 
+        /// <param name="array1D">An 1-dimensional array containing the Values of the upper triangle of the matrix in column 
         ///     major order.</param>
         /// <param name="copyArray">If true, <paramref name="array1D"/> will be copied and the new <see cref="TriangularUpper"/>  
         ///     instance will have a reference to the copy, which is safer. If false, the new matrix will have a reference to 
@@ -433,9 +433,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedImmutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
         /// </summary>
-        public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
+        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector dense) return Multiply(dense, transposeThis);
             else throw new NotImplementedException();
@@ -460,9 +460,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
         /// </summary>
-        public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis = false)
+        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
         {
             if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
             {

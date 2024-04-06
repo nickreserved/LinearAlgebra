@@ -11,12 +11,12 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		IMutableMatrix AddIntoThis(IImmutableMatrix otherMatrix);
 
-		static protected IMutableMatrix AddIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, 1);
+		protected static IMutableMatrix AddIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, 1);
 
 
 		IMutableMatrix SubtractIntoThis(IImmutableMatrix otherMatrix);
 		
-		static protected IMutableMatrix SubtractIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, -1);
+		protected static IMutableMatrix SubtractIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, -1);
 
 
 		IMutableMatrix LinearCombinationIntoThis(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient);

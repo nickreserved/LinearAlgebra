@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
 		/// <param name="numRows">The number of rows of the original matrix.</param>
 		/// <param name="numCols">The number of columns of the original matrix.</param>
 		/// <param name="matrix">The internal buffer storing the matrix entries in column major layout. It will 
-		///     be overwritten with the factorization Elements.</param>
+		///     be overwritten with the factorization Values.</param>
 		/// <exception cref="NotImplementedException">Thrown if <paramref name="numCols"/> &gt; <paramref name="numRows"/>.
 		///     </exception>
 		/// <exception cref="Exceptions.LapackException">Thrown if tha call to LAPACK fails due to an invalid 
@@ -77,7 +77,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// Explicitly creates the matrix Q1, which consists of the first n columns of the orthogonal matrix Q that resulted  
         /// from the factorization: A =  Q * R = [Q1, Q2] * [R1; 0] (Matlab notation) = Q1 * R1, 
         /// where A is m-by-n, Q is m-by-m, R is m-by-n, Q1 is m-by-n and R1 is (n-by-n). 
-        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Values are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public Matrix GetEconomyFactorQ()
@@ -108,7 +108,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// Explicitly creates the upper triangular matrix R1, which consists of the first n rows of the matrix R that resulted  
         /// from the factorization: A =  Q * R = [Q1, Q2] * [R1; 0] (Matlab notation) = Q1 * R1, 
         /// where A is m-by-n, Q is m-by-m, R is m-by-n, Q1 is m-by-n and R1 is (n-by-n). 
-        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Values are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public TriangularUpper GetEconomyFactorR()
@@ -124,7 +124,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// <summary>
         /// Explicitly creates the orthogonal matrix Q that resulted from the factorization: A = Q * R, where A is m-by-n, 
         /// Q is m-by-m and R is m-by-n. 
-        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Values are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public Matrix GetFactorQ()
@@ -150,7 +150,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// <summary>
         /// Explicitly creates the upper trapezoidal matrix R that resulted from the factorization: A = Q * R, where A is m-by-n, 
         /// Q is m-by-m and R is m-by-n. 
-        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Values are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public Matrix GetFactorR()
@@ -192,7 +192,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
 
             // Step 2: R * x = c, with R being m-by-n and upper trapezoidal (because m >= n).
             // Decomposing R: [R1; 0] * x = [c1 ; c2 ] => R1 * x = c1 => R1 * x = c1, with R1 being n-by-n, upper triangular
-            // and stored in the factorized col major Elements. c1 and x are both n-by-1. The information stored in c2 is lost due to
+            // and stored in the factorized col major Values. c1 and x are both n-by-1. The information stored in c2 is lost due to
             // the least squares approximation.
             // TODO: I do not really need to discard the extra m-n terms of c2, but I think it is unsafe to carry them around and
             // risk some method of Vector using the length of the internal buffer, instead of its Length propert.

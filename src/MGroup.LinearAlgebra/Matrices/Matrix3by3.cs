@@ -779,9 +779,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedImmutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
         /// </summary>
-        public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
+        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector3 casted) return Multiply(casted, transposeThis);
 
@@ -833,9 +833,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
         /// </summary>
-        public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis = false)
+        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
         {
             if ((lhsVector is Vector2 lhsDense) && (rhsVector is Vector2 rhsDense))
             {

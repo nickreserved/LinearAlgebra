@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
         private double relativeTolerance;
         private int maximumIterations;
         private IMaxIterationsProvider innerIterationsProvider;
-        protected IMinimalMutableVector residual;
+        protected IMinimalVector residual;
 
         public GmresAlgorithm(double absoluteTolerance, double relativeTolerance, int maximumIterations,
             IMaxIterationsProvider innerIterationsProvider)
@@ -31,22 +31,22 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
             this.innerIterationsProvider = innerIterationsProvider;
         }
 
-        public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IMinimalImmutableVector rhs, IMinimalMutableVector solution,
-            bool initialGuessIsZero, Func<IMinimalMutableVector> zeroVectorInitializer)
+        public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IMinimalReadOnlyVector rhs, IMinimalVector solution,
+            bool initialGuessIsZero, Func<IMinimalVector> zeroVectorInitializer)
         {
             return Solve(new ExplicitMatrixTransformation(matrix), preconditioner,rhs, solution, initialGuessIsZero,
                 zeroVectorInitializer);
         }
 
 
-        public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalImmutableVector rhs, IMinimalMutableVector solution,
-            bool initialGuessIsZero, Func<IMinimalMutableVector> zeroVectorInitializer)
+        public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalReadOnlyVector rhs, IMinimalVector solution,
+            bool initialGuessIsZero, Func<IMinimalVector> zeroVectorInitializer)
         {
             Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
             Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
             var innerIterations = innerIterationsProvider.GetMaxIterations(matrix.NumRows);
-			IMinimalMutableVector[] v =new Vector[innerIterations+1];
+			IMinimalVector[] v =new Vector[innerIterations+1];
             var y = Vector.CreateZero(innerIterations + 1);
             var c= Vector.CreateZero(innerIterations + 1);
             var s = Vector.CreateZero(innerIterations + 1);

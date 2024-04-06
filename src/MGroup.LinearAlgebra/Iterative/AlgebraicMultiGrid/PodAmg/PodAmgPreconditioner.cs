@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 			_numIterations = numIterations;
 		}
 
-		public void Apply(IMinimalImmutableVector rhsVector, IMinimalMutableVector lhsVector)
+		public void Apply(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector)
 		{
 			Vector rhs = (Vector)rhsVector;
 			Vector solution = (Vector)lhsVector;

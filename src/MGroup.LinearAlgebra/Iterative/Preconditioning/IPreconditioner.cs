@@ -22,6 +22,6 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
         /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="rhsVector"/> or <paramref name="lhsVector"/> 
         /// is different than the number of rows of this <see cref="IPreconditioner"/>.
         /// </exception>
-        void Apply(IMinimalImmutableVector rhsVector, IMinimalMutableVector lhsVector);
+        void Apply(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector);
     }
 }

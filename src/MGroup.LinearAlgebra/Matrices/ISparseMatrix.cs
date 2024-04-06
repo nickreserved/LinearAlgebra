@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Matrices
         IEnumerable<(int row, int col, double value)> EnumerateNonZeros();
 
         /// <summary>
-        /// Returns a Elements transfer object that contains the internal Elements structures of this matrix.
+        /// Returns a Values transfer object that contains the internal Values structures of this matrix.
         /// </summary>
         SparseFormat GetSparseFormat();
     }

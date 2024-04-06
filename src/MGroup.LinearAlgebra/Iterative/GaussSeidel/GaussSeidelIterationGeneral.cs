@@ -25,12 +25,12 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			this.inactive = true;
 		}
 
-		public void GaussSeidelBackwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
+		public void GaussSeidelBackwardIteration(IExtendedReadOnlyVector rhsVector, IExtendedVector lhsVector)
 		{
 			CheckActive();
 
-			IExtendedMutableVector x = lhsVector;
-			IExtendedImmutableVector b = rhsVector;
+			IExtendedVector x = lhsVector;
+			IExtendedReadOnlyVector b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
 			int n = matrix.NumRows;
 			for (int i = n - 1; i >= 0; --i)
@@ -53,12 +53,12 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			}
 		}
 
-		public void GaussSeidelForwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
+		public void GaussSeidelForwardIteration(IExtendedReadOnlyVector rhsVector, IExtendedVector lhsVector)
 		{
 			CheckActive();
 
-			IExtendedMutableVector x = lhsVector;
-			IExtendedImmutableVector b = rhsVector;
+			IExtendedVector x = lhsVector;
+			IExtendedReadOnlyVector b = rhsVector;
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, x, b);
 			int n = matrix.NumRows;
 			for (int i = 0; i < n; ++i)

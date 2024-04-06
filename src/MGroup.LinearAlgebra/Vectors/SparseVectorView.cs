@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			ToIndex = toIndex;
 		}
 
-		override public int FromIndex { get; }
-		override public int ToIndex { get; }
+		public override int FromIndex { get; }
+		public override int ToIndex { get; }
 	}
 }

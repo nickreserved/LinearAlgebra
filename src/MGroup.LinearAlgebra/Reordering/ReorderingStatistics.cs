@@ -7,7 +7,7 @@
     public class ReorderingStatistics
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReorderingStatistics"/> class, with the provided Elements.
+        /// Initializes a new instance of the <see cref="ReorderingStatistics"/> class, with the provided Values.
         /// </summary>
         /// <param name="supFactorizedNumNonZeros">An upper bound for the number of non zero entries in a subsequent L*L^T 
         ///     factorization.</param>

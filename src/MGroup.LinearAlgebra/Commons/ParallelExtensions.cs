@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra.Commons
             return GetVectorLimits(size, chunks);
         }
 
-        public static IEnumerable<Tuple<int, int, int>> PartitionLimits(this IMinimalImmutableVector vector, int chunks)
+        public static IEnumerable<Tuple<int, int, int>> PartitionLimits(this IMinimalReadOnlyVector vector, int chunks)
         {
             int size = vector.Length;
             return GetVectorLimits(size, chunks);

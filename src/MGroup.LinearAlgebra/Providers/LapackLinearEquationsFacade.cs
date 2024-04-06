@@ -215,7 +215,7 @@ namespace MGroup.LinearAlgebra.Providers
                 //TODO: not sure about the use of numColsA in the next.
                 if (Math.Abs(factorizedMatrixA[offsetA + numColsA * leadingDimA - 1]) <= pivotTolerance)
                 {
-                    // False Negative: info = 0, but LAPACK doesn't check the last diagonal entry!
+                    // False Negate: info = 0, but LAPACK doesn't check the last diagonal entry!
                     firstZeroPivot =  numColsA - 1;
                 }
             }

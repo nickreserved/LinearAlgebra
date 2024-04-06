@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <summary>
 		/// A list of columns that form a basis for the null space of the original matrix. 
 		/// </summary>
-		public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IExtendedImmutableVector
+		public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IExtendedReadOnlyVector
 
         /// <summary>
         /// The number of rows/columns of the original square matrix.

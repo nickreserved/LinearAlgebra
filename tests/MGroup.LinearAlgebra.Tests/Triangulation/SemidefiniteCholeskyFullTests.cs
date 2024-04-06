@@ -9,7 +9,7 @@ using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Vectors;
 using Xunit;
 
-//TODO: Also check the invertible part of the factorized Elements 
+//TODO: Also check the invertible part of the factorized Values 
 namespace MGroup.LinearAlgebra.Tests.Triangulation
 {
 	/// <summary>
@@ -35,7 +35,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 				nullSpaceMatrix.SetSubcolumn(j, x);
 
 				// Check that each vector belongs to the nullspace
-				IExtendedMutableVector Ax = unfactorizedMatrix.Multiply(x);
+				IExtendedVector Ax = unfactorizedMatrix.Multiply(x);
 				double normAx = Ax.Norm2() / Ax.Length;
 				//comparer.AssertEqual(0.0, normAx);
 			}

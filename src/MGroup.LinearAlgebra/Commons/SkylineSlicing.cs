@@ -168,7 +168,7 @@ namespace MGroup.LinearAlgebra.Commons
             return submatrix;
         }
 
-        //TODO: Move this method to SparsityPatternSymmetric, so that I can optimize access to its private Elements
+        //TODO: Move this method to SparsityPatternSymmetric, so that I can optimize access to its private Values
         internal static SparsityPatternSymmetric GetSubmatrixSymmetricPattern(double[] skyValues, int[] skyDiagOffsets,
             int[] rowsColsToKeep)
         {
@@ -211,7 +211,7 @@ namespace MGroup.LinearAlgebra.Commons
             return submatrix;
         }
 
-        //TODO: Move this method to DokSymmetric, so that I can optimize access to its private Elements
+        //TODO: Move this method to DokSymmetric, so that I can optimize access to its private Values
         internal static SkylineMatrix GetSubmatrixSymmetricSkyline(double[] skyValues, int[] skyDiagOffsets, 
             int[] rowsColsToKeep) 
         {

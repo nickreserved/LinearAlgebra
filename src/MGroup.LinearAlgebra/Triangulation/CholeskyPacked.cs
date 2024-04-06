@@ -26,8 +26,8 @@ namespace MGroup.LinearAlgebra.Triangulation
         }
 
         /// <summary>
-        /// If true, the internal Elements of this object are overwritten and used by another object. No property or method of
-        /// this object must be called as it would throw exceptions or lead to Elements corruption. If false, this object can be 
+        /// If true, the internal Values of this object are overwritten and used by another object. No property or method of
+        /// this object must be called as it would throw exceptions or lead to Values corruption. If false, this object can be 
         /// used normally.
         /// </summary>
         public bool IsOverwritten { get; private set; }
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         public int Order { get; }
 
 		/// <summary>
-		/// The internal Elements containing the factorized upper triangle of a matrix in PACKED column major format.
+		/// The internal Values containing the factorized upper triangle of a matrix in PACKED column major format.
 		/// </summary>
 		public double[] RawData => data;
 
@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// Explicitly creates the upper triangular matrix U that resulted from the Cholesky factorization: A = transpose(U) * U,
         /// where A and U are n-by-n. 
-        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Values are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public TriangularUpper GetFactorU()
@@ -101,7 +101,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// WARNING: If <paramref name="inPlace"/> is set to true, this object must not be used again, otherwise a 
         /// <see cref="InvalidOperationException"/> will be thrown.
         /// </summary>
-        /// <param name="inPlace">False, to copy the internal factorization Elements before inversion. True, to overwrite it with
+        /// <param name="inPlace">False, to copy the internal factorization Values before inversion. True, to overwrite it with
         ///     the inverse matrix, thus saving memory and time. However, that will make this object unusable, so you MUST NOT 
         ///     call any other members afterwards.</param>
         public SymmetricMatrix Invert(bool inPlace)

@@ -106,7 +106,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
         /// <summary>
         /// Initializes a new <see cref="CscMatrix"/> with the specified dimensions and the provided arrays 
-        /// (<paramref name="values"/>, <paramref name="rowIndices"/> and <paramref name="colOffsets"/>) as its internal Elements.
+        /// (<paramref name="values"/>, <paramref name="rowIndices"/> and <paramref name="colOffsets"/>) as its internal Values.
         /// </summary>
         /// <param name="numRows">The number of rows of the new matrix.</param>
         /// <param name="numCols">The number of columns of the new matrix.</param>
@@ -276,7 +276,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Copies the entries of this matrix.
         /// </summary>
         /// <param name="copyIndexingData">
-        /// If true, all Elements of this object will be copied. If false, only the array containing the values of the stored 
+        /// If true, all Values of this object will be copied. If false, only the array containing the values of the stored 
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         public CscMatrix Copy(bool copyIndexingData)
@@ -710,9 +710,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedImmutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
         /// </summary>
-        public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
+        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector dense) return Multiply(dense, transposeThis);
 
@@ -751,9 +751,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
         /// </summary>
-        public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis = false)
+        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
         {
 			if (this.values.Length == 0)
 			{

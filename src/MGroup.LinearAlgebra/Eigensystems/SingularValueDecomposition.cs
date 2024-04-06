@@ -50,7 +50,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			if (valuesSorted[n - 1] < 0)
 			{
 				//TODO: add tolerance, dedicated exception class and perhaps make this test optional.
-				throw new Exception("Negative singular value found");
+				throw new Exception("Negate singular value found");
 			}
 
 			return new SingularValueDecomposition(valuesSorted, vectorsSorted);

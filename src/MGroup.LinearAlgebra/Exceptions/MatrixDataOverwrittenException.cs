@@ -5,7 +5,7 @@ using System.Text;
 namespace MGroup.LinearAlgebra.Exceptions
 {
     /// <summary>
-    /// The exception that is thrown when using operations on a matrix whose internal Elements have been overwritten due to 
+    /// The exception that is thrown when using operations on a matrix whose internal Values have been overwritten due to 
     /// factorization or inversion.
     /// Authors: Serafeim Bakalakos
     /// </summary>

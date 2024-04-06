@@ -10,9 +10,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     public class RegularPcgResidualUpdater : IPcgResidualUpdater
     {
 		/// <summary>
-		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalMutableVector)"/>
+		/// See <see cref="IPcgResidualUpdater.UpdateResidual(PcgAlgorithmBase, IMinimalVector)"/>
 		/// </summary>
-		public void UpdateResidual(PcgAlgorithmBase pcg, IMinimalMutableVector residual)
+		public void UpdateResidual(PcgAlgorithmBase pcg, IMinimalVector residual)
         {
             // Normally the residual vector is updated as: r = r - α * A*d
             residual.AxpyIntoThis(pcg.MatrixTimesDirection, -pcg.StepSize);

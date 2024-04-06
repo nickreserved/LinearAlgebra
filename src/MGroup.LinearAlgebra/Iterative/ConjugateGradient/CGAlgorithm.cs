@@ -9,7 +9,7 @@ using MGroup.LinearAlgebra.Vectors;
 
 //TODO: needs to throw exceptions or at least report indefinite, nonsymmetric and singular matrices.
 //TODO: zero vector initialization should be done by a vector factory
-//TODO: Exposing properties is more flexible than pushing Elements to the strategies, but how can I ensure that the properties are
+//TODO: Exposing properties is more flexible than pushing Values to the strategies, but how can I ensure that the properties are
 //      initialized when the strategies will access them?
 namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
 {
@@ -27,11 +27,11 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         private readonly ICGResidualUpdater residualUpdater;
         private readonly double residualTolerance;
 
-        private IMinimalMutableVector direction;
-        private IMinimalMutableVector matrixTimesDirection;
+        private IMinimalVector direction;
+        private IMinimalVector matrixTimesDirection;
         private double resDotRes;
-        private IMinimalMutableVector residual;
-        private IMinimalMutableVector solution;
+        private IMinimalVector residual;
+        private IMinimalVector solution;
 
         private CGAlgorithm(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
             ICGResidualConvergence residualConvergence, ICGResidualUpdater residualUpdater)
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <summary>
         /// The direction vector d, used to update the solution vector: x = x + α * d
         /// </summary>
-        public IMinimalImmutableVector Direction => direction;
+        public IMinimalReadOnlyVector Direction => direction;
 
         /// <summary>
         /// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <summary>
         /// The vector that results from <see cref="Matrix"/> * <see cref="Direction"/>.
         /// </summary>
-        public IMinimalImmutableVector MatrixTimesDirection => matrixTimesDirection;
+        public IMinimalReadOnlyVector MatrixTimesDirection => matrixTimesDirection;
 
         /// <summary>
         /// The β parameter of Conjugate Gradient that ensures conjugacy between the direction vectors.
@@ -75,17 +75,17 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <summary>
         /// The residual vector r = b - A * x.
         /// </summary>
-        public IMinimalImmutableVector Residual => residual;
+        public IMinimalReadOnlyVector Residual => residual;
 
         /// <summary>
         /// The right hand side of the linear system b = A * x.
         /// </summary>
-        public IMinimalImmutableVector Rhs { get; private set; }
+        public IMinimalReadOnlyVector Rhs { get; private set; }
 
         /// <summary>
         /// The current approximation to the solution of the linear system A * x = b
         /// </summary>
-        public IMinimalImmutableVector Solution => solution;
+        public IMinimalReadOnlyVector Solution => solution;
 
         /// <summary>
         /// The step α taken along <see cref="Direction"/> to update the solution vector: x = x + α * d
@@ -131,7 +131,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
         /// </exception>
-        public IterativeStatistics Solve(IMatrixView matrix, IMinimalImmutableVector rhs, IMinimalMutableVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
+        public IterativeStatistics Solve(IMatrixView matrix, IMinimalReadOnlyVector rhs, IMinimalVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
             => Solve(new ExplicitMatrixTransformation(matrix), rhs, solution, initialGuessIsZero);
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
         /// </exception>
-        public IterativeStatistics Solve(ILinearTransformation matrix, IMinimalImmutableVector rhs, IMinimalMutableVector solution, 
+        public IterativeStatistics Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhs, IMinimalVector solution, 
             bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
         {
             //TODO: these will also be checked by the matrix vector multiplication.

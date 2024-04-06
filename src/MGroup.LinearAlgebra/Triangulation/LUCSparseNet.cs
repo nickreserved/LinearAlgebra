@@ -44,7 +44,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         public int Order { get; }
 
 		/// <summary>
-		/// The internal Elements containing the factorization.
+		/// The internal Values containing the factorization.
 		/// </summary>
 		public SparseLU RawData => factorization;
 

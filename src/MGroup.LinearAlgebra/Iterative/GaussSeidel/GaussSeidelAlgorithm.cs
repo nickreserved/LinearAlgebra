@@ -44,18 +44,18 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		/// </param>
 		/// <param name="rhs">
 		/// The right hand side vector b of the linear system A * x = b. Constraints:
-		/// <paramref name="rhs"/>.<see cref="IMinimalImmutableVector.Length"/> 
+		/// <paramref name="rhs"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
 		/// == <paramref name="matrix"/>.<see cref="ILinearTransformation.NumRows"/>.
 		/// </param>
 		/// <param name="solution">
 		/// The vector from which to start refining the solution vector x. Constraints:
-		/// <paramref name="solution"/>.<see cref="IMinimalImmutableVector.Length"/>
+		/// <paramref name="solution"/>.<see cref="IMinimalReadOnlyVector.Length"/>
 		/// == <paramref name="matrix"/>.<see cref="ILinearTransformation.NumColumns"/>.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public IterativeStatistics Solve(IMatrixView matrix, IExtendedImmutableVector rhs, IExtendedMutableVector solution)
+		public IterativeStatistics Solve(IMatrixView matrix, IExtendedReadOnlyVector rhs, IExtendedVector solution)
 		{
 			Preconditions.CheckSquareLinearSystemDimensions(matrix, solution, rhs);
 

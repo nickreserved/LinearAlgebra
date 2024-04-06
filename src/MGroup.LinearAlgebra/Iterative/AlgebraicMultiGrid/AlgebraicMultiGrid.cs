@@ -28,8 +28,8 @@
 
 //		private double resDotRes;
 //		private double residualNormRatio;
-//		private IExtendedMutableVector solution;
-//		private IExtendedMutableVector residual;
+//		private IExtendedVector solution;
+//		private IExtendedVector residual;
 
 //		// <summary>
 //		// Internal iterative solver used for smoothing
@@ -39,17 +39,17 @@
 //		// <summary>
 //		// The offset position R_i:
 //		// </summary>
-//		private IExtendedMutableVector[] offsetPositionVectors;
+//		private IExtendedVector[] offsetPositionVectors;
 
 //		// <summary>
 //		// The solution vectors x_i on level i, with x_0 being the main sought solution on level 0
 //		// </summary>
-//		private IExtendedMutableVector[] solutionAtLevel;
+//		private IExtendedVector[] solutionAtLevel;
 
 //		// <summary>
 //		// The rhs vectors b_i on level i, with b_0 being the main rhs on level 0
 //		// </summary>
-//		private IExtendedMutableVector[] rhsAtLevel;
+//		private IExtendedVector[] rhsAtLevel;
 
 //		// <summary>
 //		// The system matrices A_i for each level i, with A_0 being the main system matrix at level 0
@@ -71,12 +71,12 @@
 //		/// <summary>
 //		/// The right hand side of the linear system b = A * x.
 //		/// </summary>
-//		public IExtendedImmutableVector Rhs { get; private set; }
+//		public IExtendedReadOnlyVector Rhs { get; private set; }
 
 //		/// <summary>
 //		/// The current approximation to the solution of the linear system A * x = b
 //		/// </summary>
-//		public IExtendedImmutableVector Solution => solution;
+//		public IExtendedReadOnlyVector Solution => solution;
 
 //		/// <summary>
 //		/// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -135,7 +135,7 @@
 //		/// <exception cref="NonMatchingDimensionsException">
 //		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 //		/// </exception>
-//		public IterativeStatistics Solve(ILinearTransformation matrix, IExtendedImmutableVector rhs, IExtendedMutableVector solution)
+//		public IterativeStatistics Solve(ILinearTransformation matrix, IExtendedReadOnlyVector rhs, IExtendedVector solution)
 //		{
 //			//TODO: these will also be checked by the matrix vector multiplication.
 //			Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
@@ -150,7 +150,7 @@
 //			return SolveInternal(maxIterationsProvider.GetMaxIterations(matrix.NumColumns));
 //		}
 
-//		public IterativeStatistics Solve(IMatrixView matrix, IExtendedImmutableVector rhs, IExtendedMutableVector solution)
+//		public IterativeStatistics Solve(IMatrixView matrix, IExtendedReadOnlyVector rhs, IExtendedVector solution)
 //			=> Solve(new ExplicitMatrixTransformation(matrix), rhs, solution);
 
 //		private IterativeStatistics SolveInternal(int maxiterations)
@@ -185,7 +185,7 @@
 //			throw new NotImplementedException();
 
 //			matrixAtLevel[0] = Matrix;
-//			rhsAtLevel[0] = Rhs as IExtendedMutableVector;
+//			rhsAtLevel[0] = Rhs as IExtendedVector;
 //		}
 
 //		// <summary>

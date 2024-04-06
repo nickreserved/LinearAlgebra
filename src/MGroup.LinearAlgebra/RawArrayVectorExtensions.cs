@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Thrown if <paramref name="otherVector"/> has different Length than this.
         /// </exception>
         public static double[] Axpy(this double[] thisVector, double[] otherVector, double otherCoefficient)
-            => new Vector(thisVector).Axpy(new Vector(otherVector), otherCoefficient).Elements;
+            => new Vector(thisVector).Axpy(new Vector(otherVector), otherCoefficient).Values;
 
         /// <summary>
         /// Performs the following operation for all i:
@@ -56,7 +56,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Thrown if <paramref name="otherVector"/> has different Length than this.
         /// </exception>
         public static double[] AxpyIntoThis(this double[] thisVector, double[] otherVector, double otherCoefficient)
-            => ((Vector) new Vector(thisVector).AxpyIntoThis(new Vector(otherVector), otherCoefficient)).Elements;
+            => ((Vector) new Vector(thisVector).AxpyIntoThis(new Vector(otherVector), otherCoefficient)).Values;
 
         /// <summary>
         /// Sets all entries of this vector to 0. 
@@ -89,28 +89,28 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// For calculation uses the 2 first components of this vector with 2 first components of <paramref name="otherVector"/>.
 		/// <param name="otherVector">The other vector</param>
 		/// <returns>The Z component of the cross product</returns>
-		static public double CrossProductZ(this double[] thisVector, double[] otherVector) => thisVector[0] * otherVector[1] - thisVector[1] * otherVector[0];
+		public static double CrossProductZ(this double[] thisVector, double[] otherVector) => thisVector[0] * otherVector[1] - thisVector[1] * otherVector[0];
 		/// <summary>
 		/// Returns the X component of the cross product of this vector with <paramref name="otherVector"/>.
 		/// </summary>
 		/// For calculation uses the 2nd and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
 		/// <param name="otherVector">The other vector</param>
 		/// <returns>The X component of the cross product</returns>
-		static public double CrossProductX(this double[] thisVector, double[] otherVector) => -thisVector[1] * otherVector[2] + thisVector[2] * otherVector[1];
+		public static double CrossProductX(this double[] thisVector, double[] otherVector) => -thisVector[1] * otherVector[2] + thisVector[2] * otherVector[1];
 		/// <summary>
 		/// Returns the Y component of the cross product of this vector with <paramref name="otherVector"/>.
 		/// </summary>
 		/// For calculation uses the 1st and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
 		/// <param name="otherVector">The other vector</param>
 		/// <returns>The Y component of the cross product</returns>
-		static public double CrossProductY(this double[] thisVector, double[] otherVector) => thisVector[0] * otherVector[2] - thisVector[2] * otherVector[0];
+		public static double CrossProductY(this double[] thisVector, double[] otherVector) => thisVector[0] * otherVector[2] - thisVector[2] * otherVector[0];
 		/// <summary>
 		/// Returns the cross product of this vector with <paramref name="otherVector"/>.
 		/// This is the cross product of 3 dimensional vectors.
 		/// </summary>
 		/// <param name="otherVector">The other vector</param>
 		/// <returns>The cross product</returns>
-		static public Vector CrossProduct(this double[] thisVector, double[] otherVector)
+		public static Vector CrossProduct(this double[] thisVector, double[] otherVector)
 			=> new Vector(new double[] { CrossProductX(thisVector, otherVector), CrossProductY(thisVector, otherVector), CrossProductZ(thisVector, otherVector) });
 
 		/// <summary>
@@ -203,7 +203,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="scalar">A scalar that multiplies each entry of this vector.</param>
         public static double[] Scale(this double[] thisVector, double scalar) 
-            => new Vector(thisVector).Scale(scalar).Elements;
+            => new Vector(thisVector).Scale(scalar).Values;
 
         /// <summary>
         /// Performs the following operation for all i: this[i] = <paramref name="scalar"/> * this[i].
@@ -211,7 +211,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="scalar">A scalar that multiplies each entry of this vector.</param>
         public static double[] ScaleIntoThis(this double[] thisVector, double scalar)
-            => ((Vector) new Vector(thisVector).ScaleIntoThis(scalar)).Elements;
+            => ((Vector) new Vector(thisVector).ScaleIntoThis(scalar)).Values;
 
         /// <summary>
         /// Performs the following operation for all i:

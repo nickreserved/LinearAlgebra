@@ -58,10 +58,10 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 		}
 
-		override public int FromIndex { get => 0; }
-		override public int ToIndex { get => Indices.Length; }
+		public override int FromIndex { get => 0; }
+		public override int ToIndex { get => Indices.Length; }
 
-		override public AbstractSparseVector CopyFrom(AbstractSparseVector otherVector)
+		public override AbstractSparseVector CopyFrom(AbstractSparseVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			Indices = new int[otherVector.ToIndex - otherVector.FromIndex];
@@ -111,7 +111,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public double[] RawValues => Values;
 
 		/// <summary>
-		/// Creates a new instance of <see cref="SparseVector"/> with the provided arrays as its internal Elements.
+		/// Creates a new instance of <see cref="SparseVector"/> with the provided arrays as its internal Values.
 		/// </summary>
 		/// <param name="length">The number of zero and non-zero entries of the new <see cref="SparseVector"/>.</param>
 		/// <param name="values">The internal array that stores the values of the non-zero entries of the vector. Constraints: 
@@ -198,7 +198,7 @@ namespace MGroup.LinearAlgebra.Vectors
         /// <see cref="SparseVector"/>.
         /// </summary>
         /// <param name="denseVector">The original vector that will be converted to <see cref="SparseVector"/>.</param>
-        public static SparseVector CreateFromDense(Vector denseVector) => CreateFromDense(denseVector.Elements);
+        public static SparseVector CreateFromDense(Vector denseVector) => CreateFromDense(denseVector.Values);
 
         /// <summary>
         /// Creates a new instance of <see cref="SparseVector"/> with the entries of <paramref name="denseVector"/>. Only the
@@ -211,7 +211,7 @@ namespace MGroup.LinearAlgebra.Vectors
         ///     <paramref name="tolerance"/> = 0 use <see cref="CreateFromDense(double[])"/>.</param>
         public static SparseVector CreateFromDense(Vector denseVector, double tolerance)
         {
-            return CreateFromDense(denseVector.Elements, tolerance);
+            return CreateFromDense(denseVector.Values, tolerance);
         }
 
         /// <summary>
@@ -291,30 +291,30 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 		[Obsolete("Avoid use of this")]
-        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IExtendedImmutableVector otherVector, int[] otherIndices)
+        public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IExtendedReadOnlyVector otherVector, int[] otherIndices)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
 
 		[Obsolete("Avoid use of this")]
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IExtendedImmutableVector otherVector)
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IExtendedReadOnlyVector otherVector)
             => DenseStrategies.AddNonContiguouslyFrom(this, thisIndices, otherVector);
 
 		[Obsolete("use this[index] += value instead - better not using it at all because it is highly inefficient")]
 		public void AddToIndex(int index, double value) => this[index] += value;
 
 		[Obsolete("Avoid use of this")]
-		public void AxpySubvectorIntoThis(int destinationIndex, IExtendedImmutableVector sourceVector, double sourceCoefficient, int sourceIndex, int length)
+		public void AxpySubvectorIntoThis(int destinationIndex, IExtendedReadOnlyVector sourceVector, double sourceCoefficient, int sourceIndex, int length)
 			=> View(destinationIndex, destinationIndex + length).AxpyIntoThis(sourceVector.View(sourceIndex, sourceIndex + length), sourceCoefficient);
 
 		[Obsolete("Avoid use of this because it is highly inefficient")]
-		public void CopyNonContiguouslyFrom(int[] thisIndices, IExtendedImmutableVector otherVector, int[] otherIndices)
+		public void CopyNonContiguouslyFrom(int[] thisIndices, IExtendedReadOnlyVector otherVector, int[] otherIndices)
             => DenseStrategies.CopyNonContiguouslyFrom(this, thisIndices, otherVector, otherIndices);
 
 		[Obsolete("Avoid use of this because it is highly inefficient")]
-		public void CopyNonContiguouslyFrom(IExtendedImmutableVector otherVector, int[] otherIndices)
+		public void CopyNonContiguouslyFrom(IExtendedReadOnlyVector otherVector, int[] otherIndices)
             => DenseStrategies.CopyNonContiguouslyFrom(this, otherVector, otherIndices);
 
 		[Obsolete("Avoid use of this")]
-		public void CopySubvectorFrom(int destinationIndex, IExtendedImmutableVector sourceVector, int sourceIndex, int length)
+		public void CopySubvectorFrom(int destinationIndex, IExtendedReadOnlyVector sourceVector, int sourceIndex, int length)
 			=> View(destinationIndex, destinationIndex + length).CopyFrom(sourceVector.View(sourceIndex, sourceIndex + length));
 
 		/// <summary>
@@ -333,8 +333,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// Iterates over the non zero entries of the vector. This includes zeros that are explicitly stored.
 		/// </summary>
-		[Obsolete("use EnumerateStoredElements() instead")]
-		public IEnumerable<(int index, double value)> EnumerateNonZeros() => EnumerateStoredElements();
+		[Obsolete("use EnumerateStoredEntries() instead")]
+		public IEnumerable<(int index, double value)> EnumerateNonZeros() => EnumerateStoredEntries();
 
         /// <summary>
         /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.

@@ -14,14 +14,14 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 		/// </summary>
 		/// <param name="rhsVector">Will not check if the dimensions are compatible with the matrix.</param>
 		/// <param name="lhsVector">Will not check if the dimensions are compatible with the matrix.</param>
-		void GaussSeidelBackwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector);
+		void GaussSeidelBackwardIteration(IExtendedReadOnlyVector rhsVector, IExtendedVector lhsVector);
 
 		/// <summary>
 		/// Performs 1 forward Gauss-Seidel iteration.
 		/// </summary>
 		/// <param name="rhsVector">Will not check if the dimensions are compatible with the matrix.</param>
 		/// <param name="lhsVector">Will not check if the dimensions are compatible with the matrix.</param>
-		void GaussSeidelForwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector);
+		void GaussSeidelForwardIteration(IExtendedReadOnlyVector rhsVector, IExtendedVector lhsVector);
 	}
 
 	public interface IGaussSeidelIterationBuilder

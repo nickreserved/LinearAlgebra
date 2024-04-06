@@ -69,7 +69,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == 
         ///     <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.</param>
         /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-        public (IMinimalMutableVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IMinimalImmutableVector rhsVector, double shift = 0.0)
+        public (IMinimalVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IMinimalReadOnlyVector rhsVector, double shift = 0.0)
             => SolveInternal(new ExplicitMatrixTransformation(matrix), rhsVector, null, shift);
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         /// <param name="preconditioner">A preconditioner matrix that has the same dimensions as A, but must be symmetric 
         ///     positive definite, contrary to A.</param>
         /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-        public (IMinimalMutableVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IMinimalImmutableVector rhsVector, 
+        public (IMinimalVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IMinimalReadOnlyVector rhsVector, 
             IPreconditioner preconditioner, double shift = 0.0)
             => SolveInternal(new ExplicitMatrixTransformation(matrix), rhsVector, preconditioner, shift);
 
@@ -97,7 +97,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == 
         ///     <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.</param>
         /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-        public (IMinimalMutableVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalImmutableVector rhsVector, 
+        public (IMinimalVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhsVector, 
             double shift = 0.0)
             => SolveInternal(matrix, rhsVector, null, shift);
 
@@ -113,11 +113,11 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         /// <param name="preconditioner">A preconditioner matrix that has the same dimensions as A, but must be symmetric 
         ///     positive definite, contrary to A.</param>
         /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-        public (IMinimalMutableVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalImmutableVector rhsVector, 
+        public (IMinimalVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhsVector, 
             IPreconditioner preconditioner,  double shift = 0.0) 
             => SolveInternal(matrix, rhsVector, preconditioner, shift);
 
-        private (IMinimalMutableVector solution, MinresStatistics stats) SolveInternal(ILinearTransformation A, IMinimalImmutableVector b, 
+        private (IMinimalVector solution, MinresStatistics stats) SolveInternal(ILinearTransformation A, IMinimalReadOnlyVector b, 
             IPreconditioner M, double shift)
         {
             /// Initialize.
@@ -129,7 +129,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             double Acond = 0.0;
             double rnorm = 0.0;
             double ynorm = 0.0;
-            IMinimalMutableVector x = b.CreateZero();
+            IMinimalVector x = b.CreateZero();
             var orthogonalizer = new LocalReorthogonalizer(n, numStoredOrthogonalDirections);
 
             /// -------------------------------------------------
@@ -138,7 +138,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             /// v is really P' v1.
             /// -------------------------------------------------
 
-            IMinimalMutableVector y;
+            IMinimalVector y;
             if (M == null) y = b.Copy();
             else
             {
@@ -146,7 +146,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 M.Apply(b, y);
             }
                 
-            IMinimalMutableVector r1 = b.Copy(); // initial guess x = 0 initial residual
+            IMinimalVector r1 = b.Copy(); // initial guess x = 0 initial residual
             double beta1 = b.DotProduct(y);
 
             /// If b = 0 exactly, stop with x = 0.            
@@ -181,9 +181,9 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             double qrnorm = beta1, phibar = beta1, rhs1 = beta1, rhs2 = 0.0;
             double tnorm2 = 0.0, gmax = 0.0, gmin = double.MaxValue;
             double cs = -1.0, sn = 0.0;
-            IMinimalMutableVector w = b.CreateZero();
-            IMinimalMutableVector w2 = b.CreateZero();
-            IMinimalMutableVector r2 = r1.Copy();
+            IMinimalVector w = b.CreateZero();
+            IMinimalVector w2 = b.CreateZero();
+            IMinimalVector r2 = r1.Copy();
 
 
             /// ------------------------------------------------- 
@@ -208,7 +208,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 /// -----------------------------------------------------------------
 
                 double s = 1.0 / beta;    // Normalize previous vector(in y).
-                IMinimalMutableVector v = y.Copy();
+                IMinimalVector v = y.Copy();
                 v.ScaleIntoThis(s); // v = vk if P = I
                 orthogonalizer.StoreDirection(v); // Store old v for local reorthogonalization of new v, if it is enabled. 
 
@@ -274,7 +274,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 /// Update  x.
 
                 double denom = 1.0 / gamma;
-                IMinimalMutableVector w1 = w2.Copy();
+                IMinimalVector w1 = w2.Copy();
                 w2 = w;
                 // Do efficiently: w = (v - oldeps * w1 - delta * w2) * denom 
                 w = v.Axpy(w1, - oldeps);
@@ -363,11 +363,11 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             }
         }
 
-        private static void CheckSymmetricMatrix(ILinearTransformation A, IMinimalImmutableVector y, IMinimalImmutableVector r1)
+        private static void CheckSymmetricMatrix(ILinearTransformation A, IMinimalReadOnlyVector y, IMinimalReadOnlyVector r1)
         {
-            IMinimalMutableVector w = y.CreateZero();
+            IMinimalVector w = y.CreateZero();
             A.MultiplyIntoThis(y, w);
-            IMinimalMutableVector r2 = y.CreateZero();
+            IMinimalVector r2 = y.CreateZero();
             A.MultiplyIntoThis(w, r2);
             double s = w.DotProduct(w);
             double t = y.DotProduct(r2);
@@ -376,9 +376,9 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             if (z > epsa) throw new AsymmetricMatrixException("The matrix or linear transformation A is not symmetric.");
         }
 
-        private void CheckSymmetricPreconditioner(IPreconditioner M, IMinimalImmutableVector y, IMinimalImmutableVector r1)
+        private void CheckSymmetricPreconditioner(IPreconditioner M, IMinimalReadOnlyVector y, IMinimalReadOnlyVector r1)
         {
-            IMinimalMutableVector r2 = y.CreateZero();
+            IMinimalVector r2 = y.CreateZero();
             M.Apply(y, r2);
             double s = y.DotProduct(y);
             double t = r1.DotProduct(r2);
@@ -390,7 +390,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         /// <summary>
         /// Calculates (A - shift * I) * v = A*v - shift*v
         /// </summary>
-        private static void ShiftedMatrixVectorMult(ILinearTransformation matrix, IMinimalImmutableVector x, IMinimalMutableVector y, double shift)
+        private static void ShiftedMatrixVectorMult(ILinearTransformation matrix, IMinimalReadOnlyVector x, IMinimalVector y, double shift)
         {
             //TODO: this should just be implemented as a wrapping LinearTransformation
             if (shift == 0.0) matrix.MultiplyIntoThis(x, y);
@@ -401,7 +401,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             }
         }
 
-        private static void WriteIterationData(ILinearTransformation A, IMinimalImmutableVector b, double shift, IMinimalImmutableVector x, int iter,
+        private static void WriteIterationData(ILinearTransformation A, IMinimalReadOnlyVector b, double shift, IMinimalReadOnlyVector x, int iter,
             int maxIterations, double test1, double test2, double Anorm, double Acond, double gbar, double qrnorm, 
             int istop, double epsx, double epsr)
         {
@@ -430,12 +430,12 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                     // Print true Arnorm. This works only if there is no preconditioning
 
                     // vv = b - (A - shift * I) * x
-                    IMinimalMutableVector vv = b.CreateZero();
+                    IMinimalVector vv = b.CreateZero();
                     ShiftedMatrixVectorMult(A, x, vv, shift);
                     vv.SubtractIntoThis(b);
 
                     // ww = (A - shift * I) * vv = "Ar"
-                    IMinimalMutableVector ww = b.CreateZero();
+                    IMinimalVector ww = b.CreateZero();
                     ShiftedMatrixVectorMult(A, vv, ww, shift);
                     double trueArnorm = ww.Norm2();
                     Console.WriteLine();
@@ -447,21 +447,21 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         private class LocalReorthogonalizer
         {
             private readonly int localSize;
-            private readonly LinkedList<IMinimalImmutableVector> store;
+            private readonly LinkedList<IMinimalReadOnlyVector> store;
 
             internal LocalReorthogonalizer(int order, int localSize)
             {
                 if ((localSize < 0) || (localSize > order)) throw new ArgumentException(
                     "The number of stored vectors must belong to [0, matrix.Order), but was " + localSize);
                 this.localSize = localSize;
-                this.store = new LinkedList<IMinimalImmutableVector>();
+                this.store = new LinkedList<IMinimalReadOnlyVector>();
             }
 
             /// <summary>
             /// If orthogonalization is enabled, store a new direction <paramref name="v"/>.
             /// </summary>
             /// <param name="v"></param>
-            internal void StoreDirection(IMinimalImmutableVector v)
+            internal void StoreDirection(IMinimalReadOnlyVector v)
             {
                 if (localSize > 0) store.AddLast(v);
                 if (store.Count > localSize) store.RemoveFirst();
@@ -472,7 +472,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             /// </summary>
             /// <param name="v">The vector to reorthogonalize. It will be overwritten with the result. If there are no stored 
             ///     vectors, it will remain unchanged without being copied.</param>
-            internal void Reorthogonalize(IMinimalMutableVector v)
+            internal void Reorthogonalize(IMinimalVector v)
             {
                 // reorthogonalize 1 by 1
                 foreach (var p in store)

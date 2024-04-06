@@ -4,13 +4,13 @@ using System.IO;
 namespace MGroup.LinearAlgebra.Output
 {
     /// <summary>
-    /// Write Elements to a stream using the provided <see cref="StreamWriter"/>.
+    /// Write Values to a stream using the provided <see cref="StreamWriter"/>.
     /// </summary>
-    /// <param name="writer">The writer with which to write Elements to the stream.</param>
+    /// <param name="writer">The writer with which to write Values to the stream.</param>
     internal delegate void WriteToStream(StreamWriter writer);
 
     /// <summary>
-    /// Provides utility methods that handle writing Elements to various streams. The caller only needs to specify the Elements that will
+    /// Provides utility methods that handle writing Values to various streams. The caller only needs to specify the Values that will
     /// be written.
     /// Authors: Serafeim Bakalakos
     /// </summary>

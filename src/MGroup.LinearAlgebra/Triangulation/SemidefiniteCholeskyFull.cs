@@ -46,10 +46,10 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <summary>
 		/// A list of columns that form a basis for the null space of the original matrix. 
 		/// </summary>
-        public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IExtendedImmutableVector
+        public IReadOnlyList<double[]> NullSpaceBasis => nullSpaceBasis; //TODO: return IExtendedReadOnlyVector
 
 		/// <summary>
-		/// The internal Elements containing the factorization of a matrix. Only the upper triangle (including the diagonal) 
+		/// The internal Values containing the factorization of a matrix. Only the upper triangle (including the diagonal) 
 		/// is factorized. The lower triangle (excluding the diagonal) remains as in the original matrix.
 		/// </summary>
 		public Matrix RawData => upperFactorized;
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// extra memory for the basis vectors of the nullspace.
         /// </summary>
         /// <param name="order">The number of rows/ columns of the square matrix.</param>
-        /// <param name="matrix">The matrix to factorize. It will be overwritten with the factorization Elements.</param>
+        /// <param name="matrix">The matrix to factorize. It will be overwritten with the factorization Values.</param>
         /// <param name="pivotTolerance">
         /// If a diagonal entry is &lt;= <paramref name="pivotTolerance"/> it means that the corresponding column is dependent 
         /// on the rest. The Cholesky factorization only applies to independent column, while dependent ones are used to compute

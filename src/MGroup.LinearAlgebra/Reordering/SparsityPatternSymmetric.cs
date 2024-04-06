@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Reordering
     /// <summary>
     /// Builder for the sparsity pattern of a symmetric matrix. If the values of the matrix entries are needed and the sparsity 
     /// pattern will not change, use a DOK matrix instead. Only the super-diagonal part is stored (including the diagonal). 
-    /// Efficient for outputting the pattern to column major Elements structures (e.g. CSC arrays).
+    /// Efficient for outputting the pattern to column major Values structures (e.g. CSC arrays).
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public class SparsityPatternSymmetric: ISparsityPatternSymmetric

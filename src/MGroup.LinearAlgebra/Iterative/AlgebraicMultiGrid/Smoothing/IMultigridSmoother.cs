@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.Smoothing
 	{
 		void Initialize(IMatrixView matrix);
 
-		void Smooth(IExtendedImmutableVector rhs, IExtendedMutableVector lhs);
+		void Smooth(IExtendedReadOnlyVector rhs, IExtendedVector lhs);
 	}
 
 	public interface IMultigridSmootherBuilder

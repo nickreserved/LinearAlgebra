@@ -17,14 +17,14 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// in many neighboring local diagonal vectors, then its value must be the same in all these local vectors.
 		/// </param>
 		/// <param name="alreadyInverted">Diagonal vector is already inverted</param>
-		public JacobiPreconditioner(IMinimalImmutableVector diagonal, bool alreadyInverted = false)
+		public JacobiPreconditioner(IMinimalReadOnlyVector diagonal, bool alreadyInverted = false)
 		{
 			Diagonal = alreadyInverted ? diagonal : diagonal.DoToAllEntries(x => 1 / x);
 		}
 
-		public IMinimalImmutableVector Diagonal { get; }
+		public IMinimalReadOnlyVector Diagonal { get; }
 
-		public void Apply(IMinimalImmutableVector rhsVector, IMinimalMutableVector lhsVector)
+		public void Apply(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector)
 		{
 			lhsVector = rhsVector.DoEntrywise(Diagonal, (x, y) => x * y);
 		}

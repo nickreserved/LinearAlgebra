@@ -10,6 +10,6 @@ namespace MGroup.LinearAlgebra.Iterative
 
 		//TODO: initialGuessIsZero can be ommited if solution is null, but in that case we need a zero vector generator
 		IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner,
-			IMinimalImmutableVector rhs, IMinimalMutableVector solution, bool initialGuessIsZero);
+			IMinimalReadOnlyVector rhs, IMinimalVector solution, bool initialGuessIsZero);
 	}
 }

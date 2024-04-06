@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// doesn't have to define the dimensions of the linear system, which is useful when testing or benchmarking, at the 
 		/// expense of little extra safety.
 		/// </remarks>
-		public void Apply(IMinimalImmutableVector rhsVector, IMinimalMutableVector lhsVector) => lhsVector.CopyFrom(rhsVector);
+		public void Apply(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector) => lhsVector.CopyFrom(rhsVector);
 
         /// <summary>
         /// Creates instances of <see cref="IdentityPreconditioner"/>.

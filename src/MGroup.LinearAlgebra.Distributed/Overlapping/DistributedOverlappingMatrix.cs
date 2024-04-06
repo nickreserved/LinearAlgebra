@@ -187,10 +187,10 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			outputVector.SumOverlappingEntries();
 		}
 
-		public void Multiply(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
+		public void Multiply(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector)
 			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
 
-		void ILinearTransformation.MultiplyIntoThis(IMinimalImmutableVector inputVector, IMinimalMutableVector outputVector)
+		void ILinearTransformation.MultiplyIntoThis(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector)
 			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
 
 

@@ -9,47 +9,47 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// A partial linear combination between this and another matrix.
 		/// </summary>
-		/// <param name="otherMatrix">A vector with the same number of Elements with this vector</param>
+		/// <param name="otherMatrix">A vector with the same number of Values with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
 		IMutableMatrix Axpy(IImmutableMatrix otherMatrix, double otherCoefficient);
 
-		static protected IMutableMatrix Axpy(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix, double otherCoefficient) => thisMatrix.Copy().AxpyIntoThis(otherMatrix, otherCoefficient);
+		protected static IMutableMatrix Axpy(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix, double otherCoefficient) => thisMatrix.Copy().AxpyIntoThis(otherMatrix, otherCoefficient);
 
 
 		IMutableMatrix Add(IImmutableMatrix otherMatrix);
 
-		static protected IMutableMatrix Add(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, 1);
+		protected static IMutableMatrix Add(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, 1);
 
 
 		IMutableMatrix Subtract(IImmutableMatrix otherMatrix);
 
-		static protected IMutableMatrix Subtract(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, -1);
+		protected static IMutableMatrix Subtract(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, -1);
 
 
 		/// <summary>
 		/// A linear combination between this and another one matrix.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar as coefficient to this matrix</param>
-		/// <param name="otherMatrix">A matrix with the same number of Elements with this matrix</param>
+		/// <param name="otherMatrix">A matrix with the same number of Values with this matrix</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix * <paramref name="thisCoefficient"/> + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
 		public IMutableMatrix LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient);
 
-		static protected IMutableMatrix LinearCombination(IImmutableMatrix thisMatrix, double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
+		protected static IMutableMatrix LinearCombination(IImmutableMatrix thisMatrix, double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
 			=> thisMatrix.Copy().LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
 
 
 		IMutableMatrix Scale(double coefficient);
 
-		static protected IMutableMatrix Scale(IImmutableMatrix thisMatrix, double coefficient) => thisMatrix.Copy().ScaleIntoThis(coefficient);
+		protected static IMutableMatrix Scale(IImmutableMatrix thisMatrix, double coefficient) => thisMatrix.Copy().ScaleIntoThis(coefficient);
 
 
 		IMutableMatrix Copy();
 
 
 		/// <summary>
-		/// Creates a new matrix with all Elements set to zero, the same dimensions with this matrix and probably with the same format with this matrix.
+		/// Creates a new matrix with all Values set to zero, the same dimensions with this matrix and probably with the same format with this matrix.
 		/// </summary>
 		/// <returns>A new zero matrix with the same dimensions with this matrix</returns>
 		IMutableMatrix CreateZero();
@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Check if this matrix and <paramref name="otherMatrix"/> are almost equal.
 		/// </summary>
 		/// <param name="otherMatrix">A matrix of any dimensions</param>
-		/// <param name="tolerance">The maximum difference between corresponding Elements to considered equal</param>
+		/// <param name="tolerance">The maximum difference between corresponding Values to considered equal</param>
 		/// <returns>True if both vectors are almost equal</returns>
 		bool Equals(IImmutableMatrix otherMatrix, double tolerance = 1e-7);
 

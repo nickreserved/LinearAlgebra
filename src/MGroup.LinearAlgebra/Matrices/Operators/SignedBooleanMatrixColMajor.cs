@@ -9,7 +9,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
 {
     /// <summary>
     /// Sparse matrix with the non-zero entries being 1 or -1. Its main use is in domain decomposition solvers. 
-    /// The internal Elements structures that store the non-zero entries are column major.
+    /// The internal Values structures that store the non-zero entries are column major.
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public class SignedBooleanMatrixColMajor : IIndexable2D, IMappingMatrix

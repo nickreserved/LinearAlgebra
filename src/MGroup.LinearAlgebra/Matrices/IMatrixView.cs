@@ -35,7 +35,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// returned.
         /// </summary>
         /// <param name="copyIndexingData">
-        /// If true, all Elements of this object will be copied. If false, only the array(s) containing the values of the stored 
+        /// If true, all Values of this object will be copied. If false, only the array(s) containing the values of the stored 
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         IMatrix Copy(bool copyIndexingData = false);
@@ -101,7 +101,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="vector"/> is different than the 
         /// <see cref="IIndexable2D.NumColumns"/> of oper(this).
         /// </exception>
-        IMinimalMutableVector Multiply(IMinimalImmutableVector vector, bool transposeThis = false);
+        IMinimalVector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false);
 
         /// <summary>
         /// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
@@ -128,7 +128,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Thrown if the storage format of <paramref name="rhsVector"/> does not support overwritting the entries that this 
         /// method will try to.
         /// </exception>
-        void MultiplyIntoResult(IMinimalImmutableVector lhsVector, IMinimalMutableVector rhsVector, bool transposeThis = false);
+        void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis = false);
         //TODO: this is NOT a specialization of a version with offsets. It is defined only if the vectors have exactly the matching lengths.
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
 		/// implementations of <see cref="IMatrixView"/> may offer more efficient transpositions, that do not copy the entries.
 		/// If the transposed matrix will be used only for multiplications, <see cref="MultiplyLeft(IMatrixView, bool, bool)"/>,
-		/// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IExtendedImmutableVector, bool)"/> are more 
+		/// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IExtendedReadOnlyVector, bool)"/> are more 
 		/// effient generally.
 		/// </summary>
 		IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.

@@ -39,7 +39,7 @@ namespace MGroup.LinearAlgebra.Providers
 			if (info > 0)
 			{
 				throw new LapackException($"The QR algorithm failed to compute all the eigenvalues, and no eigenvectors have "
-				+$"been computed. Elements {info+1:N} of the eigenvalues arrays (real and imaginary) contain eigenvalues which" 
+				+$"been computed. Values {info+1:N} of the eigenvalues arrays (real and imaginary) contain eigenvalues which" 
 				+ "have converged");
 			}
 			else if (info < 0) ProcessNegativeInfo(info);
@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra.Providers
 
 			if (info > 0)
 			{
-				throw new LapackException($"The algorithm failed to converge. There were {info} Elements of an intermediate"
+				throw new LapackException($"The algorithm failed to converge. There were {info} Values of an intermediate"
 					+ " tridiagonal form which did not converge to zero");
 			}
 			else if (info < 0) ProcessNegativeInfo(info);

@@ -9,7 +9,7 @@ using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
 using MGroup.LinearAlgebra.Eigensystems;
 
-//TODO: align Elements using mkl_malloc
+//TODO: align Values using mkl_malloc
 namespace MGroup.LinearAlgebra.Matrices
 {
 	/// <summary>
@@ -23,7 +23,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	{
 		/// <summary>
 		/// Packed storage, column major order, upper triangle: 
-		/// A[i,j] = Elements[i + j*(j+1)/2] for 0 &lt;= i &lt;= j &lt; n.
+		/// A[i,j] = Values[i + j*(j+1)/2] for 0 &lt;= i &lt;= j &lt; n.
 		/// </summary>
 		private readonly double[] data;
 
@@ -101,7 +101,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Create a new <see cref="SymmetricMatrix"/> from the lower (subdiagonal) or upper (superdiagonal) portion of the 
 		/// provided array. The array entries will be copied.
 		/// </summary>
-		/// <param name="array2D">A 2-dimensional containing the Elements of the whole matrix. Its lengths in both dimensions 
+		/// <param name="array2D">A 2-dimensional containing the Values of the whole matrix. Its lengths in both dimensions 
 		///     must be the same.</param>
 		/// <param name="definiteness">If the caller knows that the matrix is positive definite, etc, he can set this property 
 		///     during creation of the <see cref="SymmetricMatrix"/> object.</param>
@@ -123,7 +123,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Create a new <see cref="SymmetricMatrix"/> from a provided array. The array can be copied (for extra safety)
 		/// or not (for extra performance).
 		/// </summary>
-		/// <param name="array1D">A 1-dimensional array containing the Elements of the upper triangle of the matrix in column 
+		/// <param name="array1D">A 1-dimensional array containing the Values of the upper triangle of the matrix in column 
 		///     major order.</param>
 		/// <param name="order"> The order of the matrix. It must be positive and match the length of <see cref="array1D"/>. If a 
 		///     value is provided, these will not be checked. If no value is provided, the order will be calculated from 
@@ -149,7 +149,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Create a new <see cref="SymmetricMatrix"/> from a provided array. The array can be copied (for extra safety)
 		/// or not (for extra performance).
 		/// </summary>
-		/// <param name="array1D">A 1-dimensional array containing the Elements of the upper triangle of the matrix in row 
+		/// <param name="array1D">A 1-dimensional array containing the Values of the upper triangle of the matrix in row 
 		///     major order.</param>
 		/// <param name="order"> The order of the matrix. It must be positive and match the length of <see cref="array1D"/>. If a 
 		///     value is provided, these will not be checked. If no value is provided, the order will be calculated from 
@@ -261,7 +261,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// Calculate the determinant of this matrix.
 		/// If <see cref="Definiteness"/> != <see cref="DefiniteProperty.PositiveDefinite"/>, the calculation will be very 
-		/// cumbersome and require an extra O(n^2) space: It will expand the packed storage format into a full Elements array, 
+		/// cumbersome and require an extra O(n^2) space: It will expand the packed storage format into a full Values array, 
 		/// factorize it using LU and then calculate the determinant. For positive definite matrices, it is more efficient,
 		/// since it uses the Cholesky factorization directly.
 		/// </summary>
@@ -570,7 +570,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
 		}
 
-		public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
+		public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense) return Multiply(dense, transposeThis);
 			else throw new NotImplementedException();
@@ -590,9 +590,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
+		/// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
 		/// </summary>
-		public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis = false)
+		public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{

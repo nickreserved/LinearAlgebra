@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 				// MultiplyIntoThis() - untransposed
 				var x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
 				var bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-				IExtendedMutableVector bComputed = A.Multiply(x, false);
+				IExtendedVector bComputed = A.Multiply(x, false);
 				comparer.AssertEqual(bExpected, bComputed);
 
 				// MultiplyIntoThis() - transposed

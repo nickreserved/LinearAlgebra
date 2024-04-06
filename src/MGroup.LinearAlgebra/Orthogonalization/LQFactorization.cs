@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
 		/// <param name="numRows">The number of rows of the matrix.</param>
 		/// <param name="numCols">The number of columns of the matrix.</param>
 		/// <param name="matrix">The internal buffer storing the matrix entries in column major order. It will 
-		///     be overwritten with the factorization Elements.</param>
+		///     be overwritten with the factorization Values.</param>
 		/// <exception cref="NotImplementedException">Thrown if <paramref name="numCols"/> &lt; <paramref name="numRows"/>.
 		///     </exception>
 		/// <exception cref="Exceptions.LapackException">Thrown if tha call to LAPACK fails due to an invalid 
@@ -76,7 +76,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// <summary>
         /// Explicitly creates the lower trapezoidal matrix L that resulted from the factorization: A = L * Q, where A is m-by-n, 
         /// L is m-by-n and Q is n-by-n. 
-        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Values are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public Matrix GetFactorL()
@@ -92,7 +92,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// <summary>
         /// Explicitly creates the orthogonal matrix Q that resulted from the factorization: A = L * Q, where A is m-by-n, 
         /// L is m-by-n and Q is n-by-n. 
-        /// This method is safe to use as the factorization Elements are copied (if necessary). However, it is inefficient if the 
+        /// This method is safe to use as the factorization Values are copied (if necessary). However, it is inefficient if the 
         /// generated matrix is only used once.
         /// </summary>
         public Matrix GetFactorQ()

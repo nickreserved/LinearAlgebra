@@ -144,7 +144,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
                 SparsePosDef10by10.SkylineValues, SparsePosDef10by10.SkylineDiagOffsets, true, true);
             var x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
             var bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-            IExtendedMutableVector bComputed = A.Multiply(x, false);
+            IExtendedVector bComputed = A.Multiply(x, false);
             comparer.AssertEqual(bExpected, bComputed);
 
             //});

@@ -26,14 +26,14 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			inactive = true;
 		}
 
-		public void GaussSeidelBackwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
+		public void GaussSeidelBackwardIteration(IExtendedReadOnlyVector rhsVector, IExtendedVector lhsVector)
 		{
 			CheckActive();
 
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
 				BackwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
-					rhsDense.Elements, lhsDense.Elements);
+					rhsDense.Values, lhsDense.Values);
 			}
 			else
 			{
@@ -44,14 +44,14 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			}
 		}
 
-		public void GaussSeidelForwardIteration(IExtendedImmutableVector rhsVector, IExtendedMutableVector lhsVector)
+		public void GaussSeidelForwardIteration(IExtendedReadOnlyVector rhsVector, IExtendedVector lhsVector)
 		{
 			CheckActive();
 
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
 				ForwardIteration(matrix.NumRows, matrix.RawValues, matrix.RawRowOffsets, matrix.RawColIndices, diagonalOffsets,
-					rhsDense.Elements, lhsDense.Elements);
+					rhsDense.Values, lhsDense.Values);
 			}
 			else
 			{

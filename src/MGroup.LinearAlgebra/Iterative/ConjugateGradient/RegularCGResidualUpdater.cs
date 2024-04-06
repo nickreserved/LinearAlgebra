@@ -12,9 +12,9 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
     public class RegularCGResidualUpdater : ICGResidualUpdater
     {
         /// <summary>
-        /// See <see cref="ICGResidualUpdater.UpdateResidual(CGAlgorithm, IMinimalMutableVector, out double)"/>
+        /// See <see cref="ICGResidualUpdater.UpdateResidual(CGAlgorithm, IMinimalVector, out double)"/>
         /// </summary>
-        public void UpdateResidual(CGAlgorithm cg, IMinimalMutableVector residual, out double resDotRes)
+        public void UpdateResidual(CGAlgorithm cg, IMinimalVector residual, out double resDotRes)
         {
             // Normally the residual vector is updated as: r = r - α * A*d
             residual.AxpyIntoThis(cg.MatrixTimesDirection, -cg.StepSize);

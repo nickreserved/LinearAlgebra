@@ -35,7 +35,7 @@ namespace MGroup.LinearAlgebra.Providers.PInvoke
         /// <summary>
         /// Frees the memory for the factorized matrix in unmanaged memory
         /// </summary>
-        /// <param name="factorizedMatrix">The factorized matrix Elements. It will be freed in unmanaged memory.</param>
+        /// <param name="factorizedMatrix">The factorized matrix Values. It will be freed in unmanaged memory.</param>
         /// <param name="common">The matrix settings.</param>
         [DllImport("suitesparse_utilities.dll", EntryPoint = "util_destroy_factor")]
         internal static extern void DestroyFactor(ref IntPtr factorizedMatrix, IntPtr common);
@@ -152,7 +152,7 @@ namespace MGroup.LinearAlgebra.Providers.PInvoke
         /// where n is the order of the matrix. Returns 1 if the method succeeds, 0 otherwise.
         /// </summary>
         /// <param name="order">Number of rows = number of columns.</param>
-        /// <param name="factorizedMatrix">The Elements of the cholesky factorization of the matrix. It will be modified.</param>
+        /// <param name="factorizedMatrix">The Values of the cholesky factorization of the matrix. It will be modified.</param>
         /// <param name="rowIdx">Index of row/column to add.</param>
         /// <param name="vectorNnz">Number of non zero entries of the row/column to add.</param>
         /// <param name="vectorValues">The CSC format values of the row/column to add.</param>
@@ -181,7 +181,7 @@ namespace MGroup.LinearAlgebra.Providers.PInvoke
         ///     5 for back substitution (L^T*x=b)</param>
         /// <param name="numRows">Number of matrix rows = number of matrix columns = number of rhs matrix rows.</param>
         /// <param name="numRhs">Number of rhs vectors = number of columns in rhs matrix.</param>
-        /// <param name="factorizedMatrix">The Elements of the cholesky factorization of the matrix.</param>
+        /// <param name="factorizedMatrix">The Values of the cholesky factorization of the matrix.</param>
         /// <param name="rhs">The right hand side matrix. Column major array with dimensions = 
         ///     <paramref name="numRows"/> -by- <paramref name="numRhs"/>.</param>
         /// <param name="outSolution">Buffer for the left hand side vector (unknown). Column major array with dimensions = 

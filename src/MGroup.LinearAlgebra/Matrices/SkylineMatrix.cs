@@ -157,7 +157,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
         /// <summary>
         /// Initializes a new <see cref="SkylineMatrix"/> with the specified dimensions and the provided arrays 
-        /// (<paramref name="values"/> and <paramref name="diagOffsets"/>) as its internal Elements.
+        /// (<paramref name="values"/> and <paramref name="diagOffsets"/>) as its internal Values.
         /// </summary>
         /// <param name="order">The number of rows/columns of the new matrix.</param>
         /// <param name="values">Contains the non zero superdiagonal entries of the matrix in column major order, starting from 
@@ -393,7 +393,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Copies the entries of this matrix.
         /// </summary>
         /// <param name="copyIndexingData">
-        /// If true, all Elements of this object will be copied. If false, only the array containing the values of the stored 
+        /// If true, all Values of this object will be copied. If false, only the array containing the values of the stored 
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         public SkylineMatrix Copy(bool copyIndexingData)
@@ -622,7 +622,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// must not be used again, otherwise a <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>
@@ -661,7 +661,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>
@@ -700,7 +700,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// must not be used again, otherwise a <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>
@@ -742,7 +742,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// must not be used again, otherwise a <see cref="NullReferenceException"/> will be thrown.
         /// </summary>
         /// <param name="inPlace">
-        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Elements, 
+        /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
         /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
         /// afterwards.
         /// </param>
@@ -1015,12 +1015,12 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedImmutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
         /// </summary>
         /// <remarks>
         /// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
         /// </remarks>
-        public IExtendedMutableVector Multiply(IExtendedImmutableVector vector, bool transposeThis = false)
+        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector casted) return Multiply(casted);
             else throw new NotImplementedException();
@@ -1042,9 +1042,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedImmutableVector, IExtendedMutableVector, bool)"/>.
+        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
         /// </summary>
-        public void MultiplyIntoResult(IExtendedImmutableVector lhsVector, IExtendedMutableVector rhsVector, bool transposeThis = false)
+        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
         {
 			if (this.values.Length == 0)
 			{
