@@ -12,6 +12,8 @@ namespace MGroup.LinearAlgebra.Matrices
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.Runtime.ConstrainedExecution;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
@@ -498,6 +500,17 @@ namespace MGroup.LinearAlgebra.Matrices
 				}
 			}
 			return true; //At this point all entries have been checked and are equal
+		}
+
+		/// <summary>
+		/// Extracts the upper triangle of this matrix, including the diagonal. The original matrix must be square.
+		/// </summary>
+		/// <returns>The upper triangle is column major format.</returns>
+		public TriangularUpper ExtractUpperAndDiagonalToPacked()
+		{
+			Preconditions.CheckSquare(this);
+			double[] pck = Conversions.CsrToPackedUpperColMajor(NumColumns, values, rowOffsets, colIndices);
+			return TriangularUpper.CreateFromArray(NumColumns, pck, false);
 		}
 
 		/// <summary>

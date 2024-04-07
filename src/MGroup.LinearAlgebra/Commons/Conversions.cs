@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 //TODO: All the functions in this namespace serve to copy entries to other positions. They should be performed in C and Pinvoked.
 //      Some might exist in MKL, thus I should use that one instead. In C# I should write the Pinvoke methods and wrap them in
@@ -12,7 +12,6 @@ namespace MGroup.LinearAlgebra.Commons
 {
     /// <summary>
     /// Low level array operations to convert between matrix storage formats.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     public static class Conversions
     {
@@ -191,7 +190,27 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        internal static double[,] FullColMajorToArray2D(double[] array1D, int numRows, int numColumns)
+		internal static double[] CsrToPackedUpperColMajor(int numCols, double[] values, int[] rowOffsets, int[] colIndices)
+		{
+			var pck = new double[(numCols * (numCols + 1)) / 2];
+			for (int i = 0; i < numCols; ++i)
+			{
+				int rowStart = rowOffsets[i];
+				int rowEnd = rowOffsets[i + 1]; //exclusive
+				for (int k = rowStart; k < rowEnd; ++k)
+				{
+					int j = colIndices[k];
+					if (j >= i) //TODO: optimizations are possible. If the csr arrays are sorted, then locate diagonal first.
+					{
+						pck[i + ((j + 1) * j) / 2] = values[k];
+					}
+				}
+			}
+			return pck;
+		}
+
+
+		internal static double[,] FullColMajorToArray2D(double[] array1D, int numRows, int numColumns)
         {
             double[,] array2D = new double[numRows, numColumns];
             for (int j = 0; j < numColumns; ++j)
