@@ -5,11 +5,10 @@ using System.Diagnostics;
 using System.Text;
 using MGroup.Environments;
 using MGroup.MSolve.Solution.LinearSystem;
-using MGroup.LinearAlgebra.Distributed.Overlapping;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
 
-namespace MGroup.Solvers.DDM.LinearSystem
+namespace MGroup.LinearAlgebra.Distributed.Overlapping
 {
 	public class DistributedOverlappingMatrix<TMatrix> : IGlobalMatrix
 		where TMatrix : class, IMatrix

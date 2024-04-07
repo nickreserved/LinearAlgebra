@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MGroup.LinearAlgebra.LinearAlgebraExtensions
+namespace MGroup.LinearAlgebra.Exceptions
 {
 	/// <summary>
 	/// The exception that is thrown when a linear algebra operation cannot be executed due to the arguments (vectors, matrices 

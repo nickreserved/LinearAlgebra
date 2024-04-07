@@ -1,7 +1,5 @@
 using System;
 
-using MGroup.LinearAlgebra.LinearAlgebraExtensions;
-
 namespace MGroup.LinearAlgebra.Exceptions
 {
     /// <summary>
