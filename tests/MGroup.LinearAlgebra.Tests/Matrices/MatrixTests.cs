@@ -34,6 +34,23 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			});
 		}
 
+		[Theory]
+		[MemberData(nameof(TestSettings.ProvidersToTest), MemberType = typeof(TestSettings))]
+		internal static void TestAxpyColumn(LinearAlgebraProviderChoice providers)
+		{
+			TestSettings.RunMultiproviderTest(providers, delegate ()
+			{
+				var A1 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
+				var columnVector = Vector.CreateWithValue(10, 1.0);
+				double coeff = 2.0;
+				Matrix expected = A1.Copy();
+				for (int i = 0; i < )
+
+				// operator+
+				comparer.AssertEqual(expected, A1 + A2);
+			});
+		}
+
 		[Fact]
 		private static void TestClear()
 		{
@@ -309,6 +326,11 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			var A2TransposeExpected = MatrixOperations.Transpose(RectangularFullRank10by5.Matrix);
 			Matrix A2TransposeComputed = A2.Transpose();
 			comparer.AssertEqual(A2TransposeExpected, A2TransposeComputed.CopyToArray2D());
+		}
+
+		private static void Axpy(double[] x,)
+		{
+
 		}
 	}
 }

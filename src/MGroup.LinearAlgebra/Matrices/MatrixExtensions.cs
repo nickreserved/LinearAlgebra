@@ -33,6 +33,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static IMatrix Add(this IMatrixView matrix1, IMatrixView matrix2) => matrix1.Axpy(matrix2, 1.0);
 
 		/// <summary>
+		/// Performs: matrix[:, <paramref name="colIdx"/>] = matrix[:,<paramref name="colIdx"/>] +
+		/// <paramref name="wholeColumn"/>[:]
+		/// </summary>
+		/// <param name="colIdx">The index of the column to modify.</param>
+		/// <param name="wholeColumn">
+		/// Vector with the same <see cref="Vector.Length"/> as <see cref="NumRows"/> of this matrix.
+		/// </param>
+		public static void AddColumn(this Matrix matrix, int colIdx, Vector wholeColumn)
+			=> matrix.AxpyColumn(colIdx, +1.0, wholeColumn);
+
+		/// <summary>
 		/// Performs the operation: 
 		/// <paramref name="matrix1"/>[i, j] = <paramref name="matrix1"/>[i, j] + <paramref name="matrix2"/>[i, j], 
 		/// for 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>.
@@ -403,6 +414,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     have a different number of <see cref="IIndexable2D.NumRows"/> or 
 		///     <see cref="IIndexable2D.NumColumns"/>.</exception>
 		public static IMatrix Subtract(this IMatrixView matrix1, IMatrixView matrix2) => matrix1.Axpy(matrix2, -1.0);
+
+		/// <summary>
+		/// Performs: matrix[:, <paramref name="colIdx"/>] = matrix[:,<paramref name="colIdx"/>] -
+		/// <paramref name="wholeColumn"/>[:]
+		/// </summary>
+		/// <param name="colIdx">The index of the column to modify.</param>
+		/// <param name="wholeColumn">
+		/// Vector with the same <see cref="Vector.Length"/> as <see cref="NumRows"/> of this matrix.
+		/// </param>
+		public static void SubtractColumn(this Matrix matrix, int colIdx, Vector wholeColumn)
+			=> matrix.AxpyColumn(colIdx, -1.0, wholeColumn);
 
 		/// <summary>
 		/// Performs the operation: 

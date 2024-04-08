@@ -388,6 +388,22 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
+		/// Performs: matrix[:, <paramref name="colIdx"/>] = matrix[:,<paramref name="colIdx"/>] +
+		/// <paramref name="colCoeff"/> * <paramref name="wholeColumn"/>[:]
+		/// </summary>
+		/// <param name="colIdx">The index of the column to modify.</param>
+		/// <param name="colCoeff">Scalar coefficient to multiply the vector <paramref name="wholeColumn"/>.</param>
+		/// <param name="wholeColumn">
+		/// Vector with the same <see cref="Vector.Length"/> as <see cref="NumRows"/> of this matrix.
+		/// </param>
+		public void AxpyColumn(int colIdx, double colCoeff, Vector wholeColumn)
+		{
+			Preconditions.CheckSameRowDimension(this, wholeColumn);
+			int colOffset = colIdx * NumRows;
+			Blas.Daxpy(NumRows, colCoeff, wholeColumn.RawData, 0, 1, data, colOffset, 1);
+		}
+
+		/// <summary>
 		/// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
 		/// </summary>
 		public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
@@ -485,6 +501,18 @@ namespace MGroup.LinearAlgebra.Matrices
 			double[] clone = new double[data.Length];
 			Array.Copy(data, clone, data.Length);
 			return new Matrix(clone, NumRows, NumColumns);
+		}
+
+		/// <summary>
+		/// Copies the entries from <paramref name="otherMatrix"/> over the entries of this matrix object.
+		/// </summary>
+		/// <param name="otherMatrix">
+		/// Must have the same <see cref="NumRows"/> and <see cref="NumColumns"/> as this matrix.
+		/// </param>
+		public void CopyFrom(Matrix otherMatrix)
+		{
+			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
+			Array.Copy(otherMatrix.RawData, data, data.Length);
 		}
 
 		/// <summary>
