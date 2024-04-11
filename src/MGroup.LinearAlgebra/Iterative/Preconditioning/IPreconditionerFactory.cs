@@ -1,4 +1,4 @@
-//TODO: working with the matrix itself is not always convenient, especially when abstracted behind IImmutableMatrix. E.g. Jacobi
+//TODO: working with the matrix itself is not always convenient, especially when abstracted behind IMinimalReadOnlyMatrix. E.g. Jacobi
 //      preconditioner needs to access the diagonal which is more efficient with the DOK. IncompleteCholesky may also be more 
 //      effient on other matrix storage formats than the CSR that will be used for multiplications.
 namespace MGroup.LinearAlgebra.Iterative.Preconditioning

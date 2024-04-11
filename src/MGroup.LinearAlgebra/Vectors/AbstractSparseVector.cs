@@ -90,19 +90,6 @@ namespace MGroup.LinearAlgebra.Vectors
 			return (indicesFromIndex, indicesToIndex);
 		}
 
-		/// <summary>
-		/// Shift indices of non-zero elements by <paramref name="offsetIndex"/>
-		/// </summary>
-		/// Caller must avoid to shift indices to negative indices. This function doesn't check that.
-		/// <param name="offsetIndex">The shift for all indices of non-zero elements. Usually this value is negative.</param>
-		/// <returns>This vector</returns>
-		public AbstractSparseVector ShiftIntoThis(int offsetIndex)
-		{
-			for (int i = FromIndex; i < ToIndex; ++i)
-				Indices[i] += offsetIndex;
-			return this;
-		}
-
 		public bool HasSameIndexer(AbstractSparseVector otherVector) => Indices == otherVector.Indices && FromIndex == otherVector.FromIndex && ToIndex == otherVector.ToIndex;
 
 		/// <summary>
@@ -120,7 +107,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="index">Index of vector element</param>
 		/// <returns>Value of vector element</returns>
 		/// <exception cref="IndexOutOfRangeException">If you try to set an element not existed in sparse vector</exception>
-		[Obsolete("Intention of this property, is for sparse vectors and it is highly inefficient. Please stop use it RIGHT NOW")]
+		[Obsolete("This property is EXTREMELY inefficient")]
 		public double this[int index]
 		{
 			get
@@ -140,17 +127,16 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		// ------------------- COVARIANT RETURN TYPE FROM IExtendedReadOnlyVector
 
-		public virtual SparseVector CopyUnshifted(int fromIndex, int toIndex)
+		public virtual SparseVector Copy(int fromIndex, int toIndex)
 		{
 			var (indicesFromIndex, indicesToIndex) = Bounds(fromIndex, toIndex);
 			var indices = new int[indicesToIndex - indicesFromIndex];
 			var values = new double[indices.Length];
-			Array.Copy(Indices, indicesFromIndex, indices, 0, indices.Length);
+			for (int i = 0; i < indices.Length; ++i)
+				indices[i] = Indices[i + indicesFromIndex] - fromIndex;
 			Array.Copy(Values, indicesFromIndex, values, 0, indices.Length);
 			return new SparseVector(toIndex - fromIndex, values, indices);
 		}
-
-		public virtual SparseVector Copy(int fromIndex, int toIndex) => (SparseVector)CopyUnshifted(fromIndex, toIndex).ShiftIntoThis(-fromIndex);
 		IExtendedVector IExtendedReadOnlyVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex);
 
 		public virtual SparseVector Axpy(AbstractSparseVector otherVector, double otherCoefficient)
@@ -164,7 +150,12 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 			else return DoEntrywise(otherVector, (double x, double y) => x + y * otherCoefficient);
 		}
-		public virtual Vector Axpy(AbstractFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)otherVector.Scale(otherCoefficient).AddIntoThis(this);
+		public virtual Vector Axpy(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
+		{
+			var result = otherVector.Scale(otherCoefficient);
+			result.AddIntoThis(this);
+			return result;
+		}
 		public virtual IExtendedVector Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient)
 		{
 			if (otherVector is AbstractSparseVector sparseVector) return Axpy(sparseVector, otherCoefficient);
@@ -172,7 +163,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
 		}
 
-		public virtual SparseVector Add(AbstractSparseVector otherVector) => DoEntrywise(otherVector, (double x, double y) => x + y);
+		public virtual SparseVector Add(AbstractSparseVector otherVector) => Axpy(otherVector, 1);
 		public virtual Vector Add(AbstractFullyPopulatedVector otherVector) => (Vector)otherVector.Add(this);
 		public virtual IExtendedVector Add(IMinimalReadOnlyVector otherVector)
 		{
@@ -181,7 +172,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			throw new NotImplementedException("Add(NotSupportedVector)");
 		}
 
-		public virtual SparseVector Subtract(AbstractSparseVector otherVector) => DoEntrywise(otherVector, (double x, double y) => x - y);
+		public virtual SparseVector Subtract(AbstractSparseVector otherVector) => Axpy(otherVector, -1);
 		public virtual Vector Subtract(AbstractFullyPopulatedVector otherVector) => (Vector)otherVector.Subtract(this);
 		public virtual IExtendedVector Subtract(IMinimalReadOnlyVector otherVector)
 		{
@@ -190,8 +181,8 @@ namespace MGroup.LinearAlgebra.Vectors
 			throw new NotImplementedException("Subtract(NotSupportedVector)");
 		}
 
-		public virtual SparseVector Negative() => (SparseVector)IMinimalReadOnlyVector.Negate(this);
-		IExtendedVector IExtendedReadOnlyVector.Negate() => Negative();
+		public virtual SparseVector Negate() => (SparseVector)IMinimalReadOnlyVector.Negate(this);
+		IExtendedVector IExtendedReadOnlyVector.Negate() => Negate();
 
 		public virtual SparseVector Scale(double coefficient) => (SparseVector)IMinimalReadOnlyVector.Scale(this, coefficient);
 		IExtendedVector IExtendedReadOnlyVector.Scale(double coefficient) => Scale(coefficient);
@@ -311,8 +302,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 		IExtendedVector IExtendedReadOnlyVector.Copy() => Copy();
 
-		public virtual SparseVector CreateZero() => new SparseVector(Length, new double[0], new int[0]);
-		IExtendedVector IExtendedReadOnlyVector.CreateZero() => CreateZero();
+		public virtual SparseVector CreateZeroWithSameFormat()
+		{
+			var indices = new int[ToIndex - FromIndex];
+			Array.Copy(Indices, FromIndex, indices, 0, indices.Length);
+			return new SparseVector(Length, new double[indices.Length], indices);
+		}
+		IExtendedVector IExtendedReadOnlyVector.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
 
 
 
@@ -332,6 +328,10 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 		IExtendedVector IExtendedVector.View(int fromIndex, int toIndex) => View(fromIndex, toIndex);
 
+
+
+		// ------------------- COVARIANT RETURN TYPE FROM IMinimalVector
+		
 		public virtual AbstractSparseVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 		{
 			if (otherCoefficient != 0)
@@ -345,46 +345,17 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 			return this;
 		}
-		public virtual AbstractSparseVector AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is AbstractSparseVector sparseVector) return AxpyIntoThis(sparseVector, otherCoefficient);
-			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
-		}
-		IExtendedVector IExtendedVector.AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient) => AxpyIntoThis(otherVector, otherCoefficient);
+		public virtual void AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient) => AxpyIntoThis((AbstractSparseVector)otherVector, otherCoefficient);
 
-		public virtual AbstractSparseVector AddIntoThis(SparseVector otherVector) => DoEntrywiseIntoThis(otherVector, (double x, double y) => x + y);
-		public virtual AbstractSparseVector AddIntoThis(IMinimalReadOnlyVector otherVector)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is AbstractSparseVector sparseVector) return AddIntoThis(sparseVector);
-			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
-		}
-		IExtendedVector IExtendedVector.AddIntoThis(IMinimalReadOnlyVector otherVector) => AddIntoThis(otherVector);
+		public virtual AbstractSparseVector AddIntoThis(SparseVector otherVector) => AxpyIntoThis(otherVector, 1);
+		public virtual void AddIntoThis(IMinimalReadOnlyVector otherVector) => AddIntoThis((AbstractSparseVector)otherVector);
 
-		public virtual AbstractSparseVector SubtractIntoThis(SparseVector otherVector) => DoEntrywiseIntoThis(otherVector, (double x, double y) => x - y);
-		public virtual AbstractSparseVector SubtractIntoThis(IMinimalReadOnlyVector otherVector)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is AbstractSparseVector sparseVector) return SubtractIntoThis(sparseVector);
-			throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
-		}
-		IExtendedVector IExtendedVector.SubtractIntoThis(IMinimalReadOnlyVector otherVector) => SubtractIntoThis(otherVector);
+		public virtual AbstractSparseVector SubtractIntoThis(SparseVector otherVector) => AxpyIntoThis(otherVector, -1);
+		public virtual void SubtractIntoThis(IMinimalReadOnlyVector otherVector) => SubtractIntoThis((AbstractSparseVector)otherVector);
 
-		public virtual AbstractSparseVector NegativeIntoThis()
-		{
-			for (int i = FromIndex; i < ToIndex; ++i)
-				Values[i] = -Values[i];
-			return this;
-		}
-		IExtendedVector IExtendedVector.NegateIntoThis() => NegativeIntoThis();
+		public virtual void NegateIntoThis() => ScaleIntoThis(-1);
 
-		public virtual AbstractSparseVector ScaleIntoThis(double coefficient)
-		{
-			Blas.Dscal(ToIndex - FromIndex, coefficient, Values, FromIndex, 1);
-			return this;
-		}
-		IExtendedVector IExtendedVector.ScaleIntoThis(double coefficient) => ScaleIntoThis(coefficient);
+		public virtual void ScaleIntoThis(double coefficient) => Blas.Dscal(ToIndex - FromIndex, coefficient, Values, FromIndex, 1);
 
 		public virtual AbstractSparseVector LinearCombinationIntoThis(double thisCoefficient, AbstractSparseVector otherVector, double otherCoefficient)
 		{
@@ -397,36 +368,15 @@ namespace MGroup.LinearAlgebra.Vectors
 			else IMinimalVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
 			return this;
 		}
-		public virtual AbstractSparseVector LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is AbstractSparseVector sparseVector) return LinearCombinationIntoThis(thisCoefficient, sparseVector, otherCoefficient);
-			else return (AbstractSparseVector)IMinimalVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
-		}
-		IExtendedVector IExtendedVector.LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		public virtual void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient)
+			=> LinearCombinationIntoThis(thisCoefficient, (AbstractSparseVector)otherVector, otherCoefficient);
 
 		public virtual AbstractSparseVector CopyFrom(AbstractSparseVector otherVector) => DoEntrywiseIntoThis(otherVector, (double x, double y) => y);
-		public virtual AbstractSparseVector CopyFrom(IMinimalReadOnlyVector otherVector)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is AbstractSparseVector sparseVector) return CopyFrom(sparseVector);
-			throw new NotImplementedException("CopyFrom(NotSupportedVector)");
-		}
-		IExtendedVector IExtendedVector.CopyFrom(IMinimalReadOnlyVector otherVector) => CopyFrom(otherVector);
+		public virtual void CopyFrom(IMinimalReadOnlyVector otherVector) => CopyFrom((AbstractSparseVector)otherVector);
 
-		public virtual AbstractSparseVector Clear()
-		{
-			Array.Clear(Values, FromIndex, ToIndex - FromIndex);
-			return this;
-		}
-		IExtendedVector IExtendedVector.Clear() => Clear();
+		public virtual void Clear() => Array.Clear(Values, FromIndex, ToIndex - FromIndex);
 
-		public virtual AbstractSparseVector SetAll(double value)
-		{
-			Array.Fill(Values, value, FromIndex, ToIndex - FromIndex);
-			return this;
-		}
-		IExtendedVector IExtendedVector.SetAll(double value) => SetAll(value);
+		public virtual void SetAll(double value) => Array.Fill(Values, value, FromIndex, ToIndex - FromIndex);
 
 		public virtual AbstractSparseVector DoEntrywiseIntoThis(AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
 		{
@@ -457,21 +407,14 @@ namespace MGroup.LinearAlgebra.Vectors
 					throw new SparsityPatternModifiedException("This operation will change the sparsity pattern");
 			return this;
 		}
-		public virtual AbstractSparseVector DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
-		{
-			// Runtime Identification is_a_bad_thing™
-			if (otherVector is AbstractSparseVector sparseVector) return DoEntrywiseIntoThis(sparseVector, binaryOperation);
-			throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
-		}
-		IExtendedVector IExtendedVector.DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywiseIntoThis(otherVector, binaryOperation);
+		public virtual void DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
+			=> DoEntrywiseIntoThis((AbstractSparseVector) otherVector, binaryOperation);
 
-		public virtual AbstractSparseVector DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
+		public virtual void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
 			for (int i = FromIndex; i < ToIndex; ++i)
 				Values[i] = unaryOperation(Values[i]);
-			return this;
 		}
-		IExtendedVector IExtendedVector.DoToAllEntriesIntoThis(Func<double, double> unaryOperation) => DoToAllEntriesIntoThis(unaryOperation);
 
 
 
@@ -596,7 +539,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		// ------------ STATIC MEMBERS WHICH DO NOT EXPOSE SPARSE FUNCTIONALITY TO DENSE VECTORS
 
-		public static AbstractFullyPopulatedVector AxpyIntoDenseVector(AbstractFullyPopulatedVector thisVector, AbstractSparseVector otherVector, double otherCoefficient)
+		internal static AbstractFullyPopulatedVector AxpyIntoDenseVector(AbstractFullyPopulatedVector thisVector, AbstractSparseVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(thisVector, otherVector);
 			if (otherCoefficient == 1)
@@ -611,7 +554,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return thisVector;
 		}
 
-		public static AbstractFullyPopulatedVector CopyToDenseVector(AbstractFullyPopulatedVector thisVector, AbstractSparseVector otherVector)
+		internal static AbstractFullyPopulatedVector CopyToDenseVector(AbstractFullyPopulatedVector thisVector, AbstractSparseVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(thisVector, otherVector);
 			thisVector.Clear();    // it is faster, initially to set all elements to zero, then change only the sparse stored elements
@@ -620,7 +563,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return thisVector;
 		}
 
-		public static AbstractFullyPopulatedVector DoEntrywiseIntoDenseVector(AbstractFullyPopulatedVector thisVector, AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
+		internal static AbstractFullyPopulatedVector DoEntrywiseIntoDenseVector(AbstractFullyPopulatedVector thisVector, AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(thisVector, otherVector);
 			for (int i = 0, j = otherVector.FromIndex; i < thisVector.Length; ++i)
@@ -633,7 +576,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				}
 			return thisVector;
 		}
-		public static AbstractFullyPopulatedVector AxpyIntoDenseVector(AbstractContiguousFullyPopulatedVector thisVector, AbstractSparseVector otherVector, double otherCoefficient)
+		internal static AbstractFullyPopulatedVector AxpyIntoDenseVector(AbstractContiguousFullyPopulatedVector thisVector, AbstractSparseVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(thisVector, otherVector);
 			SparseBlas.Daxpyi(thisVector.Length, otherCoefficient, otherVector.Values, otherVector.Indices, otherVector.FromIndex, thisVector.Values, thisVector.FromIndex);

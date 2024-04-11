@@ -19,6 +19,30 @@ namespace MGroup.LinearAlgebra.Vectors
 	public static class VectorExtensions
 	{
 		/// <summary>
+		/// Returns the X component of the cross product of this vector with <paramref name="otherVector"/>.
+		/// </summary>
+		/// For calculation uses the 2nd and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
+		/// <param name="otherVector">The other vector</param>
+		/// <returns>The X component of the cross product</returns>
+		public static double CrossProductX(this AbstractFullyPopulatedVector thisVector, AbstractFullyPopulatedVector otherVector)
+		{
+			if (thisVector.Length != 3 || otherVector.Length != 3)
+				throw new NonMatchingDimensionsException($"thisVector and otherVector must have Length = 3 and they have Lengths {thisVector.Length} and {otherVector.Length}");
+			return thisVector[1] * otherVector[2] - thisVector[2] * otherVector[1];
+		}
+		/// <summary>
+		/// Returns the Y component of the cross product of this vector with <paramref name="otherVector"/>.
+		/// </summary>
+		/// For calculation uses the 1st and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
+		/// <param name="otherVector">The other vector</param>
+		/// <returns>The Y component of the cross product</returns>
+		public static double CrossProductY(this AbstractFullyPopulatedVector thisVector, AbstractFullyPopulatedVector otherVector)
+		{
+			if (thisVector.Length != 3 || otherVector.Length != 3)
+				throw new NonMatchingDimensionsException($"thisVector and otherVector must have Length = 3 and they have Lengths {thisVector.Length} and {otherVector.Length}");
+			return -thisVector[0] * otherVector[2] + thisVector[2] * otherVector[0];
+		}
+		/// <summary>
 		/// Returns the Z component of the cross product of this vector with <paramref name="otherVector"/>.
 		/// This is the cross product of 2 dimensional vectors.
 		/// </summary>
@@ -31,30 +55,6 @@ namespace MGroup.LinearAlgebra.Vectors
 					(thisVector.Length != 2 || otherVector.Length != 2))
 				throw new NonMatchingDimensionsException($"thisVector and otherVector must have Length = 2 or 3 and they have Lengths {thisVector.Length} and {otherVector.Length}");
 			return thisVector[0] * otherVector[1] - thisVector[1] * otherVector[0];
-		}
-		/// <summary>
-		/// Returns the X component of the cross product of this vector with <paramref name="otherVector"/>.
-		/// </summary>
-		/// For calculation uses the 2nd and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
-		/// <param name="otherVector">The other vector</param>
-		/// <returns>The X component of the cross product</returns>
-		public static double CrossProductX(this AbstractFullyPopulatedVector thisVector, AbstractFullyPopulatedVector otherVector)
-		{
-			if (thisVector.Length != 3 || otherVector.Length != 3)
-				throw new NonMatchingDimensionsException($"thisVector and otherVector must have Length = 3 and they have Lengths {thisVector.Length} and {otherVector.Length}");
-			return -thisVector[1] * otherVector[2] + thisVector[2] * otherVector[1];
-		}
-		/// <summary>
-		/// Returns the Y component of the cross product of this vector with <paramref name="otherVector"/>.
-		/// </summary>
-		/// For calculation uses the 1st and 3rd components of this vector with corresponding components of <paramref name="otherVector"/>.
-		/// <param name="otherVector">The other vector</param>
-		/// <returns>The Y component of the cross product</returns>
-		public static double CrossProductY(this AbstractFullyPopulatedVector thisVector, AbstractFullyPopulatedVector otherVector)
-		{
-			if (thisVector.Length != 3 || otherVector.Length != 3)
-				throw new NonMatchingDimensionsException($"thisVector and otherVector must have Length = 3 and they have Lengths {thisVector.Length} and {otherVector.Length}");
-			return thisVector[0] * otherVector[2] - thisVector[2] * otherVector[0];
 		}
 		/// <summary>
 		/// Returns the cross product of this vector with <paramref name="otherVector"/>.

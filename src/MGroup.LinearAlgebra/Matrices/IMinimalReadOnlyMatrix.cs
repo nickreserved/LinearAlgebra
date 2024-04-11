@@ -4,27 +4,39 @@ namespace MGroup.LinearAlgebra.Matrices
 
 	using MGroup.LinearAlgebra.Vectors;
 
-	public interface IImmutableMatrix : ILinearTransformation
+	public interface IMinimalReadOnlyMatrix : ILinearTransformation
 	{
+		/// <summary>
+		/// Multiplies this matrix with vector rhsVector and returns the result of multiplication.
+		/// returnVector = thisMatrix * rhsVector.
+		/// </summary>
+		/// <param name="rhsVector">The right hand vector. It must have number of elements equal to number of this matrix columns.</param>
+		/// <returns>The result vector</returns>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="rhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
+		/// than this matrix <see cref="ILinearTransformation.NumColumns"/>.</exception>
+		Vector MultiplyRight(IMinimalReadOnlyVector rhsVector);
+
+
 		/// <summary>
 		/// A partial linear combination between this and another matrix.
 		/// </summary>
 		/// <param name="otherMatrix">A vector with the same number of Values with this vector</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
-		IMutableMatrix Axpy(IImmutableMatrix otherMatrix, double otherCoefficient);
+		IMinimalMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 
-		protected static IMutableMatrix Axpy(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix, double otherCoefficient) => thisMatrix.Copy().AxpyIntoThis(otherMatrix, otherCoefficient);
-
-
-		IMutableMatrix Add(IImmutableMatrix otherMatrix);
-
-		protected static IMutableMatrix Add(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, 1);
+		protected static IMinimalMatrix Axpy(IMinimalReadOnlyMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient) => thisMatrix.Copy().AxpyIntoThis(otherMatrix, otherCoefficient);
 
 
-		IMutableMatrix Subtract(IImmutableMatrix otherMatrix);
+		IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix);
 
-		protected static IMutableMatrix Subtract(IImmutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, -1);
+		protected static IMinimalMatrix Add(IMinimalReadOnlyMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, 1);
+
+
+		IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix);
+
+		protected static IMinimalMatrix Subtract(IMinimalReadOnlyMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.Axpy(otherMatrix, -1);
 
 
 		/// <summary>
@@ -34,25 +46,25 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherMatrix">A matrix with the same number of Values with this matrix</param>
 		/// <param name="otherCoefficient">A scalar as coefficient to <paramref name="otherMatrix"/></param>
 		/// <returns>thisMatrix * <paramref name="thisCoefficient"/> + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
-		public IMutableMatrix LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient);
+		public IMinimalMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 
-		protected static IMutableMatrix LinearCombination(IImmutableMatrix thisMatrix, double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
+		protected static IMinimalMatrix LinearCombination(IMinimalReadOnlyMatrix thisMatrix, double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 			=> thisMatrix.Copy().LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
 
 
-		IMutableMatrix Scale(double coefficient);
+		IMinimalMatrix Scale(double coefficient);
 
-		protected static IMutableMatrix Scale(IImmutableMatrix thisMatrix, double coefficient) => thisMatrix.Copy().ScaleIntoThis(coefficient);
+		protected static IMinimalMatrix Scale(IMinimalReadOnlyMatrix thisMatrix, double coefficient) => thisMatrix.Copy().ScaleIntoThis(coefficient);
 
 
-		IMutableMatrix Copy();
+		IMinimalMatrix Copy();
 
 
 		/// <summary>
 		/// Creates a new matrix with all Values set to zero, the same dimensions with this matrix and probably with the same format with this matrix.
 		/// </summary>
 		/// <returns>A new zero matrix with the same dimensions with this matrix</returns>
-		IMutableMatrix CreateZero();
+		IMinimalMatrix CreateZeroWithSameFormat();
 
 
 		/// <summary>
@@ -61,7 +73,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="otherMatrix">A matrix of any dimensions</param>
 		/// <param name="tolerance">The maximum difference between corresponding Values to considered equal</param>
 		/// <returns>True if both vectors are almost equal</returns>
-		bool Equals(IImmutableMatrix otherMatrix, double tolerance = 1e-7);
+		bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-7);
 
 
 		/// <summary>
@@ -74,9 +86,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
 		/// Thrown if <paramref name="matrix"/> has different dimensions or some other special property than this matrix.
 		/// </exception>
-		IMutableMatrix DoEntrywise(IImmutableMatrix matrix, Func<double, double, double> binaryOperation)
+		IMinimalMatrix DoEntrywise(IMinimalReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
 		{
-			IMutableMatrix result = Copy();
+			IMinimalMatrix result = Copy();
 			result.DoEntrywiseIntoThis(matrix, binaryOperation);
 			return result;
 		}
@@ -87,9 +99,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The resulting matrix is written in a new object and then returned.
 		/// </summary>
 		/// <param name="unaryOperation">A method that takes 1 argument and returns 1 result.</param>
-		IMutableMatrix DoToAllEntries(Func<double, double> unaryOperation)
+		IMinimalMatrix DoToAllEntries(Func<double, double> unaryOperation)
 		{
-			IMutableMatrix result = Copy();
+			IMinimalMatrix result = Copy();
 			result.DoToAllEntries(unaryOperation);
 			return result;
 		}
@@ -97,9 +109,9 @@ namespace MGroup.LinearAlgebra.Matrices
 
 
 		// -------- OPERATORS
-		public static IMutableMatrix operator +(IImmutableMatrix x, IImmutableMatrix y) => x.Add(y);
-		public static IMutableMatrix operator -(IImmutableMatrix x, IImmutableMatrix y) => x.Subtract(y);
-		public static IMutableMatrix operator *(IImmutableMatrix x, double y) => x.Scale(y);
-		public static IMutableMatrix operator *(double y, IImmutableMatrix x) => x.Scale(y);
+		public static IMinimalMatrix operator +(IMinimalReadOnlyMatrix x, IMinimalReadOnlyMatrix y) => x.Add(y);
+		public static IMinimalMatrix operator -(IMinimalReadOnlyMatrix x, IMinimalReadOnlyMatrix y) => x.Subtract(y);
+		public static IMinimalMatrix operator *(IMinimalReadOnlyMatrix x, double y) => x.Scale(y);
+		public static IMinimalMatrix operator *(double y, IMinimalReadOnlyMatrix x) => x.Scale(y);
 	}
 }

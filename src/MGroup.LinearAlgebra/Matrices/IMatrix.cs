@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Matrices
     /// are used on sparse or triangular storage matrix formats.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    public interface IMatrix: IMatrixView, IEntrywiseOperable2D<IMatrixView>, IMutableMatrix
+    public interface IMatrix: IMatrixView, IEntrywiseOperable2D<IMatrixView>, IMinimalMatrix
     {
         /// <summary>
         /// Performs the following operation for all (i, j):
@@ -24,7 +24,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
         ///     is not permitted by the matrix storage format.</exception>
         void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient);
-		IMutableMatrix IMutableMatrix.AxpyIntoThis(IImmutableMatrix otherMatrix, double otherCoefficient)
+		IMinimalMatrix IMinimalMatrix.AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			AxpyIntoThis((IMatrixView)otherMatrix, otherCoefficient);
 			return this;
@@ -46,7 +46,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
         ///     is not permitted by the matrix storage format.</exception>
         void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
-		IMutableMatrix IMutableMatrix.LinearCombinationIntoThis(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient)
+		IMinimalMatrix IMinimalMatrix.LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			LinearCombinationIntoThis(thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
 			return this;

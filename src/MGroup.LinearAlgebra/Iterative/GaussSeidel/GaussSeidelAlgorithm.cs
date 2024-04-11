@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Iterative.GaussSeidel
 			gsIteration.Initialize(matrix);
 
 			int maxIterations = maxIterationsProvider.GetMaxIterations(matrix.NumRows);
-			var previousSolution = solution.CreateZero();
+			var previousSolution = solution.CreateZeroWithSameFormat();
 			double convergenceMetric = double.NaN;
 			int iter = 0;
 			while (iter < maxIterations)

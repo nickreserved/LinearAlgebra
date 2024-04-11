@@ -21,21 +21,15 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// Performs the matrix-vector multiplication (with the matrix represented by this 
-		/// <see cref="ILinearTransformation"/>): <paramref name="outputVector"/> = this * <paramref name="inputVector"/>.
+		/// <see cref="ILinearTransformation"/>): <paramref name="lhsVector"/> = thisLinearTransformation * <paramref name="rhsVector"/>.
 		/// </summary>
-		/// <param name="inputVector">
-		/// The vector that will be multiplied by the represented matrix. It sits on the left hand side of the equation 
-		/// y = A * x. Constraints: Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to the number of columns of the matrix  
-		/// represented by this <see cref="ILinearTransformation"/>.
-		/// </param>
-		/// <param name="outputVector">
-		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = A * x. Constraints: Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to the number of rows of the
-		/// matrix represented by this <see cref="ILinearTransformation"/>.
-		/// </param>
+		/// <param name="rhsVector">The vector that will be multiplied by the represented matrix.</param>
+		/// <param name="lhsVector">The vector that will be overwritten by the result of the multiplication.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="inputVector"/> or <paramref name="outputVector"/> violate the described constraints.
-		/// </exception>
-		void MultiplyIntoThis(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector);
+		/// Thrown if <paramref name="rhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
+		/// than this linear transformation <see cref="ILinearTransformation.NumColumns"/>, or
+		/// if <paramref name="lhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
+		/// than this linear transformation <see cref="ILinearTransformation.NumRows"/>.</exception>
+		void MultiplyIntoThis(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector);
 	}
 }

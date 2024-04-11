@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// thisVector = -thisVector.
 		void NegateIntoThis();
 
-		protected static void NegativeIntoThis(IMinimalVector thisVector) => thisVector.ScaleIntoThis(-1);
+		protected static void NegateIntoThis(IMinimalVector thisVector) => thisVector.ScaleIntoThis(-1);
 
 
 		/// <summary>
@@ -155,8 +155,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// Performs a unary operation on each entry: this[i] = <paramref name="unaryOperation"/>(this[i]).
 		/// The resulting vector overwrites the entries of this.
-		/// </summary>
 		/// In sparse vectors, this method applies only to the non-zero (stored) elements. The non-stored (implied as zero) elements remain zero.
+		/// </summary>
 		/// <param name="unaryOperation">A method that takes 1 argument and returns 1 result.</param>
 		/// <returns>This vector.</returns>
 		void DoToAllEntriesIntoThis(Func<double, double> unaryOperation);

@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="indices">Element with that indices of this vector, form the returned vector.
 		/// Not all indices from this vector needed and the same indices can exist more than once.</param>
 		/// <returns>A vector from this vector with elements for given indices</returns>
-		public virtual Vector Copy(int[] indices) => new Vector(CopyToArray(indices));
+		public Vector Copy(int[] indices) => new Vector(CopyToArray(indices));
 
 		/// <summary>
 		/// Return scattered elements from this vector to a new array.
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="indices">Element with that indices of this vector, form the returned array.
 		/// Not all indices from this vector needed and the same indices can exist more than once.</param>
 		/// <returns>A new array with elements from this vector for given indices</returns>
-		public virtual double[] CopyToArray(int[] indices)
+		public double[] CopyToArray(int[] indices)
 		{
 			var result = new double[indices.Length];
 			for (int i = 0; i < indices.Length; ++i)
@@ -57,14 +57,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="arrayIndex">Index of first element in target <paramref name="array"/> where elements of this vector will be written</param>
 		/// <param name="indices">Element with that indices of this vector, form the returned array.
 		/// Not all indices from this vector needed and the same indices can exist more than once.</param>
-		public virtual void CopyToArray(double[] array, int arrayIndex, int[] indices)
+		public void CopyToArray(double[] array, int arrayIndex, int[] indices)
 		{
 			for (int i = 0; i < indices.Length; ++i)
 				array[i + arrayIndex] = this[indices[i]];
 		}
 		
-		public virtual double[] CopyToArray() => CopyToArray(0, Length);
-		public virtual double[] CopyToArray(int fromIndex, int toIndex) => IExtendedReadOnlyVector.CopyToArray(this, fromIndex, toIndex);
+		public double[] CopyToArray() => CopyToArray(0, Length);
+		public double[] CopyToArray(int fromIndex, int toIndex) => IExtendedReadOnlyVector.CopyToArray(this, fromIndex, toIndex);
 		public virtual void CopyToArray(int fromIndex, double[] array, int arrayIndex, int length)
 		{
 			for (int i = 0; i < length; ++i)
@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// result[i, j] = this[i] * otherVector[j], for all valid i, j.
 		/// </summary>
 		/// <param name="otherVector">The other vector.</param>
-		public virtual Matrix TensorProduct(AbstractFullyPopulatedVector otherVector)
+		public Matrix TensorProduct(AbstractFullyPopulatedVector otherVector)
 		{
 			var result = Matrix.CreateZero(Length, otherVector.Length);
 			for (int i = 0; i < this.Length; ++i)
@@ -100,38 +100,38 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		// ------------------- COVARIANT RETURN TYPE FROM IExtendedReadOnlyVector
 
-		public virtual Vector Copy(int fromIndex, int toIndex) => new Vector(CopyToArray(fromIndex, toIndex));
+		public Vector Copy(int fromIndex, int toIndex) => new Vector(CopyToArray(fromIndex, toIndex));
 		IExtendedVector IExtendedReadOnlyVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex);
 
-		public virtual Vector Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.Axpy(this, otherVector, otherCoefficient);
+		public Vector Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.Axpy(this, otherVector, otherCoefficient);
 		IExtendedVector IExtendedReadOnlyVector.Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient);
 
-		public virtual Vector Add(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Add(this, otherVector);
+		public Vector Add(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Add(this, otherVector);
 		IExtendedVector IExtendedReadOnlyVector.Add(IMinimalReadOnlyVector otherVector) => Add(otherVector);
 
-		public virtual Vector Subtract(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Subtract(this, otherVector);
+		public Vector Subtract(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Subtract(this, otherVector);
 		IExtendedVector IExtendedReadOnlyVector.Subtract(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Subtract(this, otherVector);
 
-		public virtual Vector Negative() => (Vector)IMinimalReadOnlyVector.Negate(this);
-		IExtendedVector IExtendedReadOnlyVector.Negate() => Negative();
+		public Vector Negate() => (Vector)IMinimalReadOnlyVector.Negate(this);
+		IExtendedVector IExtendedReadOnlyVector.Negate() => Negate();
 
-		public virtual Vector Scale(double coefficient) => (Vector)IMinimalReadOnlyVector.Scale(this, coefficient);
+		public Vector Scale(double coefficient) => (Vector)IMinimalReadOnlyVector.Scale(this, coefficient);
 		IExtendedVector IExtendedReadOnlyVector.Scale(double coefficient) => Scale(coefficient);
 
-		public virtual Vector LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
+		public Vector LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
 		IExtendedVector IExtendedReadOnlyVector.LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient);
 
-		public virtual Vector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)IMinimalReadOnlyVector.DoEntrywise(this, otherVector, binaryOperation);
+		public Vector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)IMinimalReadOnlyVector.DoEntrywise(this, otherVector, binaryOperation);
 		IExtendedVector IExtendedReadOnlyVector.DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);
 
-		public virtual Vector DoToAllEntries(Func<double, double> unaryOperation) => (Vector)IMinimalReadOnlyVector.DoToAllEntries(this, unaryOperation);
+		public Vector DoToAllEntries(Func<double, double> unaryOperation) => (Vector)IMinimalReadOnlyVector.DoToAllEntries(this, unaryOperation);
 		IExtendedVector IExtendedReadOnlyVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
 
-		public virtual Vector Copy() => new Vector(CopyToArray());
+		public Vector Copy() => new Vector(CopyToArray());
 		IExtendedVector IExtendedReadOnlyVector.Copy() => Copy();
 
-		public virtual Vector CreateZero() => new Vector(new double[Length]);
-		IExtendedVector IExtendedReadOnlyVector.CreateZero() => CreateZero();
+		public Vector CreateZeroWithTheSameFormat() => new Vector(new double[Length]);
+		IExtendedVector IExtendedReadOnlyVector.CreateZeroWithSameFormat() => CreateZeroWithTheSameFormat();
 
 
 
@@ -146,7 +146,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public virtual AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 			=> AbstractSparseVector.AxpyIntoDenseVector(this, otherVector, otherCoefficient);
-		public virtual AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
+		public AbstractFullyPopulatedVector AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			if (otherCoefficient == 1)
@@ -189,7 +189,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public virtual void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => IMinimalVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
 
 		public virtual AbstractFullyPopulatedVector CopyFrom(AbstractSparseVector otherVector) => AbstractSparseVector.CopyToDenseVector(this, otherVector);
-		public virtual AbstractFullyPopulatedVector CopyFrom(AbstractFullyPopulatedVector otherVector)
+		public AbstractFullyPopulatedVector CopyFrom(AbstractFullyPopulatedVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			for (int i = 0; i < Length; ++i)
@@ -214,7 +214,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public virtual AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractSparseVector otherVector, Func<double, double, double> binaryOperation)
 			=> AbstractSparseVector.DoEntrywiseIntoDenseVector(this, otherVector, binaryOperation);
-		public virtual AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation)
+		public AbstractFullyPopulatedVector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			for (int i = 0; i < Length; ++i)
@@ -240,7 +240,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		// ------------------- COVARIANT RETURN TYPE FROM IMinimalReadOnlyVector
 
 		public virtual double DotProduct(AbstractSparseVector otherVector) => otherVector.DotProduct(this);
-		public virtual double DotProduct(AbstractFullyPopulatedVector otherVector)
+		public double DotProduct(AbstractFullyPopulatedVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			double result = 0;
@@ -278,7 +278,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public virtual double Norm2() => IMinimalReadOnlyVector.Norm2(this);
 
 		public virtual bool Equals(AbstractSparseVector otherVector, double tolerance = 1E-07) => otherVector.Equals(this, tolerance);
-		public virtual bool Equals(AbstractFullyPopulatedVector otherVector, double tolerance = 1E-07)
+		public bool Equals(AbstractFullyPopulatedVector otherVector, double tolerance = 1E-07)
 		{
 			if (Length != otherVector.Length) return false;
 			var cmp = new ValueComparer(tolerance);

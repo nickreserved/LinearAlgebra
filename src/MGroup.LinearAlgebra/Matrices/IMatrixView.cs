@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Matrices
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public interface IMatrixView: 
-		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, ΙDiagonalAccessible, IImmutableMatrix
+		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, ΙDiagonalAccessible, IMinimalReadOnlyMatrix
 	{
         /// <summary>
         /// Performs the following operation for all (i, j):
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
         ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
         IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient);
-		IMutableMatrix IImmutableMatrix.Axpy(IImmutableMatrix otherMatrix, double otherCoefficient) => Axpy((IMatrixView) otherMatrix, otherCoefficient);
+		IMinimalMatrix IMinimalReadOnlyMatrix.Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient) => Axpy((IMatrixView) otherMatrix, otherCoefficient);
 
         /// <summary>
         /// Copies this <see cref="IMatrixView"/> object. A new matrix of the same type as this object is initialized and 
@@ -39,7 +39,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
         /// </param>
         IMatrix Copy(bool copyIndexingData = false);
-		IMutableMatrix IImmutableMatrix.Copy() => Copy(false);
+		IMinimalMatrix IMinimalReadOnlyMatrix.Copy() => Copy(false);
 
 		/// Copies this <see cref="IMatrixView"/> object. The new matrix will have all its entries explicitly stored.
 		/// </summary>
@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
         ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
         IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
-		IMutableMatrix IImmutableMatrix.LinearCombination(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient) => LinearCombination(thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
+		IMinimalMatrix IMinimalReadOnlyMatrix.LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient) => LinearCombination(thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
 
 		/// <summary>
 		/// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
@@ -137,7 +137,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
         new IMatrix Scale(double scalar);
-		IMutableMatrix IImmutableMatrix.Scale(double scalar) => Scale(scalar);
+		IMinimalMatrix IMinimalReadOnlyMatrix.Scale(double scalar) => Scale(scalar);
 
 		/// <summary>
 		/// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some

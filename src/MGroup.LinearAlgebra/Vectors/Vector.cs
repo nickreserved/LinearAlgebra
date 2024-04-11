@@ -29,7 +29,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="elements">Array of elements provided as is in vector.
 		/// Any later change to a vector element, also modifies corresponding element of this array.
 		/// If you don't want that, use (double[]) elements.Clone()</param>
-		public Vector(double[] elements) =>  Values = elements;
+		public Vector(double[] elements) => Values = elements;
 
 		/// <summary>
 		/// Construct a vector from another.
@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public override int Length { get => Values.Length; }
 
-		public override ref double this[int index] => ref Values[/*FromIndex +*/ index]; // Avoid one virtual property for performance
+		public override ref double this[int index] => ref Values[index];
 
 
 
@@ -74,13 +74,13 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		// -------- OPERATORS FROM IMinimalReadOnlyVector
 
-		public static Vector operator -(Vector x) => x.Negative();
+		public static Vector operator -(Vector x) => x.Negate();
 		public static Vector operator +(Vector x, Vector y) => x.Add(y);
 		public static Vector operator +(Vector x, IMinimalReadOnlyVector y) => x.Add(y);
 		public static Vector operator +(IMinimalReadOnlyVector y, Vector x) => x.Add(y);
 		public static Vector operator -(Vector x, Vector y) => x.Subtract(y);
 		public static Vector operator -(Vector x, IMinimalReadOnlyVector y) => x.Subtract(y);
-		public static Vector operator -(IMinimalReadOnlyVector y, Vector x) => (Vector) (x - y).NegativeIntoThis();
+		public static Vector operator -(IMinimalReadOnlyVector x, Vector y) => y.LinearCombination(-1, x, 1);
 		public static double operator *(Vector x, Vector y) => x.DotProduct(y);
 		public static double operator *(Vector x, IMinimalReadOnlyVector y) => x.DotProduct(y);
 		public static double operator *(IMinimalReadOnlyVector x, Vector y) => x.DotProduct(y);
@@ -289,8 +289,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		// ----------- REMAININGS FROM IVECTORVIEW
 
 
-		[Obsolete("Use this.CreateZero()")]
-		public Vector CreateZeroVectorWithSameFormat() => CreateZero();
+		[Obsolete("Use this.CreateZeroWithSameFormat()")]
+		public Vector CreateZeroVectorWithSameFormat() => CreateZeroWithTheSameFormat();
 
 		//TODO: I must include this in IMinimalReadOnlyVector
 		/// <summary>
@@ -350,6 +350,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// the requested Knot. The multiplicity of a single Knot can be derived using the exported multiplicity vector. 
 		/// The entries of this <see cref="Vector"/> will be sorted.
 		/// </summary>
+		[Obsolete("Obsolete because I want to know where this alien operation needed")]
 		public Vector[] RemoveDuplicatesFindMultiplicity()
 		{
 			Array.Sort(Values);

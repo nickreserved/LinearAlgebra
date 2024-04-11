@@ -204,7 +204,7 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
                 var x5 = Vector.CreateFromArray(SparseRectangular10by5.Lhs5);
                 var b10Expected = Vector.CreateFromArray(SparseRectangular10by5.Rhs10);
                 Vector b10Computed = Vector.CreateWithValue(SparseRectangular10by5.NumRows, 1.0);
-                //Vector bComputed = Vector.CreateZero(SparseRectangular10by5.NumRows);
+                //Vector bComputed = Vector.CreateZeroWithSameFormat(SparseRectangular10by5.NumRows);
                 A.MultiplyIntoResult(x5, b10Computed, false);
                 comparer.AssertEqual(b10Expected, b10Computed);
 

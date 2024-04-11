@@ -106,9 +106,9 @@ namespace MGroup.LinearAlgebra.Vectors
 		int Length { get; }
 
 		/// <summary>
-		/// Length of vector.
+		/// Euclidian norm of vector.
 		/// </summary>
-		/// <returns>The length of vector which is the square root of Square()</returns>
+		/// <returns>The Euclidian norm of vector which is the square root of Square()</returns>
 		double Norm2();
 		protected static double Norm2(IMinimalVector thisVector) => Math.Sqrt(thisVector.Square());
 
@@ -170,7 +170,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="unaryOperation">A method that takes 1 argument and returns 1 result.</param>
 		IMinimalVector DoToAllEntries(Func<double, double> unaryOperation);
-		protected static IMinimalVector DoToAllEntries(IMinimalReadOnlyVector thisVector, Func<double, double> unaryOperation) => thisVector.Copy().DoToAllEntries(unaryOperation);
+		protected static IMinimalVector DoToAllEntries(IMinimalReadOnlyVector thisVector, Func<double, double> unaryOperation)
+		{
+			var result = thisVector.Copy();
+			result.DoToAllEntriesIntoThis(unaryOperation);
+			return result;
+		}
 
 
 

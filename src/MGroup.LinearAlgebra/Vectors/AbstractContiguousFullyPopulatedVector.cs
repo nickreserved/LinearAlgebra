@@ -34,7 +34,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		
 		public override void CopyToArray(int fromIndex, double[] array, int arrayIndex, int length) => Array.Copy(Values, FromIndex + fromIndex, array, arrayIndex, length);
 
-		public virtual AbstractFullyPopulatedVector CopyFrom(AbstractContiguousFullyPopulatedVector otherVector)
+		public AbstractFullyPopulatedVector CopyFrom(AbstractContiguousFullyPopulatedVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			otherVector.CopyToArray(otherVector.FromIndex, Values, FromIndex, Length);
@@ -47,7 +47,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			else base.CopyFrom(otherVector);
 		}
 
-		public virtual AbstractContiguousFullyPopulatedVector LinearCombinationIntoThis(double thisCoefficient, AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient)
+		public AbstractContiguousFullyPopulatedVector LinearCombinationIntoThis(double thisCoefficient, AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Values, otherVector.FromIndex, 1, thisCoefficient, Values, FromIndex, 1);
@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		public override void SetAll(double value) => Array.Fill(Values, value, FromIndex, Length);
 		
-		public virtual AbstractContiguousFullyPopulatedVector AxpyIntoThis(AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient)
+		public AbstractContiguousFullyPopulatedVector AxpyIntoThis(AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			Blas.Daxpy(Length, otherCoefficient, otherVector.Values, otherVector.FromIndex, 1, Values, FromIndex, 1);
@@ -77,7 +77,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			else base.AxpyIntoThis(otherVector, otherCoefficient);
 		}
 
-		public virtual double DotProduct(AbstractContiguousFullyPopulatedVector otherVector)
+		public double DotProduct(AbstractContiguousFullyPopulatedVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
 			return Blas.Ddot(Length, Values, FromIndex, 1, otherVector.Values, otherVector.FromIndex, 1);

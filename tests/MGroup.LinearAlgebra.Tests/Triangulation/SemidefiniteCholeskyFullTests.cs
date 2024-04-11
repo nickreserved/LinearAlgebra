@@ -25,7 +25,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
 			// Check that each vector belongs to the nullspace
 			int order = unfactorizedMatrix.NumColumns;
-			//var zeroVector = Vector.CreateZero(order);
+			//var zeroVector = Vector.CreateZeroWithSameFormat(order);
 			int nullity = nullSpaceBasis.Count;
 			var nullSpaceMatrix = Matrix.CreateZero(order, nullity);
 

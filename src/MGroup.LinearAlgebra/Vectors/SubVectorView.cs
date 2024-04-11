@@ -47,13 +47,13 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		// -------- OPERATORS FROM IMinimalReadOnlyVector
 
-		public static Vector operator -(SubVectorView x) => x.Negative();
+		public static Vector operator -(SubVectorView x) => x.Negate();
 		public static Vector operator +(SubVectorView x, SubVectorView y) => x.Add(y);
 		public static Vector operator +(SubVectorView x, IMinimalReadOnlyVector y) => x.Add(y);
 		public static Vector operator +(IMinimalReadOnlyVector y, SubVectorView x) => x.Add(y);
 		public static Vector operator -(SubVectorView x, SubVectorView y) => x.Subtract(y);
 		public static Vector operator -(SubVectorView x, IMinimalReadOnlyVector y) => x.Subtract(y);
-		public static Vector operator -(IMinimalReadOnlyVector y, SubVectorView x) => (Vector) (x - y).NegativeIntoThis();
+		public static Vector operator -(IMinimalReadOnlyVector x, SubVectorView y) => y.LinearCombination(-1, x, 1);
 		public static double operator *(SubVectorView x, SubVectorView y) => x.DotProduct(y);
 		public static double operator *(SubVectorView x, IMinimalReadOnlyVector y) => x.DotProduct(y);
 		public static double operator *(IMinimalReadOnlyVector x, SubVectorView y) => x.DotProduct(y);

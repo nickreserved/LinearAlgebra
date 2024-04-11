@@ -4,25 +4,25 @@ namespace MGroup.LinearAlgebra.Matrices
 
 	using MGroup.LinearAlgebra.Vectors;
 
-	public interface IMutableMatrix : IImmutableMatrix
+	public interface IMinimalMatrix : IMinimalReadOnlyMatrix
 	{
-		IMutableMatrix AxpyIntoThis(IImmutableMatrix otherMatrix, double otherCoefficient);
+		IMinimalMatrix AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 
 
-		IMutableMatrix AddIntoThis(IImmutableMatrix otherMatrix);
+		IMinimalMatrix AddIntoThis(IMinimalReadOnlyMatrix otherMatrix);
 
-		protected static IMutableMatrix AddIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, 1);
+		protected static IMinimalMatrix AddIntoThis(IMinimalMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, 1);
 
 
-		IMutableMatrix SubtractIntoThis(IImmutableMatrix otherMatrix);
+		IMinimalMatrix SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix);
 		
-		protected static IMutableMatrix SubtractIntoThis(IMutableMatrix thisMatrix, IImmutableMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, -1);
+		protected static IMinimalMatrix SubtractIntoThis(IMinimalMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, -1);
 
 
-		IMutableMatrix LinearCombinationIntoThis(double thisCoefficient, IImmutableMatrix otherMatrix, double otherCoefficient);
+		IMinimalMatrix LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 		
 
-		IMutableMatrix ScaleIntoThis(double coefficient);
+		IMinimalMatrix ScaleIntoThis(double coefficient);
 
 
 		/// <summary>
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if an entry this[i, j] needs to be overwritten, but that is not permitted by the matrix storage format.
 		/// </exception>
-		void DoEntrywiseIntoThis(IImmutableMatrix matrix, Func<double, double, double> binaryOperation);
+		void DoEntrywiseIntoThis(IMinimalReadOnlyMatrix matrix, Func<double, double, double> binaryOperation);
 
 		/// <summary>
 		/// Performs a unary operation on each entry: this[i] = <paramref name="unaryOperation"/>(this[i, j]).

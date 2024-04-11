@@ -85,8 +85,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		new IExtendedVector Copy();
 		IMinimalVector IMinimalReadOnlyVector.Copy() => Copy();
 
-		new IExtendedVector CreateZero();
-		IMinimalVector IMinimalReadOnlyVector.CreateZero() => CreateZero();
+		new IExtendedVector CreateZeroWithSameFormat();
+		IMinimalVector IMinimalReadOnlyVector.CreateZero() => CreateZeroWithSameFormat();
 
 		new IExtendedVector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation);
 		IMinimalVector IMinimalReadOnlyVector.DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);

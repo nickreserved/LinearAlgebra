@@ -36,7 +36,7 @@
 //                builder.ResidualTolerance = 1E-7;
 //                builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 //                var cg = builder.Build();
-//                var xComputed = Vector.CreateZero(A.NumRows);
+//                var xComputed = Vector.CreateZeroWithSameFormat(A.NumRows);
 //                IterativeStatistics stats = cg.Solve(A, b, xComputed);
 //                comparer.AssertEqual(xExpected, xComputed);
 //            });
