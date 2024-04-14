@@ -10,19 +10,22 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 	/// </summary>
 	internal static class MatrixOperations
 	{
-
-
-
 		internal static double[] LinearCombination(double scalar1, double[] vector1, double scalar2, double[] vector2)
+		{
+			var result = new double[vector1.Length];
+			LinearCombination(scalar1, vector1, scalar2, vector2, result);
+			return result;
+		}
+
+		internal static void LinearCombination(double scalar1, double[] vector1, double scalar2, double[] vector2, double[] result)
 		{
 			int n = vector1.Length;
 			if (vector2.Length != n) throw new NonMatchingDimensionsException("Cannot add arrays with different length");
-			var c = new double[n];
+			if (result.Length != n) throw new NonMatchingDimensionsException("Cannot add arrays with different length");
 			for (int i = 0; i < n; ++i)
 			{
-				c[i] = scalar1 * vector1[i] + scalar2 * vector2[i];
+				result[i] = scalar1 * vector1[i] + scalar2 * vector2[i];
 			}
-			return c;
 		}
 
 		internal static double[,] LinearCombination(double scalar1, double[,] matrix1, double scalar2, double[,] matrix2)

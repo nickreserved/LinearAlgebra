@@ -42,12 +42,14 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			{
 				var A1 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
 				var columnVector = Vector.CreateWithValue(10, 1.0);
+				int colIdx = 3;
 				double coeff = 2.0;
-				Matrix expected = A1.Copy();
-				for (int i = 0; i < )
 
-				// operator+
-				comparer.AssertEqual(expected, A1 + A2);
+				double[,] expected = SquareSingular10by10.Matrix;
+				AxpyColumn(expected, colIdx, columnVector.RawData, coeff);
+				A1.AxpyColumn(colIdx, coeff, columnVector);
+
+				comparer.AssertEqual(Matrix.CreateFromArray(expected), A1);
 			});
 		}
 
@@ -328,9 +330,12 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			comparer.AssertEqual(A2TransposeExpected, A2TransposeComputed.CopyToArray2D());
 		}
 
-		private static void Axpy(double[] x,)
+		private static void AxpyColumn(double[,] matrix, int colIdx, double[] columnValues, double coeff)
 		{
-
+			for (int i = 0; i < matrix.GetLength(0); i++)
+			{
+				matrix[i, colIdx] += coeff * columnValues[i];
+			}
 		}
 	}
 }
