@@ -528,6 +528,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return Vector.CreateFromArray(colVector, false);
 		}
 
+		/// <inheritdoc/>
 		public double[] GetDiagonalAsArray()
 		{
 			Preconditions.CheckSquare(this);

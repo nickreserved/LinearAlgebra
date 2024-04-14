@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Matrices
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public interface IMatrixView: 
-		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, ΙDiagonalAccessible
+		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, IDiagonalAccessible
 	{
         /// <summary>
         /// Performs the following operation for all (i, j):

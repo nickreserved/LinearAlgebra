@@ -1,6 +1,5 @@
-﻿using MGroup.LinearAlgebra.Vectors;
+using MGroup.LinearAlgebra.Vectors;
 
-//TODO: also GetDiagonal(), which can throw NonMatchingDimensionsException, if the matrix is not square.
 namespace MGroup.LinearAlgebra.Matrices
 {
     /// <summary>

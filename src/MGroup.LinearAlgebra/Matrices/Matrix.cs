@@ -735,16 +735,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return Vector.CreateFromArray(columnVector, false);
 		}
 
-		/// <summary>
-		/// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal. The matrix must be square.
-		/// </summary>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
-		public Vector GetDiagonal() => Vector.CreateFromArray(GetDiagonalAsArray(), false);
-
-		/// <summary>
-		/// Returns an array with the entries of the matrix's main diagonal. The matrix must be square.
-		/// </summary>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
+		/// <inheritdoc/>
 		public double[] GetDiagonalAsArray()
 		{
 			if (isOverwritten) throw new MatrixDataOverwrittenException();
