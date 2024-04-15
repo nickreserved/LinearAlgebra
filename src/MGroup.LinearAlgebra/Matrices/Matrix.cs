@@ -1135,24 +1135,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </exception>
 		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
 		{   //TODO: this is NOT a specialization of the version with offsets. It is defined only if the vectors have exactly the matching lengths.
-			int leftRows, leftCols;
-			TransposeMatrix transpose;
-			if (transposeThis)
-			{
-				transpose = TransposeMatrix.Transpose;
-				leftRows = this.NumColumns;
-				leftCols = this.NumRows;
-			}
-			else
-			{
-				transpose = TransposeMatrix.NoTranspose;
-				leftRows = this.NumRows;
-				leftCols = this.NumColumns;
-			}
-
-			Preconditions.CheckMultiplicationDimensions(leftCols, lhsVector.Length);
-			Preconditions.CheckSystemSolutionDimensions(leftRows, rhsVector.Length);
-			Blas.Dgemv(transpose, NumRows, NumColumns,
+			(TransposeMatrix transposeA, int lhsLength, int rhsLength) = TransposeUtilities.PrepareBlas(this, transposeThis);
+			Preconditions.CheckMultiplicationDimensions(lhsLength, lhsVector.Length);
+			Preconditions.CheckSystemSolutionDimensions(rhsLength, rhsVector.Length);
+			Blas.Dgemv(transposeA, NumRows, NumColumns,
 				1.0, this.data, 0, NumRows, lhsVector.RawData, 0, 1,
 				0.0, rhsVector.RawData, 0, 1);
 		}

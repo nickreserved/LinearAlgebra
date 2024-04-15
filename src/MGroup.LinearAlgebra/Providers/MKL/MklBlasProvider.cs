@@ -1,4 +1,6 @@
-﻿using IntelMKL.LP64;
+using IntelMKL.LP64;
+
+using MGroup.LinearAlgebra.Providers.Managed;
 
 //TODO: this should probably call the MKL dll directly, instead of using the package Compute.NET Bindings.
 namespace MGroup.LinearAlgebra.Providers.MKL
@@ -14,8 +16,9 @@ namespace MGroup.LinearAlgebra.Providers.MKL
     internal class MklBlasProvider : IBlasProvider
     {
         internal static MklBlasProvider UniqueInstance { get; } = new MklBlasProvider();
+		private static readonly ManagedBlasProvider defaultProvider = ManagedBlasProvider.UniqueInstance;
 
-        private MklBlasProvider() { } // private constructor for singleton pattern
+		private MklBlasProvider() { } // private constructor for singleton pattern
 
         #region BLAS Level 1
 
@@ -55,10 +58,13 @@ namespace MGroup.LinearAlgebra.Providers.MKL
             => Blas.Dgemv(transA.Translate(), ref m, ref n, ref alpha, ref a[offsetA], ref ldA,
                 ref x[offsetX], ref incX, ref beta, ref y[offsetY], ref incY);
 
-        /// <summary>
-        /// See https://software.intel.com/en-us/mkl-developer-reference-fortran-spmv#16CB58C4-105B-486C-B6AA-42BB0C721A76
-        /// </summary>
-        public void Dspmv(StoredTriangle uplo, int n,
+		public void DgemvRowMajor(TransposeMatrix transA, int m, int n, double[] a, double[] x, double[] y) 
+			=> defaultProvider.DgemvRowMajor(transA, m, n, a, x, y);
+
+		/// <summary>
+		/// See https://software.intel.com/en-us/mkl-developer-reference-fortran-spmv#16CB58C4-105B-486C-B6AA-42BB0C721A76
+		/// </summary>
+		public void Dspmv(StoredTriangle uplo, int n,
             double alpha, double[] a, int offsetA, double[] x, int offsetX, int incX,
             double beta, double[] y, int offsetY, int incY)
             => Blas.Dspmv(uplo.Translate(), ref n, ref alpha, ref a[offsetA],

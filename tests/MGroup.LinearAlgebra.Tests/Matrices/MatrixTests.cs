@@ -197,40 +197,30 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 		{
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
+				var mvChecker = new MatrixDenseVectorMultiplicationChecker(
+				(A, x, tranpose) => ((Matrix)A).Multiply(x, tranpose),
+				(A, x, y, tranpose) => ((Matrix)A).MultiplyIntoResult(x, y, tranpose));
+				mvChecker.Tolerance = 1E-13;
+
 				// rectangular 10-by-5
 				var A1 = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix);
-				var x1 = Vector.CreateFromArray(RectangularFullRank10by5.Lhs5);
-				var b1Expected = Vector.CreateFromArray(RectangularFullRank10by5.Rhs10);
-				Vector b1Computed = A1.Multiply(x1, false);
-				comparer.AssertEqual(b1Expected, b1Computed);
+				mvChecker.CheckAllMultiplications(A1, RectangularFullRank10by5.Lhs5, RectangularFullRank10by5.Rhs10, false);
 
 				// rectangular 5-by-10
-				double[,] fullRank5by10 = MatrixOperations.Transpose(RectangularFullRank10by5.Matrix);
-				var x2 = Vector.CreateFromArray(RectangularFullRank10by5.Lhs10);
-				var b2Expected = Vector.CreateFromArray(RectangularFullRank10by5.Rhs5);
-				Vector b2Computed = A1.Multiply(x2, true);
-				comparer.AssertEqual(b2Expected, b2Computed);
+				mvChecker.CheckAllMultiplications(A1, RectangularFullRank10by5.Lhs10, RectangularFullRank10by5.Rhs5, true);
 
 				// square invertible 10-by-10
 				var A3 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
-				var x3 = Vector.CreateFromArray(SquareInvertible10by10.Lhs);
-				var b3Expected = Vector.CreateFromArray(SquareInvertible10by10.Rhs);
-				Vector b3Computed = A3.Multiply(x3, false);
-				comparer.AssertEqual(b3Expected, b3Computed);
+				mvChecker.CheckAllMultiplications(A3, SquareInvertible10by10.Lhs, SquareInvertible10by10.Rhs, false);
 
 				// square singular 10-by-10 (rank = 8)
 				var A4 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
-				var x4 = Vector.CreateFromArray(SquareSingular10by10.Lhs);
-				var b4Expected = Vector.CreateFromArray(SquareSingular10by10.Rhs);
-				Vector b4Computed = A4.Multiply(x4, false);
-				comparer.AssertEqual(b4Expected, b4Computed);
+				mvChecker.CheckAllMultiplications(A4, SquareSingular10by10.Lhs, SquareSingular10by10.Rhs, false);
 
 				// square singular 10-by-10 (rank = 9)
 				var A5 = Matrix.CreateFromArray(SquareSingularSingleDeficiency10by10.Matrix);
-				var x5 = Vector.CreateFromArray(SquareSingularSingleDeficiency10by10.Lhs);
-				var b5Expected = Vector.CreateFromArray(SquareSingularSingleDeficiency10by10.Rhs);
-				Vector b5Computed = A5.Multiply(x5, false);
-				comparer.AssertEqual(b5Expected, b5Computed);
+				mvChecker.CheckAllMultiplications(A5, SquareSingularSingleDeficiency10by10.Lhs,
+					SquareSingularSingleDeficiency10by10.Rhs, false);
 			});
 		}
 
