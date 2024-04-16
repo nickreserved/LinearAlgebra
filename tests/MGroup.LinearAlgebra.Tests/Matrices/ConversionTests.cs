@@ -85,5 +85,20 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			var comparer = new MatrixComparer(1E-15);
 			comparer.AssertEqual(submatrixExpected, submatrixComputed);
 		}
+
+		[Fact]
+		public static void TestSymmetricCscToNonSymmetricCsr()
+		{
+			int n = SparsePosDef10by10.Order;
+			var symmCsc = SymmetricCscMatrix.CreateFromArrays(n, SparsePosDef10by10.SymmetricCscValues,
+				SparsePosDef10by10.SymmetricCscRowIndices, SparsePosDef10by10.SymmetricCscColOffsets, true);
+
+			var csrExpected = CsrMatrix.CreateFromArrays(n, n, SparsePosDef10by10.CsrValues, SparsePosDef10by10.CsrColIndices, 
+				SparsePosDef10by10.CsrRowOffsets, true);
+
+			CsrMatrix csrComputed = symmCsc.ConvertToCsr();
+			var comparer = new MatrixComparer(1E-15);
+			comparer.AssertEqual(csrExpected, csrComputed);
+		}
 	}
 }
