@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Matrices.Builders;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -8,7 +8,6 @@ namespace MGroup.LinearAlgebra.Tests.MatrixBuilders
 {
     /// <summary>
     /// Tests for <see cref="DokRowMajor"/>.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     public static class DokRowMajorTests
     {

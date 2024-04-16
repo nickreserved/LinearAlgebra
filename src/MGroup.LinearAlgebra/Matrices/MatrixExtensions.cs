@@ -61,6 +61,24 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static void AddIntoThis(this IMatrix matrix1, IMatrixView matrix2) => matrix1.AxpyIntoThis(matrix2, 1.0);
 
 		/// <summary>
+		/// Converts any matrix to CSC format.
+		/// </summary>
+		/// <param name="matrix">Any matrix.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The nonzero entries of the original matrix in CSC format.</returns>
+		public static CscMatrix ConvertToCsc(this IIndexable2D matrix, double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCsc(matrix, zeroEntryTolerance);
+
+		/// <summary>
+		/// Converts any matrix to CSR format.
+		/// </summary>
+		/// <param name="matrix">Any matrix.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The nonzero entries of the original matrix in CSR format.</returns>
+		public static CsrMatrix ConvertToCsr(this IIndexable2D matrix, double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCsr(matrix, zeroEntryTolerance);
+
+		/// <summary>
 		/// Copies the entries of the matrix into a 2-dimensional array. The returned array has length(0) = number of rows 
 		/// and length(1) = number of columns. 
 		/// </summary>
@@ -106,6 +124,32 @@ namespace MGroup.LinearAlgebra.Matrices
 				}
 			}
 		}
+
+		/// <summary>
+		/// Extracts a submatrix in CSC format, which contains only the rows and columns defined by <paramref name="rowsToKeep"/>
+		/// and <paramref name="colsToKeep"/>.
+		/// </summary>
+		/// <param name="matrix">Any matrix</param>
+		/// <param name="rowsToKeep">The rows of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="colsToKeep">The columns of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The submatrix in CSC format</returns>
+		public static CscMatrix GetSubmatrixAsCsc(this IIndexable2D matrix, int[] rowsToKeep, int[] colsToKeep,
+			double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCscSubmatrix(matrix, rowsToKeep, colsToKeep, zeroEntryTolerance);
+
+		/// <summary>
+		/// Extracts a submatrix in CSR format, which contains only the rows and columns defined by <paramref name="rowsToKeep"/>
+		/// and <paramref name="colsToKeep"/>.
+		/// </summary>
+		/// <param name="matrix">Any matrix</param>
+		/// <param name="rowsToKeep">The rows of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="colsToKeep">The columns of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The submatrix in CSR format</returns>
+		public static CsrMatrix GetSubmatrixAsCsr(this IIndexable2D matrix, int[] rowsToKeep, int[] colsToKeep,
+			double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCsrSubmatrix(matrix, rowsToKeep, colsToKeep, zeroEntryTolerance);
 
 		/// <summary>
 		/// Returns true if <paramref name="matrix"/>[i, j] and <paramref name="matrix"/>[j, i] are equal or at least within the 

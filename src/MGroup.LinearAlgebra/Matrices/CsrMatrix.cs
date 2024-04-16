@@ -12,8 +12,6 @@ namespace MGroup.LinearAlgebra.Matrices
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Diagnostics;
-	using System.Runtime.ConstrainedExecution;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
@@ -1020,7 +1018,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			var cscRowIndices = new int[nnz];
 			var cscColOffsets = new int[NumColumns + 1];
 
-			SparseArrays.CsrToCsc(NumRows, NumColumns, this.rowOffsets, this.colIndices, this.values,
+			Conversions.CsrToCsc(NumRows, NumColumns, this.rowOffsets, this.colIndices, this.values,
 				cscColOffsets, cscRowIndices, cscValues);
 
 			return new CsrMatrix(NumColumns, NumRows, cscValues, cscRowIndices, cscColOffsets);
