@@ -5,6 +5,10 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 	using System.Text;
 	using MGroup.LinearAlgebra.Exceptions;
 
+	/// <summary>
+	/// Represents a symmetric sparse matrix with integer entries. The non-zero entries of the diagonal and upper triangle are 
+	/// stored in column-major order using dictionaries.
+	/// </summary>
 	public class IntDokSymColMajor : IIndexableInt2D
 	{
 		private readonly int order;

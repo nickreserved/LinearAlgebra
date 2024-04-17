@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Tests.SchurComplements
+namespace MGroup.LinearAlgebra.Tests.SchurComplements.IntegerMatrices
 {
 	using System;
 	using System.Collections.Generic;
@@ -26,11 +26,11 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 		[Fact]
 		public static void TestIndexers()
 		{
-			int nnz = SparseRectangular10by5.CscValues.Length;
+			var nnz = SparseRectangular10by5.CscValues.Length;
 			double scaleFactor = 1000;
-			int[,] array2D = ArrayUtilities.ScaleAndRound(SparseRectangular10by5.Matrix, scaleFactor);
+			var array2D = ArrayUtilities.ScaleAndRound(SparseRectangular10by5.Matrix, scaleFactor);
 
-			IntDokColMajor dok = CreateDokFromArray(array2D);
+			var dok = CreateDokFromArray(array2D);
 
 			var comparer = new MatrixComparer();
 			comparer.AssertEqual(array2D, dok);
@@ -41,13 +41,13 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 		public static void TestBuildCsrArrays()
 		{
 			double scaleFactor = 1000;
-			int[,] array2D = ArrayUtilities.ScaleAndRound(SparseRectangular10by5.Matrix, scaleFactor);
-			int[] valuesExpected = ArrayUtilities.ScaleAndRound(SparseRectangular10by5.CscValues, scaleFactor);
-			int[] rowIndicesExpected = SparseRectangular10by5.CscRowIndices;
-			int[] colOffsetsExpected = SparseRectangular10by5.CscColOffsets;
+			var array2D = ArrayUtilities.ScaleAndRound(SparseRectangular10by5.Matrix, scaleFactor);
+			var valuesExpected = ArrayUtilities.ScaleAndRound(SparseRectangular10by5.CscValues, scaleFactor);
+			var rowIndicesExpected = SparseRectangular10by5.CscRowIndices;
+			var colOffsetsExpected = SparseRectangular10by5.CscColOffsets;
 
-			IntDokColMajor dok = CreateDokFromArray(array2D);
-			(int[] values, int[] rowIndices, int[] colOffsets) = dok.BuildCscArrays();
+			var dok = CreateDokFromArray(array2D);
+			(var values, var rowIndices, var colOffsets) = dok.BuildCscArrays();
 
 			var comparer = new MatrixComparer();
 			comparer.AssertEqual(valuesExpected, values);
@@ -57,13 +57,13 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 
 		private static IntDokColMajor CreateDokFromArray(int[,] array2D)
 		{
-			int m = array2D.GetLength(0);
-			int n = array2D.GetLength(1);
+			var m = array2D.GetLength(0);
+			var n = array2D.GetLength(1);
 			var dok = IntDokColMajor.CreateZero(m, n);
 
-			for (int i = 0; i < m; i++)
+			for (var i = 0; i < m; i++)
 			{
-				for (int j = 0; j < n; j++)
+				for (var j = 0; j < n; j++)
 				{
 					if (array2D[i, j] != 0)
 					{

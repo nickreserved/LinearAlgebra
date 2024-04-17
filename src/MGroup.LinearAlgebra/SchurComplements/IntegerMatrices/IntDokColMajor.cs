@@ -5,6 +5,9 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 	using System.Text;
 	using MGroup.LinearAlgebra.Exceptions;
 
+	/// <summary>
+	/// Represents a sparse matrix with integer entries. Non-zero entries are stored in column-major order using dictionaries.
+	/// </summary>
 	public class IntDokColMajor : IIndexableInt2D
 	{
 		private readonly SortedDictionary<int, int>[] columns;

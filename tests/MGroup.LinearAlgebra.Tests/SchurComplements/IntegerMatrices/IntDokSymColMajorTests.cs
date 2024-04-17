@@ -1,4 +1,4 @@
-namespace MGroup.LinearAlgebra.Tests.SchurComplements
+namespace MGroup.LinearAlgebra.Tests.SchurComplements.IntegerMatrices
 {
 	using System;
 	using System.Collections.Generic;
@@ -26,11 +26,11 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 		[Fact]
 		public static void TestIndexers()
 		{
-			int nnz = SparsePosDef10by10.SymmetricCscValues.Length;
+			var nnz = SparsePosDef10by10.SymmetricCscValues.Length;
 			double scaleFactor = 1000;
-			int[,] array2D = ArrayUtilities.ScaleAndRound(SparsePosDef10by10.Matrix, scaleFactor);
+			var array2D = ArrayUtilities.ScaleAndRound(SparsePosDef10by10.Matrix, scaleFactor);
 
-			IntDokSymColMajor dok = CreateDokFromArray(array2D);
+			var dok = CreateDokFromArray(array2D);
 
 			var comparer = new MatrixComparer();
 			comparer.AssertEqual(array2D, dok);
@@ -41,13 +41,13 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 		public static void TestBuildCsrArrays()
 		{
 			double scaleFactor = 1000;
-			int[,] array2D = ArrayUtilities.ScaleAndRound(SparsePosDef10by10.Matrix, scaleFactor);
-			int[] valuesExpected = ArrayUtilities.ScaleAndRound(SparsePosDef10by10.SymmetricCscValues, scaleFactor);
-			int[] rowIndicesExpected = SparsePosDef10by10.SymmetricCscRowIndices;
-			int[] colOffsetsExpected = SparsePosDef10by10.SymmetricCscColOffsets;
+			var array2D = ArrayUtilities.ScaleAndRound(SparsePosDef10by10.Matrix, scaleFactor);
+			var valuesExpected = ArrayUtilities.ScaleAndRound(SparsePosDef10by10.SymmetricCscValues, scaleFactor);
+			var rowIndicesExpected = SparsePosDef10by10.SymmetricCscRowIndices;
+			var colOffsetsExpected = SparsePosDef10by10.SymmetricCscColOffsets;
 
-			IntDokSymColMajor dok = CreateDokFromArray(array2D);
-			(int[] values, int[] rowIndices, int[] colOffsets) = dok.BuildCscArrays();
+			var dok = CreateDokFromArray(array2D);
+			(var values, var rowIndices, var colOffsets) = dok.BuildCscArrays();
 
 			var comparer = new MatrixComparer();
 			comparer.AssertEqual(valuesExpected, values);
@@ -57,12 +57,12 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements
 
 		private static IntDokSymColMajor CreateDokFromArray(int[,] array2D)
 		{
-			int n = array2D.GetLength(0);
+			var n = array2D.GetLength(0);
 			var dok = IntDokSymColMajor.CreateZero(n);
 
-			for (int i = 0; i < n; i++)
+			for (var i = 0; i < n; i++)
 			{
-				for (int j = 0; j <= i; j++)
+				for (var j = 0; j <= i; j++)
 				{
 					if (array2D[i, j] != 0)
 					{
