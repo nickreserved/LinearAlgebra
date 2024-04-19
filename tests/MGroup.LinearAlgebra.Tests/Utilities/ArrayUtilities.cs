@@ -41,6 +41,22 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return true;
 		}
 
+		internal static double[,] GetSubmatrix(double[,] original, int[] rows, int[] columns)
+		{
+			int m = rows.Length;
+			int n = columns.Length;
+			var submatrix = new double[m, n];
+			for (int i = 0; i < m; i++)
+			{
+				for (int j = 0; j < n; j++)
+				{
+					submatrix[i, j] = original[rows[i], columns[j]];
+				}
+			}
+
+			return submatrix;
+		}
+
 		internal static int[] ScaleAndRound(double[] original, double scaleFactor)
 		{
 			int n = original.Length;
@@ -78,6 +94,16 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 		internal static T[] Copy<T>(T[] original)
 		{
 			var clone = new T[original.Length];
+			Array.Copy(original, clone, original.Length);
+			return clone;
+		}
+
+		/// <summary>
+		/// Shallow copy.
+		/// </summary>
+		internal static T[,] Copy<T>(T[,] original)
+		{
+			var clone = new T[original.GetLength(0), original.GetLength(1)];
 			Array.Copy(original, clone, original.Length);
 			return clone;
 		}

@@ -482,22 +482,33 @@ namespace MGroup.LinearAlgebra.Commons
 
 		internal static CscMatrix GeneralToCsc(IIndexable2D matrix, double zeroEntryTolerance)
 		{
+			// Unoptimized: 1 pass to find the number of non zero entries, then allocate arrays, then another pass to copy the non zero entries
 			int m = matrix.NumRows;
 			int n = matrix.NumColumns;
-			var dok = DokColMajor.CreateEmpty(m, n);
+			int nnz = CountNonZeros(matrix, zeroEntryTolerance);
+
+			var values = new double[nnz];
+			var rowIndices = new int[nnz];
+			var colOffsets = new int[n + 1];
+			colOffsets[n] = nnz;
+
+			int k = 0;
 			for (int j = 0; j < n; j++)
 			{
-				for (int i = 0; i < m; i++)
+				colOffsets[j] = k;
+				for (int i = 0; i < m; ++i)
 				{
 					double val = matrix[i, j];
 					if (Math.Abs(val) > zeroEntryTolerance)
 					{
-						dok[i, j] = val;
+						values[k] = val;
+						rowIndices[k] = i;
+						++k;
 					}
 				}
 			}
 
-			return dok.BuildCscMatrix(true);
+			return CscMatrix.CreateFromArrays(m, n, values, rowIndices, colOffsets, false);
 		}
 
 		internal static CscMatrix GeneralToCscSubmatrix(IIndexable2D matrix, int[] rowsToKeep, int[] colsToKeep,
@@ -525,22 +536,33 @@ namespace MGroup.LinearAlgebra.Commons
 
 		internal static CsrMatrix GeneralToCsr(IIndexable2D matrix, double zeroEntryTolerance)
 		{
+			// Unoptimized: 1 pass to find the number of non zero entries, then allocate arrays, then another pass to copy the non zero entries
 			int m = matrix.NumRows;
 			int n = matrix.NumColumns;
-			var dok = DokRowMajor.CreateEmpty(m, n);
+			int nnz = CountNonZeros(matrix, zeroEntryTolerance);
+
+			var values = new double[nnz];
+			var colIndices = new int[nnz];
+			var rowOffsets = new int[m + 1];
+			rowOffsets[m] = nnz;
+
+			int k = 0;
 			for (int i = 0; i < m; i++)
 			{
-				for (int j = 0; j < n; j++)
+				rowOffsets[i] = k;
+				for (int j = 0; j < n; ++j)
 				{
 					double val = matrix[i, j];
 					if (Math.Abs(val) > zeroEntryTolerance)
 					{
-						dok[i, j] = val;
+						values[k] = val;
+						colIndices[k] = j;
+						++k;
 					}
 				}
 			}
 
-			return dok.BuildCsrMatrix(true);
+			return CsrMatrix.CreateFromArrays(m, n, values, colIndices, rowOffsets, false);
 		}
 
 		internal static CsrMatrix GeneralToCsrSubmatrix(IIndexable2D matrix, int[] rowsToKeep, int[] colsToKeep,
@@ -836,6 +858,25 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 
 			return upper;
+		}
+
+		private static int CountNonZeros(IIndexable2D matrix, double zeroEntryTolerance)
+		{
+			int m = matrix.NumRows;
+			int n = matrix.NumColumns;
+			int nnz = 0;
+			for (int i = 0; i < m; i++)
+			{
+				for (int j = 0; j < n; ++j)
+				{
+					if (Math.Abs(matrix[i, j]) > zeroEntryTolerance)
+					{
+						++nnz;
+					}
+				}
+			}
+
+			return nnz;
 		}
 	}
 }
