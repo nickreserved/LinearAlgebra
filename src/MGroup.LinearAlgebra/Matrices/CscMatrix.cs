@@ -14,14 +14,14 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 // CSRStrategies static class.
 //TODO: In matrix-matrix/vector multiplications: perhaps I should work with a column major array directly instead of an output   
 //      Matrix and an array instead of an output Vector.
-//TODO: perhaps optimizations if (other is Matrix) are needed, to directly index into its raw col major array.
+//TODO: perhaps optimizations if (otherMatrix is Matrix) are needed, to directly index into its raw col major array.
 //      The access paterns are always the same.
 //TODO: The implementations of this class should call transposed operations on a backing CSR matrix.
 namespace MGroup.LinearAlgebra.Matrices
 {
 	/// <summary>
 	/// Sparse matrix stored in Compressed Sparse Columns format (3-array version). The CSR format is optimized for matrix-vector 
-	/// and matrix-matrix multiplications, where the CSC matrix is on the left transposed or on the right untransposed. The other
+	/// and matrix-matrix multiplications, where the CSC matrix is on the left transposed or on the right untransposed. The otherMatrix
 	/// multiplicationss are more efficient using <see cref="CsrMatrix"/>. To build a <see cref="CscMatrix"/> conveniently, 
 	/// use <see cref="Builders.DokColMajor"/>.
 	/// Authors: Serafeim Bakalakos
@@ -90,7 +90,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// The internal array that stores the index into the arrays <see cref="RawValues"/> and <see cref="RawRowIndices"/> of  
-		/// the first entry of each column. Its length is equal to <paramref name="NumColumns"/> + 1. 
+		/// the first entry of each column. Its length is equal to <see cref="ILinearTransformation.NumColumns"/> + 1. 
 		/// The last entry is the number of non-zero entries, which must be equal to 
 		/// <see cref="RawValues"/>.Length == <see cref="RawRowIndices"/>.Length.
 		/// It should only be used for passing the raw array to linear algebra libraries.
@@ -167,10 +167,8 @@ namespace MGroup.LinearAlgebra.Matrices
             => matrixRight.Multiply(vectorLeft, true);
         #endregion
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Axpy(IMatrixView, double)"/>.
-        /// </summary>
-        public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is CscMatrix otherCSC) // In case both matrices have the exact same index arrays
             {
@@ -192,7 +190,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, 1.0, otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, 1.0, (IMatrixView) otherMatrix, otherCoefficient);
         }
 
         /// <summary>
@@ -227,14 +225,12 @@ namespace MGroup.LinearAlgebra.Matrices
             return new CscMatrix(NumRows, NumColumns, resultValues, this.rowIndices, this.colOffsets);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
-        /// </summary>
-        public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is CscMatrix casted) AxpyIntoThis(casted, otherCoefficient);
             else throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the other matrix has the same sparsity pattern");
+                 "This operation is legal only if the otherMatrix matrix has the same sparsity pattern");
         }
 
         /// <summary>
@@ -254,7 +250,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				return;
 			}
 
-			//Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
+			//Preconditions.CheckSameMatrixDimensions(this, otherMatrix); // no need if the indexing arrays are the same
 			if (!HasSameIndexer(otherMatrix))
             {
                 throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
@@ -262,9 +258,7 @@ namespace MGroup.LinearAlgebra.Matrices
             Blas.Daxpy(values.Length, otherCoefficient, otherMatrix.values, 0, 1, this.values, 0, 1);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.Clear"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void Clear() => Array.Clear(values, 0, values.Length);
 
         /// <summary>
@@ -318,12 +312,10 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public int CountNonZeros() => values.Length;
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public IMatrix DoEntrywise(IMatrixView other, Func<double, double, double> binaryOperation)
+        /// <inheritdoc/>
+        public IMatrix DoEntrywise(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
         {
-            if (other is CscMatrix otherCSC) // In case both matrices have the exact same index arrays
+            if (otherMatrix is CscMatrix otherCSC) // In case both matrices have the exact same index arrays
             {
 				if (otherCSC.values.Length == 0)
 				{
@@ -345,15 +337,14 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.DoEntrywise(this, other, binaryOperation);
+            return DenseStrategies.DoEntrywise(this, (IMatrixView) otherMatrix, binaryOperation);
         }
+		IMinimalMatrix IMinimalReadOnlyMatrix.DoEntrywise(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation) => DoEntrywise(otherMatrix, binaryOperation);
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public void DoEntrywiseIntoThis(IMatrixView other, Func<double, double, double> binaryOperation)
+		/// <inheritdoc/>
+		public void DoEntrywiseIntoThis(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
         {
-            if (other is CscMatrix casted)
+            if (otherMatrix is CscMatrix casted)
             {
 				if (casted.values.Length == 0)
 				{
@@ -361,7 +352,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					return;
 				}
 
-				//Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
+				//Preconditions.CheckSameMatrixDimensions(this, otherMatrix); // no need if the indexing arrays are the same
 				if (!HasSameIndexer(casted))
                 {
                     throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
@@ -369,7 +360,7 @@ namespace MGroup.LinearAlgebra.Matrices
                 for (int i = 0; i < values.Length; ++i) this.values[i] = binaryOperation(this.values[i], casted.values[i]);
             }
             else throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other matrix has the same sparsity pattern");
+                "This operation is legal only if the otherMatrix matrix has the same sparsity pattern");
         }
 
         /// <summary>
@@ -427,31 +418,29 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1e-13)
+        /// <inheritdoc/>
+        public bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-13)
         {
-            if ((this.NumRows != other.NumRows) || (this.NumColumns != other.NumColumns)) return false;
-            var comparer = new ValueComparer(tolerance);
-            for (int j = 0; j < NumColumns; ++j)
-            {
-                int colStart = colOffsets[j]; // Inclusive
-                int colEnd = colOffsets[j + 1]; // Exclusive
-                int previousRow = 0;
-                for (int k = colStart; k < colEnd; ++k)
-                {
-                    int row = rowIndices[k];
-                    for (int i = previousRow; i < row; ++i) // Zero entries between the stored ones
-                    {
-                        if (!comparer.AreEqual(0.0, other[i, j])) return false;
-                    }
-                    if (!comparer.AreEqual(values[k], other[row, j])) return false; // Non zero entry
-                    previousRow = row + 1;
-                }
-            }
-            return true; // At this point all entries have been checked and are equal
-        }
+            if ((this.NumRows != otherMatrix.NumRows) || (this.NumColumns != otherMatrix.NumColumns)) return false;
+			var comparer = new ValueComparer(tolerance);
+			for (int j = 0; j < NumColumns; ++j)
+			{
+				int colStart = colOffsets[j]; // Inclusive
+				int colEnd = colOffsets[j + 1]; // Exclusive
+				int previousRow = 0;
+				for (int k = colStart; k < colEnd; ++k)
+				{
+					int row = rowIndices[k];
+					for (int i = previousRow; i < row; ++i) // Zero entries between the stored ones
+					{
+						if (!comparer.AreEqual(0.0, ((IMatrixView) otherMatrix)[i, j])) return false;
+					}
+					if (!comparer.AreEqual(values[k], ((IMatrixView)otherMatrix)[row, j])) return false; // Non zero entry
+					previousRow = row + 1;
+				}
+			}
+			return true; // At this point all entries have been checked and are equal
+		}
 
         /// <summary>
         /// See <see cref="ISliceable2D.GetColumn(int)"/>.
@@ -461,7 +450,7 @@ namespace MGroup.LinearAlgebra.Matrices
             Preconditions.CheckIndexCol(this, colIndex);
             double[] colVector = new double[NumRows];
             for (int k = colOffsets[colIndex]; k < colOffsets[colIndex + 1]; ++k) colVector[rowIndices[k]] = values[k];
-            return Vector.CreateFromArray(colVector, false);
+            return new Vector(colVector);
         }
 
         /// <summary>
@@ -476,7 +465,7 @@ namespace MGroup.LinearAlgebra.Matrices
                 int entryOffset = FindOffsetOf(rowIndex, j);
                 if (entryOffset != zeroEntryOffset) rowVector[j] = values[entryOffset];
             }
-            return Vector.CreateFromArray(rowVector, false);
+            return new Vector(rowVector);
         }
 
         /// <summary>
@@ -504,10 +493,8 @@ namespace MGroup.LinearAlgebra.Matrices
         public IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive)
             => DenseStrategies.GetSubmatrix(this, rowStartInclusive, rowEndExclusive, colStartInclusive, colEndExclusive);
 
-        /// <summary>
-        /// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
-        /// </summary>
-        public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is CscMatrix otherCSC) // In case both matrices have the exact same index arrays
             {
@@ -543,17 +530,15 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, thisCoefficient, otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, thisCoefficient, (IMatrixView) otherMatrix, otherCoefficient);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
-        /// </summary>
-        public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		/// <inheritdoc/>
+		public void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is CscMatrix casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
             else throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other matrix has the same sparsity pattern");
+                "This operation is legal only if the otherMatrix matrix has the same sparsity pattern");
         }
 
         /// <summary>
@@ -575,7 +560,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				return;
 			}
 
-			//Preconditions.CheckSameMatrixDimensions(this, other); // no need if the indexing arrays are the same
+			//Preconditions.CheckSameMatrixDimensions(this, otherMatrix); // no need if the indexing arrays are the same
 			if (!HasSameIndexer(otherMatrix))
             {
                 throw new SparsityPatternModifiedException("Only allowed if the indexing arrays are the same");
@@ -657,7 +642,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
             else
             {
-                //TODO: perhaps I can use the left multiplications if the other matrix is also transposed
+                //TODO: perhaps I can use the left multiplications if the otherMatrix matrix is also transposed
                 if (other is Matrix dense) return MultiplyRight(dense, transposeThis);
 
                 if (transposeThis)
@@ -677,42 +662,40 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// Performs the matrix-matrix multiplication: oper(this) * <paramref name="other"/>.
-        /// </summary>
-        /// <param name="other">
-        /// A matrix such that the <see cref="IIndexable2D.NumRows"/> of <paramref name="other"/> are equal to the 
-        /// <see cref="IIndexable2D.NumColumns"/> of oper(this).
-        /// </param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="Exceptions.NonMatchingDimensionsException">
-        /// Thrown if <paramref name="otherMatrix"/> has different <see cref="IIndexable2D.NumRows"/> than the 
-        /// <see cref="IIndexable2D.NumColumns"/> of oper(this).
-        /// </exception>
-        public Matrix MultiplyRight(Matrix other, bool transposeThis)
+		/// <summary>
+		/// Performs the matrix-matrix multiplication: oper(this) * <paramref name="otherMatrix"/>.
+		/// </summary>
+		/// <param name="otherMatrix">
+		/// A matrix such that the <see cref="ILinearTransformation.NumRows"/> of <paramref name="otherMatrix"/> are equal to the 
+		/// <see cref="ILinearTransformation.NumColumns"/> of oper(this).
+		/// </param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">
+		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="ILinearTransformation.NumRows"/> than the 
+		/// <see cref="ILinearTransformation.NumColumns"/> of oper(this).
+		/// </exception>
+		public Matrix MultiplyRight(Matrix otherMatrix, bool transposeThis)
         {
             int numRowsResult;
             if (transposeThis)
             {
-                Preconditions.CheckMultiplicationDimensions(this.NumRows, other.NumRows);
+                Preconditions.CheckMultiplicationDimensions(this.NumRows, otherMatrix.NumRows);
                 numRowsResult = this.NumColumns;
             }
             else
             {
-                Preconditions.CheckMultiplicationDimensions(this.NumColumns, other.NumRows);
+                Preconditions.CheckMultiplicationDimensions(this.NumColumns, otherMatrix.NumRows);
                 numRowsResult = this.NumRows;
             }
 
-            var result = Matrix.CreateZero(numRowsResult, other.NumColumns);
-            SparseBlas.Dcscgemm(transposeThis, this.NumRows, other.NumColumns, this.NumColumns, values, colOffsets, rowIndices,
-                other.RawData, result.RawData);
+            var result = Matrix.CreateZero(numRowsResult, otherMatrix.NumColumns);
+            SparseBlas.Dcscgemm(transposeThis, this.NumRows, otherMatrix.NumColumns, this.NumColumns, values, colOffsets, rowIndices,
+                otherMatrix.RawData, result.RawData);
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
-        /// </summary>
-        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
+        /// <inheritdoc/>
+        public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector dense) return Multiply(dense, transposeThis);
 
@@ -720,40 +703,38 @@ namespace MGroup.LinearAlgebra.Matrices
             {
                 var result = new double[NumColumns];
                 Preconditions.CheckMultiplicationDimensions(NumRows, vector.Length);
-                CsrMultiplications.CsrTimesVector(NumColumns, values, colOffsets, rowIndices, vector, result);
-                return Vector.CreateFromArray(result, false);
+                CsrMultiplications.CsrTimesVector(NumColumns, values, colOffsets, rowIndices, (IExtendedReadOnlyVector) vector, result);
+                return new Vector(result);
             }
             else
             {
                 var result = new double[NumRows];
                 Preconditions.CheckMultiplicationDimensions(NumColumns, vector.Length);
-                CsrMultiplications.CsrTransTimesVector(NumColumns, values, colOffsets, rowIndices, vector, result);
-                return Vector.CreateFromArray(result, false);
+                CsrMultiplications.CsrTransTimesVector(NumColumns, values, colOffsets, rowIndices, (IExtendedReadOnlyVector) vector, result);
+                return new Vector(result);
             }
         }
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: oper(this) * <paramref name="vector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// </summary>
-        /// <param name="vector">A vector with <see cref="IIndexable1D.Length"/> being equal to the 
-        ///     <see cref="IIndexable2D.NumColumns"/> of oper(this).</param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IIndexable1D.Length"/> of
-        ///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
-        public Vector Multiply(Vector vector, bool transposeThis = false)
+		/// <summary>
+		/// Performs the matrix-vector multiplication: oper(this) * <paramref name="vector"/>.
+		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
+		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
+		/// </summary>
+		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
+		///     <see cref="ILinearTransformation.NumColumns"/> of oper(this).</param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+		///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
+		public Vector Multiply(Vector vector, bool transposeThis = false)
         {
             //TODO: this performs redundant dimension checks, including checking the transposeThis flag.
-            var result = Vector.CreateZero(transposeThis ? NumColumns : NumRows);
+            var result = new Vector(new double[transposeThis ? NumColumns : NumRows]);
             MultiplyIntoResult(vector, result, transposeThis);
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
-        /// </summary>
-        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
+        /// <inheritdoc/>
+        public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
         {
 			if (this.values.Length == 0)
 			{
@@ -771,38 +752,42 @@ namespace MGroup.LinearAlgebra.Matrices
             {
                 Preconditions.CheckMultiplicationDimensions(NumRows, lhsVector.Length);
                 Preconditions.CheckSystemSolutionDimensions(NumColumns, rhsVector.Length);
-                CsrMultiplications.CsrTimesVector(NumColumns, values, colOffsets, rowIndices, lhsVector, rhsVector);
+                CsrMultiplications.CsrTimesVector(NumColumns, values, colOffsets, rowIndices, (IExtendedReadOnlyVector) lhsVector, (IExtendedVector) rhsVector);
             }
             else
             {
                 Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
                 Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
-                CsrMultiplications.CsrTransTimesVector(NumColumns, values, colOffsets, rowIndices, lhsVector, rhsVector);
-            }
+                CsrMultiplications.CsrTransTimesVector(NumColumns, values, colOffsets, rowIndices, (IExtendedReadOnlyVector)lhsVector, (IExtendedVector)rhsVector);
+			}
         }
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="vector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
-        /// </summary>
-        /// <param name="lhsVector">
-        /// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
-        /// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumColumns"/>.
-        /// </param>
-        /// <param name="rhsVector">
-        /// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-        /// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumRows"/>.
-        /// </param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
-        /// violate the described contraints.
-        /// </exception>
-        public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
+		/// <inheritdoc/>
+		public void MultiplyIntoResult(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector) => MultiplyIntoResult(rhsVector, lhsVector, false);
+
+
+		/// <summary>
+		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
+		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
+		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
+		/// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
+		/// </summary>
+		/// <param name="lhsVector">
+		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="ILinearTransformation.NumColumns"/>.
+		/// </param>
+		/// <param name="rhsVector">
+		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
+		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="ILinearTransformation.NumRows"/>.
+		/// </param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <exception cref="NonMatchingDimensionsException">
+		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// violate the described contraints.
+		/// </exception>
+		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
         {
 			if (this.values.Length == 0)
 			{
@@ -823,7 +808,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             SparseBlas.Dcscgemv(transposeThis, NumRows, NumColumns, values, colOffsets, rowIndices,
-                    lhsVector.RawData, 0, rhsVector.RawData, 0);
+                    lhsVector.Values, 0, rhsVector.Values, 0);
         }
 
         /// <summary>
@@ -858,9 +843,7 @@ namespace MGroup.LinearAlgebra.Matrices
             return new CscMatrix(this.NumRows, this.NumColumns, resultValues, this.rowIndices, this.colOffsets);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void ScaleIntoThis(double scalar) => Blas.Dscal(values.Length, scalar, values, 0, 1);
 
         /// <summary>
@@ -901,7 +884,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Creates a new <see cref="CsrMatrix"/> instance, that is transpose to this: result[i, j] = this[j, i]. The 
         /// internal arrays can be copied or shared with this <see cref="CscMatrix"/> instance.
         /// </summary>
-        /// <param name="copyInternalArray">If true, the internal arrays that store the entries of this 
+        /// <param name="copyInternalArrays">If true, the internal arrays that store the entries of this 
         ///     <see cref="CscMatrix"/> instance will be copied and the new <see cref="CsrMatrix"/> instance 
         ///     instance will have references to the copies, which is safer. If false, both the new matrix and this one will have  
         ///     references to the same internal arrays, which is faster.</param>
@@ -943,5 +926,14 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             return (this.rowIndices == other.rowIndices) && (this.colOffsets == other.colOffsets);
         }
-    }
+
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.AddIntoThis(this, otherMatrix);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.SubtractIntoThis(this, otherMatrix);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Add(this, otherMatrix);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Subtract(this, otherMatrix);
+		
+		public IMinimalMatrix CreateZeroWithSameFormat() =>
+			new CscMatrix(NumRows, NumColumns, new double[RawValues.Length], (int[])RawRowIndices.Clone(), (int[])RawColOffsets.Clone());
+		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
+	}
 }

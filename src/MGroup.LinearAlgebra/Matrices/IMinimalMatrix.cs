@@ -6,23 +6,52 @@ namespace MGroup.LinearAlgebra.Matrices
 
 	public interface IMinimalMatrix : IMinimalReadOnlyMatrix
 	{
-		IMinimalMatrix AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
+		/// <summary>
+		/// Performs the following operation for all (i, j):
+		/// this[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
+		/// Optimized version of <see cref="DoEntrywiseIntoThis(IMinimalReadOnlyMatrix, Func{double, double, double})"/> and 
+		/// <see cref="LinearCombinationIntoThis(double, IMinimalReadOnlyMatrix, double)"/>. Named after BLAS axpy (y = a*x plus y). 
+		/// The resulting matrix overwrites the entries of this.
+		/// </summary>
+		/// <param name="otherMatrix">A matrix with the same <see cref="ILinearTransformation.NumRows"/> and 
+		///     <see cref="ILinearTransformation.NumColumns"/> as this.</param>
+		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
+		///     <see cref="ILinearTransformation.NumRows"/> or <see cref="ILinearTransformation.NumColumns"/> than this.</exception>
+		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
+		///     is not permitted by the matrix storage format.</exception>
+		void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 
 
-		IMinimalMatrix AddIntoThis(IMinimalReadOnlyMatrix otherMatrix);
+		void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix);
 
-		protected static IMinimalMatrix AddIntoThis(IMinimalMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, 1);
+		protected static void AddIntoThis(IMinimalMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, 1);
 
 
-		IMinimalMatrix SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix);
+		void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix);
 		
-		protected static IMinimalMatrix SubtractIntoThis(IMinimalMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, -1);
+		protected static void SubtractIntoThis(IMinimalMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix) => thisMatrix.AxpyIntoThis(otherMatrix, -1);
 
 
-		IMinimalMatrix LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
+		/// <summary>
+		/// Performs the following operation for all (i, j):
+		/// this[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
+		/// <paramref name="otherMatrix"/>[i, j]. 
+		/// Optimized version of <see cref="DoEntrywiseIntoThis(IMinimalReadOnlyMatrix, Func{double, double, double})"/>.
+		/// The resulting matrix overwrites the entries of this.
+		/// </summary>
+		/// <param name="thisCoefficient">A scalar that multiplies each entry of this.</param>
+		/// <param name="otherMatrix">A matrix with the same <see cref="ILinearTransformation.NumRows"/> and 
+		///     <see cref="ILinearTransformation.NumColumns"/> as this.</param>
+		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
+		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
+		///     <see cref="ILinearTransformation.NumRows"/> or <see cref="ILinearTransformation.NumColumns"/> than this.</exception>
+		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
+		///     is not permitted by the matrix storage format.</exception>
+		void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 		
 
-		IMinimalMatrix ScaleIntoThis(double coefficient);
+		void ScaleIntoThis(double coefficient);
 
 
 		/// <summary>

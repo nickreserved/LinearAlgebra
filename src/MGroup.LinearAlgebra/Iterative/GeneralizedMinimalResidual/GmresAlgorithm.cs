@@ -80,7 +80,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
                     indexIteration = innerIteration;
                     v[innerIteration + 1] = Vector.CreateZero(v[innerIteration].Length);
 
-                    matrix.MultiplyIntoThis(v[innerIteration], v[innerIteration + 1]);
+                    matrix.MultiplyIntoResult(v[innerIteration], v[innerIteration + 1]);
                     preconditioner.Apply(v[innerIteration + 1], v[innerIteration + 1]);
 
                     var av = v[innerIteration + 1].Norm2();

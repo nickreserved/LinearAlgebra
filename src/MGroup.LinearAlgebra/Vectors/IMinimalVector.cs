@@ -63,7 +63,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 		/// <summary>
-		/// MultiplyIntoThis this vector with scalar <paramref name="coefficient"/>.
+		/// MultiplyIntoResult this vector with scalar <paramref name="coefficient"/>.
 		/// </summary>
 		/// thisVector *= <paramref name="coefficient"/>
 		/// <param name="coefficient">A scalar to multiply this vector</param>

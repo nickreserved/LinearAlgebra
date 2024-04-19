@@ -7,18 +7,6 @@ namespace MGroup.LinearAlgebra.Matrices
 	public interface IMinimalReadOnlyMatrix : ILinearTransformation
 	{
 		/// <summary>
-		/// Multiplies this matrix with vector rhsVector and returns the result of multiplication.
-		/// returnVector = thisMatrix * rhsVector.
-		/// </summary>
-		/// <param name="rhsVector">The right hand vector. It must have number of elements equal to number of this matrix columns.</param>
-		/// <returns>The result vector</returns>
-		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="rhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
-		/// than this matrix <see cref="ILinearTransformation.NumColumns"/>.</exception>
-		Vector MultiplyRight(IMinimalReadOnlyVector rhsVector);
-
-
-		/// <summary>
 		/// A partial linear combination between this and another matrix.
 		/// </summary>
 		/// <param name="otherMatrix">A vector with the same number of Values with this vector</param>
@@ -26,7 +14,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <returns>thisMatrix + <paramref name="otherMatrix"/> * <paramref name="otherCoefficient"/></returns>
 		IMinimalMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 
-		protected static IMinimalMatrix Axpy(IMinimalReadOnlyMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient) => thisMatrix.Copy().AxpyIntoThis(otherMatrix, otherCoefficient);
+		protected static IMinimalMatrix Axpy(IMinimalReadOnlyMatrix thisMatrix, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
+		{
+			var result = thisMatrix.Copy();
+			result.AxpyIntoThis(otherMatrix, otherCoefficient);
+			return result;
+		}
 
 
 		IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix);
@@ -49,12 +42,22 @@ namespace MGroup.LinearAlgebra.Matrices
 		public IMinimalMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 
 		protected static IMinimalMatrix LinearCombination(IMinimalReadOnlyMatrix thisMatrix, double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
-			=> thisMatrix.Copy().LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
+		{
+			var result = thisMatrix.Copy();
+			result.LinearCombinationIntoThis(thisCoefficient, otherMatrix, otherCoefficient);
+			return result;
+		}
+			
 
 
 		IMinimalMatrix Scale(double coefficient);
 
-		protected static IMinimalMatrix Scale(IMinimalReadOnlyMatrix thisMatrix, double coefficient) => thisMatrix.Copy().ScaleIntoThis(coefficient);
+		protected static IMinimalMatrix Scale(IMinimalReadOnlyMatrix thisMatrix, double coefficient)
+		{
+			var result = thisMatrix.Copy();
+			result.ScaleIntoThis(coefficient);
+			return result;
+		}
 
 
 		IMinimalMatrix Copy();
@@ -71,9 +74,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Check if this matrix and <paramref name="otherMatrix"/> are almost equal.
 		/// </summary>
 		/// <param name="otherMatrix">A matrix of any dimensions</param>
-		/// <param name="tolerance">The maximum difference between corresponding Values to considered equal</param>
-		/// <returns>True if both vectors are almost equal</returns>
-		bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-7);
+		/// <param name="tolerance">The maximum difference between corresponding elements to considered equal</param>
+		/// <returns>True if both matrices are almost equal</returns>
+		/// <exception cref="InvalidCastException">If 2 matrices cannot be compared.</exception>
+		bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-10);
 
 
 		/// <summary>

@@ -24,10 +24,14 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
-	public class Matrix : IMatrix, ISliceable2D, IEntrywiseOperableView2D<Matrix, Matrix>, IEntrywiseOperable2D<Matrix>
+	public class Matrix : IMatrix, ISliceable2D
 	{
 		private double[] data;
 		private bool isOverwritten = false;
+
+		
+		public Matrix(int numRows) : this(new double[numRows * numRows], numRows, numRows) {}
+		public Matrix(int numRows, int numColumns) : this(new double[numRows * numColumns], numRows, numColumns) { }
 
 		private Matrix(double[] data, int numRows, int numColumns)
 		{
@@ -77,7 +81,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// See <see cref="IIndexable2D.this[int, int]"/>.
 		/// </summary>
 		/// <remarks>
-		/// Also note that it may be possible to pass in <paramref name="rowIdx"/> &gt;= <see cref="IIndexable2D.NumRows"/> or
+		/// Also note that it may be possible to pass in <paramref name="rowIdx"/> &gt;= <see cref="ILinearTransformation.NumRows"/> or
 		/// <paramref name="rowIdx"/> &lt; 0, without throwing <see cref="IndexOutOfRangeException"/>, since the indices are not  
 		/// checked explicitly. The constraints on <paramref name="colIdx"/> described in the interfaces will correctly throw
 		/// <see cref="IndexOutOfRangeException"/> if violated.
@@ -103,7 +107,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Initializes a new instance of <see cref="Matrix"/> with <paramref name="array1D"/> or a clone as its internal array.
 		/// </summary>
 		/// <param name="array1D">A 1-dimensional array containing the Values of the matrix in column major order. Its length 
-		///     must be equal to <see cref="numRows"/> * <see cref="NumColumns"/>. It will not be checked.</param>
+		///     must be equal to <see cref="NumRows"/> * <see cref="NumColumns"/>. It will not be checked.</param>
 		/// <param name="numRows">The number of rows of the new matrix.</param>
 		/// <param name="numColumns">The number of columns of the new matrix.</param>
 		/// <param name="copyArray">If true, <paramref name="array1D"/> will be copied and the new <see cref="Matrix"/> instance 
@@ -137,9 +141,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static Matrix CreateFromDiagonal(int numRows, int numColumns, double[] diagonal)
 		{
 			Preconditions.CheckVectorDimensions(Math.Min(numRows, numColumns), diagonal.Length);
-			double[] data = new double[numRows * numColumns];
-			ArrayColMajor.DiagonalSet(numRows, numColumns, data, diagonal);
-			return new Matrix(data, numRows, numColumns);
+			Matrix result = new Matrix(numRows, numColumns);
+			ArrayColMajor.DiagonalSet(numRows, numColumns, result.data, diagonal);
+			return result;
 		}
 
 		/// <summary>
@@ -207,7 +211,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static Matrix operator -(Matrix matrix1, Matrix matrix2) => matrix1.Axpy(matrix2, -1.0);
 
 		/// <summary>
-		/// Performs the operation: result[i, j] = <paramref name="scalar"/> * <paramref name="matrix1"/>[i, j],
+		/// Performs the operation: result[i, j] = <paramref name="scalar"/> * <paramref name="matrix"/>[i, j],
 		/// for 0 &lt;= i &lt; <see cref="NumRows"/>, 0 &lt;= j &lt; <see cref="NumColumns"/>.
 		/// The resulting entries are written to a new <see cref="Matrix"/> instance.
 		/// </summary>
@@ -216,7 +220,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static Matrix operator *(double scalar, Matrix matrix) => matrix.Scale(scalar);
 
 		/// <summary>
-		/// Performs the operation: result[i, j] = <paramref name="scalar"/> * <paramref name="matrix1"/>[i, j],
+		/// Performs the operation: result[i, j] = <paramref name="scalar"/> * <paramref name="matrix"/>[i, j],
 		/// for 0 &lt;= i &lt; <see cref="NumRows"/>, 0 &lt;= j &lt; <see cref="NumColumns"/>.
 		/// The resulting entries are written to a new <see cref="Matrix"/> instance.
 		/// </summary>
@@ -292,13 +296,11 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix(result, NumRows, this.NumColumns + matrix.NumColumns);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.Axpy(IMatrixView, double)"/>.
-		/// </summary>
-		public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		/// <inheritdoc/>
+		public IMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) return Axpy(dense, otherCoefficient);
-			else return otherMatrix.LinearCombination(otherCoefficient, this, 1.0); // To avoid accessing zero entries
+			else return ((IMatrixView) otherMatrix).LinearCombination(otherCoefficient, this, 1.0); // To avoid accessing zero entries
 		}
 
 		/// <summary>
@@ -321,10 +323,8 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
-		/// </summary>
-		public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		/// <inheritdoc/>
+		public void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) AxpyIntoThis(dense, otherCoefficient);
 			else
@@ -334,7 +334,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				{
 					for (int i = 0; i < NumRows; ++i)
 					{
-						this.data[j * NumRows + i] += otherCoefficient * otherMatrix[i, j];
+						this.data[j * NumRows + i] += otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
 					}
 				}
 			}
@@ -358,7 +358,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// Calculates the determinant of this matrix, which must be square. If the inverse matrix is also needed, use
-		/// <see cref="InvertAndDeterminant"/> instead.
+		/// <see cref="InvertAndDeterminant()"/> instead.
 		/// </summary>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if this matrix is not square.</exception>
 		public double CalcDeterminant()
@@ -400,9 +400,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return (eigensystem.EigenvaluesReal, eigensystem.EigenvectorsRight);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrix.Clear"/>.
-		/// </summary>
+		/// <inheritdoc/>
 		public void Clear() => Array.Clear(data, 0, data.Length);
 
 		/// <summary>
@@ -430,22 +428,18 @@ namespace MGroup.LinearAlgebra.Matrices
 			return Conversions.FullColMajorToArray2D(data, NumRows, NumColumns);
 		}
 
-		/// See <see cref="IMatrixView.CopyToFullMatrix()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public Matrix CopyToFullMatrix() => Copy();
 
-		/// <summary>
-		/// <summary>
-		/// See <see cref="IMatrixView.DoEntrywise(IMatrixView, Func{double, double, double})"/>.
-		/// </summary>
-		public IMatrix DoEntrywise(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		/// <inheritdoc/>
+		public IMatrix DoEntrywise(IMinimalReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
 		{
 			if (matrix is Matrix dense) return DoEntrywise(dense, binaryOperation);
-			else return matrix.DoEntrywise(this, (x, y) => binaryOperation(y, x)); // To avoid accessing zero entries.
+			else return ((IMatrixView)matrix).DoEntrywise(this, (x, y) => binaryOperation(y, x)); // To avoid accessing zero entries.
 		}
 
 		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
+		/// See <see cref="IMinimalReadOnlyMatrix.DoEntrywise(IMinimalReadOnlyMatrix, Func{double, double, double})"/>.
 		/// </summary>
 		public Matrix DoEntrywise(Matrix matrix, Func<double, double, double> binaryOperation)
 		{
@@ -455,10 +449,8 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-		/// </summary>
-		public void DoEntrywiseIntoThis(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		/// <inheritdoc/>
+		public void DoEntrywiseIntoThis(IMinimalReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
 		{
 			if (matrix is Matrix dense) DoEntrywiseIntoThis(dense, binaryOperation);
 			else
@@ -469,14 +461,14 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i < NumRows; ++i)
 					{
 						int index1D = j * NumRows + i;
-						this.data[index1D] = binaryOperation(this.data[index1D], matrix[i, j]);
+						this.data[index1D] = binaryOperation(this.data[index1D], ((IMatrixView)matrix)[i, j]);
 					}
 				}
 			}
 		}
 
 		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
+		/// See <see cref="IMinimalMatrix.DoEntrywiseIntoThis(IMinimalReadOnlyMatrix, Func{double, double, double})"/>.
 		/// </summary>
 		public void DoEntrywiseIntoThis(Matrix matrix, Func<double, double, double> binaryOperation)
 		{
@@ -484,14 +476,12 @@ namespace MGroup.LinearAlgebra.Matrices
 			for (int i = 0; i < data.Length; ++i) this.data[i] = binaryOperation(this.data[i], matrix.data[i]);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
-		/// </summary>
-		IMatrix IEntrywiseOperableView2D<IMatrixView, IMatrix>.DoToAllEntries(Func<double, double> unaryOperation)
+		/// <inheritdoc/>
+		IMatrix IMatrixView.DoToAllEntries(Func<double, double> unaryOperation)
 			=> DoToAllEntries(unaryOperation);
 
 		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
+		/// See <see cref="IMatrixView.DoToAllEntries(Func{double, double})"/>.
 		/// </summary>
 		public Matrix DoToAllEntries(Func<double, double> unaryOperation)
 		{
@@ -500,20 +490,16 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoToAllEntriesIntoThis(Func{double, double})"/>.
-		/// </summary>
+		/// <inheritdoc/>
 		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
 			for (int i = 0; i < NumRows * NumColumns; ++i) data[i] = unaryOperation(data[i]);
 		}
 
-		/// <summary>
-		/// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-		/// </summary>
-		public bool Equals(IIndexable2D other, double tolerance = 1e-13)
+		/// <inheritdoc/>
+		public bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-13)
 		{
-			if (other is Matrix dense)
+			if (otherMatrix is Matrix dense)
 			{
 				//Check each dimension, rather than the lengths of the internal buffers
 				if (!Preconditions.AreSameMatrixDimensions(this, dense)) return false;
@@ -525,7 +511,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				}
 				return true;
 			}
-			else return other.Equals(this, tolerance); // To avoid accessing zero entries
+			else return otherMatrix.Equals(this, tolerance); // To avoid accessing zero entries
 		}
 
 		/// <summary>
@@ -535,7 +521,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="inPlace">
 		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Values, thus saving 
-		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
+		/// memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members afterwards.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		/// <exception cref="IndefiniteMatrixException">Thrown if the matrix is not symmetric positive definite.</exception>
@@ -562,7 +548,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="inPlace">
 		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Values, thus saving 
-		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
+		/// memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members afterwards.
 		/// </param>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
 		public LQFactorization FactorLQ(bool inPlace = false)
@@ -586,7 +572,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="inPlace">
 		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Values, thus saving 
-		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
+		/// memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members afterwards.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
@@ -612,7 +598,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="inPlace">
 		/// False, to copy the internal array before factorization. True, to overwrite it with the factorized Values, thus saving 
-		/// memory and time. However, that will make this object unusable, so you MUST NOT call any other members afterwards.
+		/// memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members afterwards.
 		/// </param>
 		/// <exception cref="LapackException">Thrown if the call to LAPACK fails due to invalid input.</exception>
 		public QRFactorization FactorQR(bool inPlace = false)
@@ -638,14 +624,14 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckIndexCol(this, colIndex);
 			double[] columnVector = new double[NumRows];
 			Array.Copy(data, colIndex * NumRows, columnVector, 0, NumRows);
-			return Vector.CreateFromArray(columnVector, false);
+			return new Vector(columnVector);
 		}
 
 		/// <summary>
 		/// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal. The matrix must be square.
 		/// </summary>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
-		public Vector GetDiagonal() => Vector.CreateFromArray(GetDiagonalAsArray(), false);
+		public Vector GetDiagonal() => new Vector(GetDiagonalAsArray());
 
 		/// <summary>
 		/// Returns an array with the entries of the matrix's main diagonal. The matrix must be square.
@@ -666,7 +652,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckIndexRow(this, rowIndex);
 			double[] rowVector = new double[NumColumns];
 			for (int j = 0; j < NumColumns; ++j) rowVector[j] = data[j * NumRows + rowIndex];
-			return Vector.CreateFromArray(rowVector, false);
+			return new Vector(rowVector);
 		}
 
 		/// <summary>
@@ -712,7 +698,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// Calculates the inverse matrix and returns it in a new <see cref="Matrix"/> instance. This only works if this 
 		/// <see cref="Matrix"/> is square and invertible. If the determinant matrix is also needed, use 
-		/// <see cref="InvertAndDeterminant"/> instead.
+		/// <see cref="InvertAndDeterminant()"/> instead.
 		/// </summary>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		/// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
@@ -722,7 +708,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// Calculates the inverse matrix and returns it in a new <see cref="Matrix"/> instance. This only works if this 
 		/// <see cref="Matrix"/> is square and invertible. If the determinant matrix is also needed, use 
-		/// <see cref="InvertAndDeterminant"/> instead.
+		/// <see cref="InvertAndDeterminant()"/> instead.
 		/// </summary>
 		/// <param name="tolerance">
 		/// Matrix determinant value under which the matrix is considered singular (valid ONLY for 2x2 and 3x3 matrices)
@@ -835,13 +821,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     if the entries are exactly 0.</param>
 		public bool IsZero(double tolerance) => DenseStrategies.IsZero(data, tolerance);
 
-		/// <summary>
-		/// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
-		/// </summary>
-		public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		/// <inheritdoc/>
+		public IMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) return LinearCombination(thisCoefficient, dense, otherCoefficient);
-			else return otherMatrix.LinearCombination(otherCoefficient, this, thisCoefficient); // To avoid accessing zero entries
+			else return ((IMatrixView)otherMatrix).LinearCombination(otherCoefficient, this, thisCoefficient); // To avoid accessing zero entries
 		}
 
 		/// <summary>
@@ -879,10 +863,8 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
-		/// </summary>
-		public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		/// <inheritdoc/>
+		public void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is Matrix dense) LinearCombinationIntoThis(thisCoefficient, dense, otherCoefficient);
 			else
@@ -893,7 +875,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i < NumRows; ++i)
 					{
 						int index1D = j * NumRows + i;
-						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * otherMatrix[i, j];
+						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
 					}
 				}
 			}
@@ -942,16 +924,16 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// Performs the matrix-matrix multiplication: oper(this) * oper(<paramref name="other"/>).
+		/// Performs the matrix-matrix multiplication: oper(this) * oper(<paramref name="otherMatrix"/>).
 		/// </summary>
-		/// <param name="other">A matrix such that the <see cref="NumRows"/> of oper(<paramref name="other"/>) 
+		/// <param name="otherMatrix">A matrix such that the <see cref="NumRows"/> of oper(<paramref name="otherMatrix"/>) 
 		///     are equal to the <see cref="NumColumns"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-		/// <param name="transposeOther">If true, oper(<paramref name="other"/>) = transpose(<paramref name="other"/>). 
-		///     Otherwise oper(<paramref name="other"/>) = <paramref name="other"/>.</param>
+		/// <param name="transposeOther">If true, oper(<paramref name="otherMatrix"/>) = transpose(<paramref name="otherMatrix"/>). 
+		///     Otherwise oper(<paramref name="otherMatrix"/>) = <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
 		///     different <see cref="NumRows"/> than the <see cref="NumColumns"/> of oper(this).</exception>
-		public Matrix MultiplyRight(Matrix other, bool transposeThis = false, bool transposeOther = false)
+		public Matrix MultiplyRight(Matrix otherMatrix, bool transposeThis = false, bool transposeOther = false)
 		{
 			int leftRows, leftCols, rightRows, rightCols;
 			TransposeMatrix transposeLeft, transposeRight;
@@ -970,28 +952,26 @@ namespace MGroup.LinearAlgebra.Matrices
 			if (transposeOther)
 			{
 				transposeRight = TransposeMatrix.Transpose;
-				rightRows = other.NumColumns;
-				rightCols = other.NumRows;
+				rightRows = otherMatrix.NumColumns;
+				rightCols = otherMatrix.NumRows;
 			}
 			else
 			{
 				transposeRight = TransposeMatrix.NoTranspose;
-				rightRows = other.NumRows;
-				rightCols = other.NumColumns;
+				rightRows = otherMatrix.NumRows;
+				rightCols = otherMatrix.NumColumns;
 			}
 
 			Preconditions.CheckMultiplicationDimensions(leftCols, rightRows);
 			double[] result = new double[leftRows * rightCols];
 			Blas.Dgemm(transposeLeft, transposeRight, leftRows, rightCols, leftCols,
-				1.0, this.data, 0, this.NumRows, other.data, 0, other.NumRows,
+				1.0, this.data, 0, this.NumRows, otherMatrix.data, 0, otherMatrix.NumRows,
 				1.0, result, 0, leftRows);
 			return new Matrix(result, leftRows, rightCols);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
-		/// </summary>
-		public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
+		/// <inheritdoc/>
+		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense) return Multiply(dense, transposeThis);
 			else throw new NotImplementedException();
@@ -1002,23 +982,21 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
 		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
 		/// </summary>
-		/// <param name="vector">A vector with <see cref="IIndexable1D.Length"/> being equal to the 
-		///     <see cref="IIndexable2D.NumColumns"/> of oper(this).</param>
+		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
+		///     <see cref="ILinearTransformation.NumColumns"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IIndexable1D.Length"/> of
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
 		///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
 		public Vector Multiply(Vector vector, bool transposeThis = false)
 		{
 			//TODO: this performs redundant dimension checks, including checking the transposeThis flag.
-			var result = Vector.CreateZero(transposeThis ? NumColumns : NumRows);
+			var result = new Vector(new double[transposeThis ? NumColumns : NumRows]);
 			MultiplyIntoResult(vector, result, transposeThis);
 			return result;
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
-		/// </summary>
-		public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
+		/// <inheritdoc/>
+		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
@@ -1026,26 +1004,28 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 			else throw new NotImplementedException();
 		}
+		/// <inheritdoc/>
+		public void MultiplyIntoResult(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector) => MultiplyIntoResult(rhsVector, lhsVector, false);
 
 		/// <summary>
-		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="vector"/>.
+		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
 		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
 		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
 		/// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
-		/// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-		/// == oper(this).<see cref="IIndexable2D.NumColumns"/>.
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="ILinearTransformation.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-		/// == oper(this).<see cref="IIndexable2D.NumRows"/>.
+		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="ILinearTransformation.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described contraints.
 		/// </exception>
 		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
@@ -1068,8 +1048,8 @@ namespace MGroup.LinearAlgebra.Matrices
 			Preconditions.CheckMultiplicationDimensions(leftCols, lhsVector.Length);
 			Preconditions.CheckSystemSolutionDimensions(leftRows, rhsVector.Length);
 			Blas.Dgemv(transpose, NumRows, NumColumns,
-				1.0, this.data, 0, NumRows, lhsVector.RawData, 0, 1,
-				0.0, rhsVector.RawData, 0, 1);
+				1.0, this.data, 0, NumRows, lhsVector.Values, 0, 1,
+				0.0, rhsVector.Values, 0, 1);
 		}
 
 		/// <summary>
@@ -1082,21 +1062,21 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector x that will be multiplied by this matrix. Constraints: 
-		/// <paramref name="lhsOffset"/> + <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-		/// &lt;= oper(this).<see cref="IIndexable2D.NumColumns"/>.
+		/// <paramref name="lhsOffset"/> + <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// &lt;= oper(this).<see cref="ILinearTransformation.NumColumns"/>.
 		/// </param>
 		/// <param name="lhsOffset">The index into <paramref name="lhsVector"/> from which to start the operations.</param>
 		/// <param name="lhsScale">The scalar alpha that will multiply <paramref name="lhsVector"/>.</param>
 		/// <param name="rhsVector">
 		/// The vector y that will be overwritten by the result of the operation. Constraints: 
-		/// <paramref name="rhsOffset"/> + <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> 
-		/// &lt;= oper(this).<see cref="IIndexable2D.NumRows"/>.
+		/// <paramref name="rhsOffset"/> + <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// &lt;= oper(this).<see cref="ILinearTransformation.NumRows"/>.
 		/// </param>
 		/// <param name="rhsOffset">The index into <paramref name="rhsVector"/> from which to start the operations.</param>
 		/// <param name="rhsScale">The scalar beta that will multiply <paramref name="rhsVector"/>.</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described contraints.
 		/// </exception>
 		/// <exception cref="PatternModifiedException">
@@ -1110,12 +1090,12 @@ namespace MGroup.LinearAlgebra.Matrices
 			if (transposeThis)
 			{
 				Blas.Dgemv(TransposeMatrix.Transpose, NumColumns, NumRows, lhsScale, this.data, 0, NumRows,
-					lhsVector.RawData, lhsOffset, 1, rhsScale, rhsVector.RawData, rhsOffset, 1);
+					lhsVector.Values, lhsOffset, 1, rhsScale, rhsVector.Values, rhsOffset, 1);
 			}
 			else
 			{
 				Blas.Dgemv(TransposeMatrix.NoTranspose, NumRows, NumColumns, lhsScale, this.data, 0, NumRows,
-					lhsVector.RawData, lhsOffset, 1, rhsScale, rhsVector.RawData, rhsOffset, 1);
+					lhsVector.Values, lhsOffset, 1, rhsScale, rhsVector.Values, rhsOffset, 1);
 			}
 		}
 
@@ -1201,9 +1181,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new Matrix(result, NumRows, NumColumns);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
-		/// </summary>
+		/// <inheritdoc/>
 		public void ScaleIntoThis(double scalar) => Blas.Dscal(data.Length, scalar, data, 0, 1);
 
 		/// <summary>
@@ -1223,20 +1201,20 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     0 &lt;= <paramref name="colIdx"/> &lt; <see cref="NumColumns"/>.</param>
 		/// <param name="rowStart">The first entry of column <paramref name="colIdx"/> to be modified. Constraints: 
 		///     1) 0 &lt;= <paramref name="rowStart"/> &lt; <see cref="NumRows"/>, 
-		///     2) <paramref name="rowStart"/> + <paramref name="colValues"/>.<see cref="IIndexable1D.Length"/> &lt;= 
+		///     2) <paramref name="rowStart"/> + <paramref name="colValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= 
 		///        <see cref="NumRows"/>.</param>
 		/// <param name="colValues">The new values of the column entries. Constraints: <paramref name="rowStart"/>
-		///     + <paramref name="colValues"/>.<see cref="IIndexable1D.Length"/> &lt;= <see cref="NumRows"/>.</param>
+		///     + <paramref name="colValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= <see cref="NumRows"/>.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="colIdx"/> or <paramref name="rowStart"/> 
 		///     violate the described constraints.</exception>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rowStart"/>
-		///     + <paramref name="colValues"/>.<see cref="IIndexable1D.Length"/> &gt; <see cref="NumRows"/>.</exception>
+		///     + <paramref name="colValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &gt; <see cref="NumRows"/>.</exception>
 		public void SetSubcolumn(int colIdx, Vector colValues, int rowStart = 0)
 		{
 			Preconditions.CheckIndexCol(this, colIdx);
 			if (rowStart + colValues.Length > this.NumRows) throw new NonMatchingDimensionsException(
 				"The entries to set exceed this matrix's number of rows");
-			ArrayColMajor.SetCol(NumRows, NumColumns, data, colIdx, rowStart, colValues.RawData);
+			ArrayColMajor.SetCol(NumRows, NumColumns, data, colIdx, rowStart, colValues.Values);
 		}
 
 		/// <summary>
@@ -1289,20 +1267,20 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     0 &lt;= <paramref name="rowIdx"/> &lt; <see cref="NumRows"/>.</param>
 		/// <param name="colStart">The first entry of row <paramref name="rowIdx"/> to be modified. Constraints: 
 		///     1) 0 &lt;= <paramref name="colStart"/> &lt; <see cref="NumColumns"/>, 
-		///     2) <paramref name="colStart"/> + <paramref name="rowValues"/>.<see cref="IIndexable1D.Length"/> &lt;= 
+		///     2) <paramref name="colStart"/> + <paramref name="rowValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= 
 		///        <see cref="NumColumns"/>.</param>
 		/// <param name="rowValues">The new values of the row entries. Constraints: <paramref name="colStart"/>
-		///     + <paramref name="rowValues"/>.<see cref="IIndexable1D.Length"/> &lt;= <see cref="NumColumns"/>.</param>
+		///     + <paramref name="rowValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= <see cref="NumColumns"/>.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> or <paramref name="colStart"/> 
 		///     violate the described constraints.</exception>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="colStart"/>
-		///     + <paramref name="rowValues"/>.<see cref="IIndexable1D.Length"/> &gt; <see cref="NumColumns"/>.</exception>
+		///     + <paramref name="rowValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &gt; <see cref="NumColumns"/>.</exception>
 		public void SetSubrow(int rowIdx, Vector rowValues, int colStart = 0)
 		{
 			Preconditions.CheckIndexRow(this, rowIdx);
 			if (colStart + rowValues.Length > this.NumRows) throw new NonMatchingDimensionsException(
 				"The entries to set exceed this matrix's number of columns");
-			ArrayColMajor.SetRow(NumRows, NumColumns, data, rowIdx, colStart, rowValues.RawData);
+			ArrayColMajor.SetRow(NumRows, NumColumns, data, rowIdx, colStart, rowValues.Values);
 		}
 
 		/// <summary>
@@ -1333,7 +1311,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
-		/// Transposes the matrix by modifying the entries of this <see cref="Matrix instance"/>: this[i, j] = this[j, i].
+		/// Transposes the matrix by modifying the entries of this <see cref="Matrix"/> instance: this[i, j] = this[j, i].
 		/// </summary>
 		public void TransposeIntoThis()
 		{
@@ -1346,5 +1324,14 @@ namespace MGroup.LinearAlgebra.Matrices
 			Array.Copy(data, dataCopy, data.Length);
 			return dataCopy;
 		}
+
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.AddIntoThis(this, otherMatrix);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.SubtractIntoThis(this, otherMatrix);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Add(this, otherMatrix);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Subtract(this, otherMatrix);
+
+		
+		public Matrix CreateZeroWithSameFormat() => new Matrix(NumRows, NumColumns);
+		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
 	}
 }

@@ -8,12 +8,15 @@ using MGroup.LinearAlgebra.Vectors;
 namespace MGroup.LinearAlgebra.Matrices
 {
     /// <summary>
-    /// A matrix with 2 rows and 2 columns. Optimized version of <see cref="Matrix"/>.
+    /// A otherMatrix with 2 rows and 2 columns. Optimized version of <see cref="Matrix"/>.
     /// Authors: Serafeim Bakalakos
     /// </summary>
-    public class Matrix2by2: IMatrix, IEntrywiseOperableView2D<Matrix2by2, Matrix2by2>, IEntrywiseOperable2D<Matrix2by2>
+    public class Matrix2by2: IMatrix
     {
         private readonly double[,] data;
+
+
+		public Matrix2by2() { data = new double[2, 2]; }
 
         private Matrix2by2(double[,] data)
         {
@@ -36,17 +39,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		MatrixSymmetry IIndexable2D.MatrixSymmetry => this.MatrixSymmetry;
 		
 		/// <summary>
-		/// The number of columns of the matrix. 
+		/// The number of columns of the otherMatrix. 
 		/// </summary>
 		public int NumColumns { get { return 2; } }
 
         /// <summary>
-        /// The number of rows of the matrix.
+        /// The number of rows of the otherMatrix.
         /// </summary>
         public int NumRows { get { return 2; } }
 
         /// <summary>
-        /// The internal array that stores the entries of the matrix. It should only be used for passing the raw array to linear 
+        /// The internal array that stores the entries of the otherMatrix. It should only be used for passing the raw array to linear 
         /// algebra libraries.
         /// </summary>
         internal double[,] InternalData { get { return data; } }
@@ -72,10 +75,10 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Initializes a new instance of <see cref="Matrix2by2"/> with <paramref name="array2D"/> or a clone as its internal 
         /// array.
         /// </summary>
-        /// <param name="array2D">A 2-dimensional array containing the entries of the matrix. Constraints 
+        /// <param name="array2D">A 2-dimensional array containing the entries of the otherMatrix. Constraints 
         ///     <paramref name="array2D"/>.GetLength(0) ==  <paramref name="array2D"/>.GetLength(0) == 2.</param>
         /// <param name="copyArray">If true, <paramref name="array2D"/> will be copied and the new <see cref="Matrix2by2"/>  
-        ///     instance will have a reference to the copy, which is safer. If false, the new matrix will have a reference to 
+        ///     instance will have a reference to the copy, which is safer. If false, the new otherMatrix will have a reference to 
         ///     <paramref name="array2D"/> itself, which is faster.</param>
         public static Matrix2by2 CreateFromArray(double[,] array2D, bool copyArray = false)
         {
@@ -91,7 +94,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="Matrix2by2"/> that is equal to the identity matrix, namely a square matrix 
+        /// Initializes a new instance of <see cref="Matrix2by2"/> that is equal to the identity otherMatrix, namely a square otherMatrix 
         /// with non-diagonal entries being equal to 0 and diagonal entries being equal to 1.
         /// </summary>
         public static Matrix2by2 CreateIdentity() => new Matrix2by2(new double[,] { { 1.0, 0.0 }, { 0.0, 1.0 } });
@@ -143,19 +146,19 @@ namespace MGroup.LinearAlgebra.Matrices
         /// for 0 &lt;= i, j &lt; 2. The resulting entries are written to a new <see cref="Matrix2by2"/> instance.
         /// </summary>
         /// <param name="scalar">The scalar value that will be multiplied with all vector entries.</param>
-        /// <param name="matrix">The matrix to multiply.</param>
+        /// <param name="matrix">The otherMatrix to multiply.</param>
         public static Matrix2by2 operator *(double scalar, Matrix2by2 matrix) => matrix.Scale(scalar);
 
         /// <summary>
         /// Performs the operation: result[i, j] = <paramref name="scalar"/> * <paramref name="matrix"/>[i, j], 
         /// for 0 &lt;= i, j &lt; 2. The resulting entries are written to a new <see cref="Matrix2by2"/> instance.
         /// </summary>
-        /// <param name="matrix">The matrix to multiply.</param>
+        /// <param name="matrix">The otherMatrix to multiply.</param>
         /// <param name="scalar">The scalar value that will be multiplied with all vector entries.</param>
         public static Matrix2by2 operator *(Matrix2by2 matrix, double scalar) => matrix.Scale(scalar);
 
         /// <summary>
-        /// Performs the matrix-matrix multiplication: result = <paramref name="matrixLeft"/> * <paramref name="matrixRight"/>.
+        /// Performs the otherMatrix-otherMatrix multiplication: result = <paramref name="matrixLeft"/> * <paramref name="matrixRight"/>.
         /// </summary>
         /// <param name="matrixLeft">The <see cref="Matrix2by2"/> operand on the left.</param>
         /// <param name="matrixRight">The <see cref="Matrix2by2"/> operand on the right.</param>
@@ -163,7 +166,7 @@ namespace MGroup.LinearAlgebra.Matrices
             => matrixLeft.MultiplyRight(matrixRight, false, false);
 
         /// <summary>
-        /// Performs the matrix-vector multiplication: result = <paramref name="matrixLeft"/> * <paramref name="vectorRight"/>.
+        /// Performs the otherMatrix-vector multiplication: result = <paramref name="matrixLeft"/> * <paramref name="vectorRight"/>.
         /// </summary>
         /// <param name="matrixLeft">The <see cref="Matrix2by2"/> operand on the left.</param>
         /// <param name="vectorRight">The <see cref="Vector2"/> operand on the right. It can be considered as a column 
@@ -172,7 +175,7 @@ namespace MGroup.LinearAlgebra.Matrices
             => matrixLeft.Multiply(vectorRight, false);
 
         /// <summary>
-        /// Performs the matrix-vector multiplication: result = <paramref name="vectorLeft"/> * <paramref name="matrixRight"/>.
+        /// Performs the otherMatrix-vector multiplication: result = <paramref name="vectorLeft"/> * <paramref name="matrixRight"/>.
         /// </summary>
         /// <param name="vectorLeft">The <see cref="Vector2"/> operand on the left. It can be considered as a row vector.</param>
         /// <param name="matrixRight">The <see cref="Matrix2by2"/> operand on the right.</param>
@@ -180,10 +183,8 @@ namespace MGroup.LinearAlgebra.Matrices
             => matrixRight.Multiply(vectorLeft, true);
         #endregion
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Axpy(IMatrixView, double)"/>.
-        /// </summary>
-        public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is Matrix2by2 casted) return Axpy(casted, otherCoefficient);
             else
@@ -191,8 +192,8 @@ namespace MGroup.LinearAlgebra.Matrices
                 Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
                 return new Matrix2by2(new double[,]
                 {
-                    { data[0, 0] + otherCoefficient * otherMatrix[0, 0], data[0, 1] + otherCoefficient * otherMatrix[0, 1] },
-                    { data[1, 0] + otherCoefficient * otherMatrix[1, 0], data[1, 1] + otherCoefficient * otherMatrix[1, 1] },
+                    { data[0, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 0], data[0, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 1] },
+                    { data[1, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 0], data[1, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 1] },
                 });
             }
         }
@@ -200,9 +201,9 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <summary>
         /// Performs the following operation for 0 &lt;= i, j &lt; 2:
         /// result[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
-        /// The resulting matrix is written to a new <see cref="Matrix2by2"/> and then returned.
+        /// The resulting otherMatrix is written to a new <see cref="Matrix2by2"/> and then returned.
         /// </summary>
-        /// <param name="otherMatrix">A matrix with 2 rows and 2 columns.</param>
+        /// <param name="otherMatrix">A otherMatrix with 2 rows and 2 columns.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         public Matrix2by2 Axpy(Matrix2by2 otherMatrix, double otherCoefficient)
         {
@@ -219,39 +220,37 @@ namespace MGroup.LinearAlgebra.Matrices
             });
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
-        /// </summary>
-        public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is Matrix2by2 casted) AxpyIntoThis(casted, otherCoefficient);
             else
             {
                 Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-                data[0, 0] += otherCoefficient * otherMatrix[0, 0];
-                data[0, 1] += otherCoefficient * otherMatrix[0, 1];
-                data[1, 0] += otherCoefficient * otherMatrix[1, 0];
-                data[1, 1] += otherCoefficient * otherMatrix[1, 1];
+                data[0, 0] += otherCoefficient * ((IMatrixView)otherMatrix)[0, 0];
+                data[0, 1] += otherCoefficient * ((IMatrixView)otherMatrix)[0, 1];
+                data[1, 0] += otherCoefficient * ((IMatrixView)otherMatrix)[1, 0];
+                data[1, 1] += otherCoefficient * ((IMatrixView)otherMatrix)[1, 1];
             }
         }
 
         /// <summary>
         /// Performs the following operation for 0 &lt;= i, j &lt; 2:
         /// this[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
-        /// The resulting matrix overwrites the entries of this <see cref="Matrix2by2"/> instance.
+        /// The resulting otherMatrix overwrites the entries of this <see cref="Matrix2by2"/> instance.
         /// </summary>
-        /// <param name="otherMatrix">A matrix with 2 rows and 2 columns.</param>
+        /// <param name="otherMatrix">A otherMatrix with 2 rows and 2 columns.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
-        public void AxpyIntoThis(Matrix2by2 other, double otherCoefficient)
+        public void AxpyIntoThis(Matrix2by2 otherMatrix, double otherCoefficient)
         {
-            this.data[0, 0] += otherCoefficient * other.data[0, 0];
-            this.data[0, 1] += otherCoefficient * other.data[0, 1];
-            this.data[1, 0] += otherCoefficient * other.data[1, 0];
-            this.data[1, 1] += otherCoefficient * other.data[1, 1];
+            this.data[0, 0] += otherCoefficient * otherMatrix.data[0, 0];
+            this.data[0, 1] += otherCoefficient * otherMatrix.data[0, 1];
+            this.data[1, 0] += otherCoefficient * otherMatrix.data[1, 0];
+            this.data[1, 1] += otherCoefficient * otherMatrix.data[1, 1];
         }
 
         /// <summary>
-        /// Calculates the determinant of this matrix. If the inverse matrix is also needed, use
+        /// Calculates the determinant of this otherMatrix. If the inverse otherMatrix is also needed, use
         /// <see cref="InvertAndDetermninant"/> instead.
         /// </summary>
         public double CalcDeterminant()
@@ -260,9 +259,7 @@ namespace MGroup.LinearAlgebra.Matrices
             return data[0, 0] * data[1, 1] - data[0, 1] * data[1, 0];
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.Clear"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void Clear() => Array.Clear(data, 0, 4); //TODO: would it be faster to do it myself?
 
         /// <summary>
@@ -276,36 +273,30 @@ namespace MGroup.LinearAlgebra.Matrices
         public Matrix2by2 Copy() => new Matrix2by2(new double[,] { { data[0, 0], data[0, 1] }, { data[1, 0], data[1, 1] } });
 
         /// <summary>
-        /// Copies the entries of the matrix into a 2-dimensional array. The returned array has length(0) = length(1) = 2. 
+        /// Copies the entries of the otherMatrix into a 2-dimensional array. The returned array has length(0) = length(1) = 2. 
         /// </summary>
         public double[,] CopyToArray2D() => new double[,] { { data[0, 0], data[0, 1] }, { data[1, 0], data[1, 1] } };
 
-        /// <summary>
-        /// /// See <see cref="IMatrixView.CopyToFullMatrix()"/>
-        /// </summary>
+        /// <inheritdoc cref="IMatrixView.CopyToFullMatrix()"/>
         public Matrix CopyToFullMatrix() => Matrix.CreateFromArray(data);
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public IMatrix DoEntrywise(IMatrixView matrix, Func<double, double, double> binaryOperation)
+        /// <inheritdoc/>
+        public IMatrix DoEntrywise(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
         {
-            if (matrix is Matrix2by2 casted) return DoEntrywise(casted, binaryOperation);
+            if (otherMatrix is Matrix2by2 casted) return DoEntrywise(casted, binaryOperation);
             else
             {
-                Preconditions.CheckSameMatrixDimensions(this, matrix);
+                Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
                 return new Matrix2by2(new double[,]
                 {
-                    { binaryOperation(data[0, 0], matrix[0, 0]), binaryOperation(data[0, 1], matrix[0, 1]) },
-                    { binaryOperation(data[1, 0], matrix[1, 0]), binaryOperation(data[1, 1], matrix[1, 1]) }
+                    { binaryOperation(data[0, 0], ((IMatrixView)otherMatrix)[0, 0]), binaryOperation(data[0, 1], ((IMatrixView)otherMatrix)[0, 1]) },
+                    { binaryOperation(data[1, 0], ((IMatrixView)otherMatrix)[1, 0]), binaryOperation(data[1, 1], ((IMatrixView)otherMatrix)[1, 1]) }
                 });
             }
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public Matrix2by2 DoEntrywise(Matrix2by2 matrix, Func<double, double, double> binaryOperation)
+		/// <inheritdoc cref="IMatrixView.DoEntrywise(IMinimalReadOnlyMatrix, Func{double, double, double})"/>.
+		public Matrix2by2 DoEntrywise(Matrix2by2 matrix, Func<double, double, double> binaryOperation)
         {
             return new Matrix2by2(new double[,]
             {
@@ -314,26 +305,22 @@ namespace MGroup.LinearAlgebra.Matrices
             });
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public void DoEntrywiseIntoThis(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		/// <inheritdoc/>.
+		public void DoEntrywiseIntoThis(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
         {
-            if (matrix is Matrix2by2 casted) DoEntrywiseIntoThis(casted, binaryOperation);
+            if (otherMatrix is Matrix2by2 casted) DoEntrywiseIntoThis(casted, binaryOperation);
             else
             {
-                Preconditions.CheckSameMatrixDimensions(this, matrix);
-                data[0, 0] = binaryOperation(data[0, 0], matrix[0, 0]);
-                data[0, 1] = binaryOperation(data[0, 1], matrix[0, 1]);
-                data[1, 0] = binaryOperation(data[1, 0], matrix[1, 0]);
-                data[1, 1] = binaryOperation(data[1, 1], matrix[1, 1]);
+                Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
+                data[0, 0] = binaryOperation(data[0, 0], ((IMatrixView)otherMatrix)[0, 0]);
+                data[0, 1] = binaryOperation(data[0, 1], ((IMatrixView)otherMatrix)[0, 1]);
+                data[1, 0] = binaryOperation(data[1, 0], ((IMatrixView)otherMatrix)[1, 0]);
+                data[1, 1] = binaryOperation(data[1, 1], ((IMatrixView)otherMatrix)[1, 1]);
             }
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public void DoEntrywiseIntoThis(Matrix2by2 matrix, Func<double, double, double> binaryOperation)
+		/// <inheritdoc cref="IMinimalMatrix.DoEntrywiseIntoThis(IMinimalReadOnlyMatrix, Func{double, double, double})"/>.
+		public void DoEntrywiseIntoThis(Matrix2by2 matrix, Func<double, double, double> binaryOperation)
         {
             this.data[0, 0] = binaryOperation(this.data[0, 0], matrix.data[0, 0]);
             this.data[0, 1] = binaryOperation(this.data[0, 1], matrix.data[0, 1]);
@@ -341,16 +328,11 @@ namespace MGroup.LinearAlgebra.Matrices
             this.data[1, 1] = binaryOperation(this.data[1, 1], matrix.data[1, 1]);
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
-        /// </summary>
-        IMatrix IEntrywiseOperableView2D<IMatrixView, IMatrix>.DoToAllEntries(Func<double, double> unaryOperation) 
-            => DoToAllEntries(unaryOperation);
+        /// <inheritdoc/>
+        IMinimalMatrix IMinimalReadOnlyMatrix.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
-        /// </summary>
-        public Matrix2by2 DoToAllEntries(Func<double, double> unaryOperation)
+		/// <inheritdoc cref="IMinimalReadOnlyMatrix.DoToAllEntries(Func{double, double})"/>.
+		public Matrix2by2 DoToAllEntries(Func<double, double> unaryOperation)
         {
             return new Matrix2by2(new double[,]
             {
@@ -359,22 +341,18 @@ namespace MGroup.LinearAlgebra.Matrices
             });
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoToAllEntriesIntoThis(Func{double, double})"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
         {
             data[0, 0] = unaryOperation(data[0, 0]); data[0, 1] = unaryOperation(data[0, 1]);
             data[1, 0] = unaryOperation(data[1, 0]); data[1, 1] = unaryOperation(data[1, 1]);
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1e-13)
+        /// <inheritdoc/>
+        public bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-13)
         {
             var comparer = new ValueComparer(1e-13);
-            if (other is Matrix2by2 casted)
+            if (otherMatrix is Matrix2by2 casted)
             {
                 return comparer.AreEqual(this.data[0, 0], casted.data[0, 0])
                     && comparer.AreEqual(this.data[0, 1], casted.data[0, 1])
@@ -383,10 +361,10 @@ namespace MGroup.LinearAlgebra.Matrices
             }
             else
             {
-                return comparer.AreEqual(this.data[0, 0], other[0, 0])
-                    && comparer.AreEqual(this.data[0, 1], other[0, 1])
-                    && comparer.AreEqual(this.data[1, 0], other[1, 0])
-                    && comparer.AreEqual(this.data[1, 1], other[1, 1]);
+                return comparer.AreEqual(this.data[0, 0], ((IMatrixView)otherMatrix)[0, 0])
+                    && comparer.AreEqual(this.data[0, 1], ((IMatrixView)otherMatrix)[0, 1])
+                    && comparer.AreEqual(this.data[1, 0], ((IMatrixView)otherMatrix)[1, 0])
+                    && comparer.AreEqual(this.data[1, 1], ((IMatrixView)otherMatrix)[1, 1]);
             }            
         }
 
@@ -396,7 +374,7 @@ namespace MGroup.LinearAlgebra.Matrices
         public Vector GetColumn(int colIndex)
         {
             Preconditions.CheckIndexCol(this, colIndex);
-            return Vector.CreateFromArray(new double[] { data[0, colIndex], data[1, colIndex] });
+            return new Vector(new double[] { data[0, colIndex], data[1, colIndex] });
         }
 
         /// <summary>
@@ -405,7 +383,7 @@ namespace MGroup.LinearAlgebra.Matrices
         public Vector GetRow(int rowIndex)
         {
             Preconditions.CheckIndexRow(this, rowIndex);
-            return Vector.CreateFromArray(new double[] { data[rowIndex, 0], data[rowIndex, 1] });
+            return new Vector(new double[] { data[rowIndex, 0], data[rowIndex, 1] });
         }
 
         /// <summary>
@@ -421,11 +399,11 @@ namespace MGroup.LinearAlgebra.Matrices
             => DenseStrategies.GetSubmatrix(this, rowStartInclusive, rowEndExclusive, colStartInclusive, colEndExclusive);
 
         /// <summary>
-        /// Calculates the inverse matrix and returns it in a new <see cref="Matrix2by2"/> instance. This only works if this 
-        /// <see cref="Matrix2by2"/> is invertible. If the determinant matrix is also needed, use 
+        /// Calculates the inverse otherMatrix and returns it in a new <see cref="Matrix2by2"/> instance. This only works if this 
+        /// <see cref="Matrix2by2"/> is invertible. If the determinant otherMatrix is also needed, use 
         /// <see cref="InvertAndDetermninant"/> instead.
         /// </summary>
-        /// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
+        /// <exception cref="SingularMatrixException">Thrown if the otherMatrix is not invertible.</exception>
         public Matrix2by2 Invert()
         {
             (Matrix2by2 inverse, double det) = InvertAndDetermninant();
@@ -433,10 +411,10 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Calculates the determinant and the inverse matrix and returns the latter in a new <see cref="Matrix"/> instance. 
+        /// Calculates the determinant and the inverse otherMatrix and returns the latter in a new <see cref="Matrix"/> instance. 
         /// This only works if this <see cref="Matrix2by2"/> is invertible.
         /// </summary>
-        /// <exception cref="SingularMatrixException">Thrown if the matrix is not invertible.</exception>
+        /// <exception cref="SingularMatrixException">Thrown if the otherMatrix is not invertible.</exception>
         public (Matrix2by2 inverse, double determinant) InvertAndDetermninant()
         {
             // Leibniz formula:
@@ -451,10 +429,8 @@ namespace MGroup.LinearAlgebra.Matrices
             return (new Matrix2by2(inverse), det);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
-        /// </summary>
-        public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is Matrix2by2 casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
             else if (thisCoefficient == 1.0) return Axpy(otherMatrix, otherCoefficient);
@@ -464,12 +440,12 @@ namespace MGroup.LinearAlgebra.Matrices
                 return new Matrix2by2(new double[,]
                 {
                     {
-                        thisCoefficient * data[0, 0] + otherCoefficient * otherMatrix[0, 0],
-                        thisCoefficient * data[0, 1] + otherCoefficient * otherMatrix[0, 1]
+                        thisCoefficient * data[0, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 0],
+                        thisCoefficient * data[0, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 1]
                     },
                     {
-                        thisCoefficient * data[1, 0] + otherCoefficient * otherMatrix[1, 0],
-                        thisCoefficient * data[1, 1] + otherCoefficient * otherMatrix[1, 1]
+                        thisCoefficient * data[1, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 0],
+                        thisCoefficient * data[1, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 1]
                     },
                 });
             }
@@ -479,10 +455,10 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Performs the following operation for 0 &lt;= i, j &lt; 2:
         /// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] 
         ///     + <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j]. 
-        /// The resulting matrix is written to a new <see cref="Matrix2by2"/> and then returned.
+        /// The resulting otherMatrix is written to a new <see cref="Matrix2by2"/> and then returned.
         /// </summary>
         /// <param name="thisCoefficient">A scalar that multiplies each entry of this <see cref="Matrix2by2"/>.</param>
-        /// <param name="otherMatrix">A matrix with 2 rows and 2 columns.</param>
+        /// <param name="otherMatrix">A otherMatrix with 2 rows and 2 columns.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         public Matrix2by2 LinearCombination(double thisCoefficient, Matrix2by2 otherMatrix, double otherCoefficient)
         {
@@ -500,20 +476,18 @@ namespace MGroup.LinearAlgebra.Matrices
             });
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
-        /// </summary>
-        public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is Matrix2by2 casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
             else if (thisCoefficient == 1.0) AxpyIntoThis(otherMatrix, otherCoefficient);
             else
             {
                 Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-                data[0, 0] = thisCoefficient * data[0, 0] + otherCoefficient * otherMatrix[0, 0];
-                data[0, 1] = thisCoefficient * data[0, 1] + otherCoefficient * otherMatrix[0, 1];
-                data[1, 0] = thisCoefficient * data[1, 0] + otherCoefficient * otherMatrix[1, 0];
-                data[1, 1] = thisCoefficient * data[1, 1] + otherCoefficient * otherMatrix[1, 1];
+                data[0, 0] = thisCoefficient * data[0, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 0];
+                data[0, 1] = thisCoefficient * data[0, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 1];
+                data[1, 0] = thisCoefficient * data[1, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 0];
+                data[1, 1] = thisCoefficient * data[1, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 1];
             }
         }
 
@@ -521,10 +495,10 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Performs the following operation for 0 &lt;= i, j &lt; 2:
         /// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] 
         ///     + <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j]. 
-        /// The resulting matrix overwrites the entries of this <see cref="Matrix2by2"/> instance.
+        /// The resulting otherMatrix overwrites the entries of this <see cref="Matrix2by2"/> instance.
         /// </summary>
         /// <param name="thisCoefficient">A scalar that multiplies each entry of this <see cref="Matrix2by2"/>.</param>
-        /// <param name="otherMatrix">A matrix with 2 rows and 2 columns.</param>
+        /// <param name="otherMatrix">A otherMatrix with 2 rows and 2 columns.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         public void LinearCombinationIntoThis(double thisCoefficient, Matrix2by2 otherMatrix, double otherCoefficient)
         {
@@ -559,9 +533,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Performs the matrix-matrix multiplication: oper(this) * oper(<paramref name="matrix"/>).
+        /// Performs the otherMatrix-otherMatrix multiplication: oper(this) * oper(<paramref name="matrix"/>).
         /// </summary>
-        /// <param name="matrix">A matrix with 2 rows and 2 columns.</param>
+        /// <param name="matrix">A otherMatrix with 2 rows and 2 columns.</param>
         /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
         /// <param name="transposeOther">If true, oper(<paramref name="matrix"/>) = transpose(<paramref name="matrix"/>). 
         ///     Otherwise oper(<paramref name="matrix"/>) = <paramref name="matrix"/>.</param>
@@ -605,34 +579,30 @@ namespace MGroup.LinearAlgebra.Matrices
             return new Matrix2by2(result);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
-        /// </summary>
-        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
+        /// <inheritdoc/>
+        public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector2 casted) return Multiply(casted, transposeThis);
 
             Preconditions.CheckMultiplicationDimensions(2, vector.Length);
             if (transposeThis)
             {
-                return Vector.CreateFromArray(new double[] 
-                {
-                    data[0, 0] * vector[0] + data[1, 0] * vector[1],
-                    data[0, 1] * vector[0] + data[1, 1] * vector[1]
-                });
+                return new Vector2(
+                    data[0, 0] * ((AbstractFullyPopulatedVector) vector)[0] + data[1, 0] * ((AbstractFullyPopulatedVector)vector)[1],
+                    data[0, 1] * ((AbstractFullyPopulatedVector)vector)[0] + data[1, 1] * ((AbstractFullyPopulatedVector)vector)[1]
+                );
             }
             else
             {
-                return Vector.CreateFromArray(new double[]
-                {
-                    data[0, 0] * vector[0] + data[0, 1] * vector[1],
-                    data[1, 0] * vector[0] + data[1, 1] * vector[1]
-                });
+                return new Vector2(
+                    data[0, 0] * ((AbstractFullyPopulatedVector) vector)[0] + data[0, 1] * ((AbstractFullyPopulatedVector) vector)[1],
+                    data[1, 0] * ((AbstractFullyPopulatedVector) vector)[0] + data[1, 1] * ((AbstractFullyPopulatedVector) vector)[1]
+                );
             }
         }
 
         /// <summary>
-        /// Performs the matrix-vector multiplication: oper(this) * <paramref name="vector"/>.
+        /// Performs the otherMatrix-vector multiplication: oper(this) * <paramref name="vector"/>.
         /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
         /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
         /// </summary>
@@ -640,25 +610,23 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
         public Vector2 Multiply(Vector2 vector, bool transposeThis = false)
         {
-            double[] x = vector.InternalData;
+            double[] x = vector.Values;
             if (transposeThis)
             {
-                return Vector2.Create(
+                return new Vector2(
                     data[0, 0] * x[0] + data[1, 0] * x[1],
                     data[0, 1] * x[0] + data[1, 1] * x[1]);
             }
             else
             {
-                return Vector2.Create(
+                return new Vector2(
                     data[0, 0] * x[0] + data[0, 1] * x[1],
                     data[1, 0] * x[0] + data[1, 1] * x[1]);
             }
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
-        /// </summary>
-        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
+        /// <inheritdoc/>
+        public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
         {
             if ((lhsVector is Vector2 lhsDense) && (rhsVector is Vector2 rhsDense))
             {
@@ -667,39 +635,42 @@ namespace MGroup.LinearAlgebra.Matrices
 
             Preconditions.CheckMultiplicationDimensions(2, lhsVector.Length);
             Preconditions.CheckSystemSolutionDimensions(2, rhsVector.Length);
-            if (transposeThis)
+			AbstractFullyPopulatedVector rhsFull = (AbstractFullyPopulatedVector)rhsVector;
+			AbstractFullyPopulatedVector lhsFull = (AbstractFullyPopulatedVector)lhsVector;
+			if (transposeThis)
             {
-                rhsVector.Set(0, data[0, 0] * lhsVector[0] + data[1, 0] * lhsVector[1]);
-                rhsVector.Set(1, data[0, 1] * lhsVector[0] + data[1, 1] * lhsVector[1]);
+				rhsFull[0] = data[0, 0] * lhsFull[0] + data[1, 0] * lhsFull[1];
+				rhsFull[1] = data[0, 1] * lhsFull[0] + data[1, 1] * lhsFull[1];
             }
             else
             {
-                rhsVector.Set(0, data[0, 0] * lhsVector[0] + data[0, 0] * lhsVector[1]);
-                rhsVector.Set(1, data[1, 1] * lhsVector[0] + data[1, 1] * lhsVector[1]);
+				rhsFull[0] = data[0, 0] * lhsFull[0] + data[0, 0] * lhsFull[1];
+				rhsFull[1] = data[1, 1] * lhsFull[0] + data[1, 1] * lhsFull[1];
             }
         }
+		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="vector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
-        /// </summary>
-        /// <param name="lhsVector">
-        /// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
-        /// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumColumns"/>.
-        /// </param>
-        /// <param name="rhsVector">
-        /// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-        /// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumRows"/>.
-        /// </param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        public void MultiplyIntoResult(Vector2 lhsVector, Vector2 rhsVector, bool transposeThis = false)
+		/// <summary>
+		/// Performs the otherMatrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
+		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
+		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
+		/// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
+		/// </summary>
+		/// <param name="lhsVector">
+		/// The vector that will be multiplied by this otherMatrix. It sits on the left hand side of the equation y = oper(A) * x.
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="ILinearTransformation.NumColumns"/>.
+		/// </param>
+		/// <param name="rhsVector">
+		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
+		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="ILinearTransformation.NumRows"/>.
+		/// </param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		public void MultiplyIntoResult(Vector2 lhsVector, Vector2 rhsVector, bool transposeThis = false)
         {
-            double[] x = lhsVector.InternalData;
-            double[] y = rhsVector.InternalData;
+            double[] x = lhsVector.Values;
+            double[] y = rhsVector.Values;
             if (transposeThis)
             {
                 y[0] = data[0, 0] * x[0] + data[1, 0] * x[1];
@@ -731,10 +702,10 @@ namespace MGroup.LinearAlgebra.Matrices
 
         /// <summary>
         /// Performs the following operation for 0 &lt;= i, j &lt; 2:
-        /// result[i, j] = <paramref name="scalar"/> * <paramref name="this"/>[i, j].
-        /// The resulting matrix is written to a new <see cref="Matrix2by2"/> and then returned.
+        /// result[i, j] = <paramref name="scalar"/> * this[i, j].
+        /// The resulting otherMatrix is written to a new <see cref="Matrix2by2"/> and then returned.
         /// </summary>
-        /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
+        /// <param name="scalar">A scalar that multiplies each entry of this otherMatrix.</param>
         public Matrix2by2 Scale(double scalar)
         {
             return new Matrix2by2(new double[,] 
@@ -744,9 +715,7 @@ namespace MGroup.LinearAlgebra.Matrices
             });
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void ScaleIntoThis(double scalar)
         {
             data[0, 0] *= scalar; data[0, 1] *= scalar;
@@ -754,9 +723,9 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Sets all entries of this matrix to be equal to <paramref name="value"/>.
+        /// Sets all entries of this otherMatrix to be equal to <paramref name="value"/>.
         /// </summary>
-        /// <param name="value">The value that all entries of the this matrix will be equal to.</param>
+        /// <param name="value">The value that all entries of the this otherMatrix will be equal to.</param>
         public void SetAll(double value)
         {
             data[0, 0] = value; data[0, 1] = value;
@@ -779,5 +748,11 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public Matrix2by2 Transpose() 
             => new Matrix2by2(new double[,] { { data[0, 0], data[1, 0] }, { data[0, 1], data[1, 1] } });
-    }
+
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.AddIntoThis(this, otherMatrix);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.SubtractIntoThis(this, otherMatrix);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Add(this, otherMatrix);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Subtract(this, otherMatrix);
+		public IMinimalMatrix CreateZeroWithSameFormat() => new Matrix2by2();
+	}
 }

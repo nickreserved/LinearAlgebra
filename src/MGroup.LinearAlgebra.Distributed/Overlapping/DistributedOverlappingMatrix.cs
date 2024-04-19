@@ -169,7 +169,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			=> LinearCombinationIntoThis(thisCoefficient, (DistributedOverlappingMatrix<TMatrix>)otherMatrix, otherCoefficient);
 
 
-		public void Multiply(DistributedOverlappingVector inputVector, DistributedOverlappingVector outputVector)
+		public void MultiplyIntoResult(DistributedOverlappingVector inputVector, DistributedOverlappingVector outputVector)
 		{
 			if (!Indexer.IsCompatibleWith(inputVector.Indexer) ||
 				!Indexer.IsCompatibleWith(outputVector.Indexer))
@@ -180,18 +180,15 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 				var localA = LocalMatrices[nodeID];
 				var localX = inputVector.LocalVectors[nodeID];
 				var localY = outputVector.LocalVectors[nodeID];
-				localA.MultiplyIntoThis(localX, localY);
+				localA.MultiplyIntoResult(localX, localY);
 			};
 			Environment.DoPerNode(multiplyLocal);
 
 			outputVector.SumOverlappingEntries();
 		}
 
-		public void Multiply(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector)
-			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
-
-		void ILinearTransformation.MultiplyIntoThis(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector)
-			=> Multiply((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
+		public void MultiplyIntoResult(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector)
+			=> MultiplyIntoResult((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
 
 
 		public DistributedOverlappingMatrix<TMatrix> ScaleIntoThis(double coefficient)

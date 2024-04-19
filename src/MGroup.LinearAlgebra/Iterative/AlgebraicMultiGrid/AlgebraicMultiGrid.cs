@@ -237,24 +237,24 @@
 //			// Requires clustering info
 //			// TODO: update x by interpolation matrix
 //			// x_{i+1} = I_i^{i+1} x_i N^{i+1} ???
-//			solutionAtLevel[level + 1] = restrictionMatrixAtLevel[level].MultiplyIntoThis(solutionAtLevel[level]);
+//			solutionAtLevel[level + 1] = restrictionMatrixAtLevel[level].MultiplyIntoResult(solutionAtLevel[level]);
 
 //			// r_i = x_i - I^{i}_{i+1} x_{i+1}
 //			offsetPositionVectors[level].AddIntoThis(solutionAtLevel[level]);
 //			offsetPositionVectors[level].AxpyIntoThis(
-//				restrictionMatrixAtLevel[level].MultiplyIntoThis(solutionAtLevel[level], offsetPositionVectors[level]),
+//				restrictionMatrixAtLevel[level].MultiplyIntoResult(solutionAtLevel[level], offsetPositionVectors[level]),
 //				-1.0);
 
 //			// b_{i+1} = I^{i}_{i+1} (b_i - A_i r_i)
 //			var diff = ExactResidual.Calculate(matrixAtLevel[level], rhsAtLevel[level], offsetPositionVectors[level]);
 //			diff.ScaleIntoThis(-1.0);
-//			rhsAtLevel[level + 1] = restrictionMatrixAtLevel[level].MultiplyIntoThis(diff);
+//			rhsAtLevel[level + 1] = restrictionMatrixAtLevel[level].MultiplyIntoResult(diff);
 //		}
 
 //		private void ProlongationMapping(int level)
 //		{
 //			// apply prolongation operator X_i = P_i * X_{i+1} + R_i
-//			prolongationMatrixAtLevel[level].MultiplyIntoThis(solutionAtLevel[level], solutionAtLevel[level - 1]);
+//			prolongationMatrixAtLevel[level].MultiplyIntoResult(solutionAtLevel[level], solutionAtLevel[level - 1]);
 //			solutionAtLevel[level - 1].AddIntoThis(offsetPositionVectors[level]);
 //		}
 

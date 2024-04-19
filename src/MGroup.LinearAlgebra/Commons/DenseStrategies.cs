@@ -244,7 +244,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return result;
 		}
 
-		public static Matrix LinearCombination(IIndexable2D matrix1, double coefficient1, IIndexable2D matrix2,
+		public static Matrix LinearCombination(IMatrixView matrix1, double coefficient1, IMatrixView matrix2,
 			double coefficient2)
 		{
 			WarnAboutPerformanceBottlenecks();

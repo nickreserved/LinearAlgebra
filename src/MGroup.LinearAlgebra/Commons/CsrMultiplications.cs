@@ -152,9 +152,9 @@ namespace MGroup.LinearAlgebra.Commons
 		internal static void CsrTransTimesVector(int numCsrRows, double[] csrValues, int[] csrRowOffsets, int[] csrColIndices,
 			IExtendedReadOnlyVector lhs, IExtendedVector rhs)
 		{
-			var temp = new double[rhs.Length];
-			CsrTransTimesVector(numCsrRows, csrValues, csrRowOffsets, csrColIndices, lhs, temp);
-			rhs.CopyFrom(Vector.CreateFromArray(temp));
+			var array = new double[rhs.Length];
+			CsrTransTimesVector(numCsrRows, csrValues, csrRowOffsets, csrColIndices, lhs, array);
+			rhs.CopyFrom(new Vector(array));
 
 			// The following requires a lot of indexing into the rhs vector.
 			//// A^T * x = linear combination of columns of A^T = rows of A, with the entries of x as coefficients

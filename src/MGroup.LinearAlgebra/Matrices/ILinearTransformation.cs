@@ -30,6 +30,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// than this linear transformation <see cref="ILinearTransformation.NumColumns"/>, or
 		/// if <paramref name="lhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
 		/// than this linear transformation <see cref="ILinearTransformation.NumRows"/>.</exception>
-		void MultiplyIntoThis(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector);
+		/// <exception cref="Exceptions.PatternModifiedException">
+		/// Thrown if the storage format of <paramref name="lhsVector"/> does not support overwritting the entries that this method will try to.</exception>
+		void MultiplyIntoResult(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector);
 	}
 }

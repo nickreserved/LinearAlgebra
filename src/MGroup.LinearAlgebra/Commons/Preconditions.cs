@@ -14,7 +14,7 @@ namespace MGroup.LinearAlgebra.Commons
     /// </summary>
     public static class Preconditions
     {
-        public static bool AreSameMatrixDimensions(IIndexable2D matrix1, IIndexable2D matrix2)
+        public static bool AreSameMatrixDimensions(ILinearTransformation matrix1, ILinearTransformation matrix2)
         {
             if ((matrix1.NumRows != matrix2.NumRows) || (matrix1.NumColumns != matrix2.NumColumns)) return false;
             else return true;
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckIndexCol(IIndexable2D matrix, int colIdx)
+        public static void CheckIndexCol(ILinearTransformation matrix, int colIdx)
         {
             if ((colIdx < 0) || (colIdx >= matrix.NumColumns))
             {
@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckIndexRow(IIndexable2D matrix, int rowIdx)
+        public static void CheckIndexRow(ILinearTransformation matrix, int rowIdx)
         {
             if ((rowIdx < 0) || (rowIdx >= matrix.NumRows))
             {
@@ -46,7 +46,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckIndices(IIndexable2D matrix, int rowIdx, int colIdx)
+        public static void CheckIndices(ILinearTransformation matrix, int rowIdx, int colIdx)
         {
             if ((rowIdx < 0) || (rowIdx >= matrix.NumRows))
             {
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckMultiplicationDimensions(IIndexable2D leftMatrix, IIndexable2D rightMatrix)
+        public static void CheckMultiplicationDimensions(ILinearTransformation leftMatrix, ILinearTransformation rightMatrix)
         {
             if (leftMatrix.NumColumns != rightMatrix.NumRows)
             {
@@ -81,7 +81,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckMultiplicationDimensionsSection(IIndexable2D matrixLeft, IMinimalReadOnlyVector vectorRight,
+        public static void CheckMultiplicationDimensionsSection(ILinearTransformation matrixLeft, IMinimalReadOnlyVector vectorRight,
             int vectorStart, IMinimalReadOnlyVector result, int resultStart)
         {
             if (vectorStart + matrixLeft.NumColumns > vectorRight.Length) throw new NonMatchingDimensionsException(
@@ -92,7 +92,7 @@ namespace MGroup.LinearAlgebra.Commons
                 $" {resultStart} + the matrix' rows = {matrixLeft.NumRows}");
         }
 
-        public static void CheckMultiplicationDimensions(IIndexable2D matrix, IMinimalReadOnlyVector lhsVector, int lhsOffset,
+        public static void CheckMultiplicationDimensions(ILinearTransformation matrix, IMinimalReadOnlyVector lhsVector, int lhsOffset,
 			IMinimalReadOnlyVector rhsVector, int rhsOffset, bool transposeMatrix)
         {
             int m, n;
@@ -114,7 +114,7 @@ namespace MGroup.LinearAlgebra.Commons
                 + "matrix (or its transpose).");
         }
 
-        public static void CheckSameColDimension(IIndexable2D matrix, IMinimalReadOnlyVector vector)
+        public static void CheckSameColDimension(ILinearTransformation matrix, IMinimalReadOnlyVector vector)
         {
             if (matrix.NumColumns != vector.Length)
             {
@@ -125,7 +125,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckSameColDimension(IIndexable2D matrix1, IIndexable2D matrix2)
+        public static void CheckSameColDimension(ILinearTransformation matrix1, ILinearTransformation matrix2)
         {
             if (matrix1.NumColumns != matrix2.NumColumns)
             {
@@ -136,7 +136,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckSameMatrixDimensions(IIndexable2D matrix1, IIndexable2D matrix2)
+        public static void CheckSameMatrixDimensions(ILinearTransformation matrix1, ILinearTransformation matrix2)
         {
             if ((matrix1.NumRows != matrix2.NumRows) || (matrix1.NumColumns != matrix2.NumColumns))
             {
@@ -147,7 +147,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckSameRowDimension(IIndexable2D matrix, IMinimalReadOnlyVector vector)
+        public static void CheckSameRowDimension(ILinearTransformation matrix, IMinimalReadOnlyVector vector)
         {
             if (matrix.NumRows != vector.Length)
             {
@@ -158,7 +158,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckSameRowDimension(IIndexable2D matrix1, IIndexable2D matrix2)
+        public static void CheckSameRowDimension(ILinearTransformation matrix1, ILinearTransformation matrix2)
         {
             if (matrix1.NumRows != matrix2.NumRows)
             {
@@ -169,7 +169,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckSquare(IIndexable2D matrix)
+        public static void CheckSquare(ILinearTransformation matrix)
         {
             if (matrix.NumRows != matrix.NumColumns) throw new NonMatchingDimensionsException(
                 $"The matrix must be square, but was {matrix.NumRows}-by-{matrix.NumColumns}");
@@ -181,7 +181,7 @@ namespace MGroup.LinearAlgebra.Commons
                 $"The matrix must be square, but was {numRows}-by-{numColumns}");
         }
 
-		public static void CheckSquareLinearSystemDimensions(IIndexable2D matrix, IMinimalReadOnlyVector lhsVector, IMinimalReadOnlyVector rhsVector)
+		public static void CheckSquareLinearSystemDimensions(ILinearTransformation matrix, IMinimalReadOnlyVector lhsVector, IMinimalReadOnlyVector rhsVector)
 		{
 			CheckSquareLinearSystemDimensions(matrix.NumRows, matrix.NumColumns, lhsVector.Length, rhsVector.Length);
 		}
@@ -201,7 +201,7 @@ namespace MGroup.LinearAlgebra.Commons
                 "The entries to access exceed the vector's length");
         }
 
-        public static void CheckSystemSolutionDimensions(IIndexable2D matrix, IMinimalReadOnlyVector rhsVector)
+        public static void CheckSystemSolutionDimensions(ILinearTransformation matrix, IMinimalReadOnlyVector rhsVector)
         {
             if (matrix.NumRows != rhsVector.Length)
             {
@@ -222,16 +222,12 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-		public static void CheckVectorDimensions(IMinimalReadOnlyVector vector1, IMinimalReadOnlyVector vector2)
+		public static void CheckVectorDimensions(IMinimalReadOnlyVector vector1, IMinimalReadOnlyVector vector2) => CheckVectorDimensions(vector1.Length, vector2.Length);
+		public static void CheckVectorDimensions(double[] vector1, double[] vector2) => CheckVectorDimensions(vector1.Length, vector2.Length);
+		public static void CheckVectorDimensions(int length1, int length2)
 		{
-			if (vector1.Length != vector2.Length)
-				throw new NonMatchingDimensionsException($"Vector1 has length of {vector1.Length}, while vector2 has length of {vector2.Length}");
+			if (length1 != length2)
+				throw new NonMatchingDimensionsException($"Vector1 has length of {length1}, while vector2 has length of {length2}");
 		}
-
-		public static void CheckVectorDimensions(double[] vector1, double[] vector2)
-        {
-            if (vector1.Length != vector2.Length)
-				throw new NonMatchingDimensionsException($"Vector1 has length of {vector1.Length}, while vector2 has length of {vector2.Length}");
-        }
-    }
+	}
 }

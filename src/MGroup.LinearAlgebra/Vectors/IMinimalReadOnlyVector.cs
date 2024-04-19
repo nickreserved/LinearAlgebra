@@ -16,6 +16,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
 		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.</exception>
 		IMinimalVector Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient);
+		/// <summary>
+		/// Default implementation for <see cref="Axpy(IMinimalReadOnlyVector, double)"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <param name="otherVector">First parameter of <see cref="Axpy(IMinimalReadOnlyVector, double)"/></param>
+		/// <param name="otherCoefficient">Second parameter of <see cref="Axpy(IMinimalReadOnlyVector, double)"/></param>
+		/// <returns>Return value of <see cref="Axpy(IMinimalReadOnlyVector, double)"/></returns>
 		protected static IMinimalVector Axpy(IMinimalReadOnlyVector thisVector, IMinimalReadOnlyVector otherVector, double otherCoefficient)
 		{
 			var result = thisVector.Copy();
@@ -31,6 +39,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
 		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.</exception>
 		IMinimalVector Add(IMinimalReadOnlyVector otherVector);
+		/// <summary>
+		/// Default implementation for <see cref="Add(IMinimalReadOnlyVector)"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <param name="otherVector">First parameter of <see cref="Add(IMinimalReadOnlyVector)"/></param>
+		/// <returns>Return value of <see cref="Add(IMinimalReadOnlyVector)"/></returns>
 		protected static IMinimalVector Add(IMinimalVector thisVector, IMinimalReadOnlyVector otherVector) => thisVector.Axpy(otherVector, 1);
 
 		/// <summary>
@@ -41,6 +56,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
 		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.</exception>
 		IMinimalVector Subtract(IMinimalReadOnlyVector otherVector);
+		/// <summary>
+		/// Default implementation for <see cref="Subtract(IMinimalReadOnlyVector)"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <param name="otherVector">First parameter of <see cref="Subtract(IMinimalReadOnlyVector)"/></param>
+		/// <returns>Return value of <see cref="Subtract(IMinimalReadOnlyVector)"/></returns>
 		protected static IMinimalVector Subtract(IMinimalVector thisVector, IMinimalReadOnlyVector otherVector) => thisVector.Axpy(otherVector, -1);
 
 		/// <summary>
@@ -56,6 +78,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Returns the square of this otherVector <c>this * this</c>
 		/// </summary>
 		double Square();
+		/// <summary>
+		/// Default implementation for <see cref="Square()"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <returns>Return value of <see cref="Square()"/></returns>
 		protected static double Square(IMinimalReadOnlyVector thisVector) => thisVector.DotProduct(thisVector);
 
 		/// <summary>
@@ -63,6 +91,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <returns>Return the negative of this vector.</returns>
 		IMinimalVector Negate();
+		/// <summary>
+		/// Default implementation for <see cref="Negate()"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <returns>Return value of <see cref="Negate()"/></returns>
 		protected static IMinimalVector Negate(IMinimalVector thisVector)
 		{
 			var result = thisVector.Copy();
@@ -76,6 +110,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="coefficient">The scalar for multiplacation with this vector</param>
 		/// <returns>The multiplication of this vector with scalar <paramref name="coefficient"/></returns>
 		IMinimalVector Scale(double coefficient);
+		/// <summary>
+		/// Default implementation for <see cref="Scale(double)"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <param name="coefficient">First parameter of <see cref="Scale(double)"/></param>
+		/// <returns>Return value of <see cref="Scale(double)"/></returns>
 		protected static IMinimalVector Scale(IMinimalVector thisVector, double coefficient)
 		{
 			var result = thisVector.Copy();
@@ -93,6 +134,15 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
 		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.</exception>
 		IMinimalVector LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient); // => Copy().LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		/// <summary>
+		/// Default implementation for <see cref="LinearCombination(double, IMinimalReadOnlyVector, double)"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <param name="thisCoefficient">First parameter of <see cref="LinearCombination(double, IMinimalReadOnlyVector, double)"/></param>
+		/// <param name="otherVector">Second parameter of <see cref="LinearCombination(double, IMinimalReadOnlyVector, double)"/></param>
+		/// <param name="otherCoefficient">Third parameter of <see cref="LinearCombination(double, IMinimalReadOnlyVector, double)"/></param>
+		/// <returns>Return value of <see cref="LinearCombination(double, IMinimalReadOnlyVector, double)"/></returns>
 		protected static IMinimalVector LinearCombination(IMinimalVector thisVector, double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient)
 		{
 			var result = thisVector.Copy();
@@ -110,6 +160,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <returns>The Euclidian norm of vector which is the square root of Square()</returns>
 		double Norm2();
+		/// <summary>
+		/// Default implementation for <see cref="Norm2()"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <returns>Return value of <see cref="Norm2()"/></returns>
 		protected static double Norm2(IMinimalVector thisVector) => Math.Sqrt(thisVector.Square());
 
 		/// <summary>
@@ -117,6 +173,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <returns>A copy of this vector</returns>
 		IMinimalVector Copy();
+		/// <summary>
+		/// Default implementation for <see cref="Copy()"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <returns>Return value of <see cref="Copy()"/></returns>
 		protected static IMinimalVector Copy(IMinimalVector thisVector)
 		{
 			var result = thisVector.CreateZero();
@@ -157,6 +219,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="otherVector"/> has different <see cref="Length"/> than this.
 		/// </exception>
 		IMinimalVector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation);
+		/// <summary>
+		/// Default implementation for <see cref="DoEntrywise(IMinimalReadOnlyVector, Func{double, double, double})"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <param name="otherVector">First parameter of <see cref="DoEntrywise(IMinimalReadOnlyVector, Func{double, double, double})"/></param>
+		/// <param name="binaryOperation">Second parameter of <see cref="DoEntrywise(IMinimalReadOnlyVector, Func{double, double, double})"/></param>
+		/// <returns>Return value of <see cref="DoEntrywise(IMinimalReadOnlyVector, Func{double, double, double})"/></returns>
 		protected static IMinimalVector DoEntrywise(IMinimalReadOnlyVector thisVector, IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			var result = thisVector.Copy();
@@ -170,6 +240,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="unaryOperation">A method that takes 1 argument and returns 1 result.</param>
 		IMinimalVector DoToAllEntries(Func<double, double> unaryOperation);
+		/// <summary>
+		/// Default implementation for <see cref="DoToAllEntries(Func{double, double})"/>
+		/// It is used as a ready implementation if no better implementation exists.
+		/// </summary>
+		/// <param name="thisVector">This vector</param>
+		/// <param name="unaryOperation">First parameter of <see cref="DoToAllEntries(Func{double, double})"/></param>
+		/// <returns>Return value of <see cref="DoToAllEntries(Func{double, double})"/></returns>
 		protected static IMinimalVector DoToAllEntries(IMinimalReadOnlyVector thisVector, Func<double, double> unaryOperation)
 		{
 			var result = thisVector.Copy();
