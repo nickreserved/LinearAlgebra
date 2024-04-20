@@ -106,6 +106,23 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			return (values, rowIndices, colOffsets);
 		}
 
+		public static double[] ArrayToFullColMajor(double[,] matrix)
+		{
+			int m = matrix.GetLength(0);
+			int n = matrix.GetLength(1);
+
+			var values = new double[m * n];
+			for (int j = 0; j < n; ++j)
+			{
+				for (int i = 0; i < m; ++i)
+				{
+					values[j * m + i] = matrix[i, j];
+				}
+			}
+
+			return values;
+		}
+
 		public static double[] ArrayToPackedUpper(double[,] matrix)
 		{
 			int m = matrix.GetLength(0);

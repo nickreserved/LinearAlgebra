@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 		public static void TestClear()
 		{
 			var extractor = new SubmatrixExtractorCsrCscSym();
-			var example = SubmatricesExampleSymmetric.CreateExampleA();
+			var example = SubmatricesExample.CreateExampleSymmetricA();
 
 			int n = example.MatrixOrder;
 			(double[] values, int[] rowIndices, int[] colOffsets) A = example.MatrixCscSymmetric;
@@ -37,7 +37,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 		public static void TestExtractSubmatricesMultiple()
 		{
 			var extractor = new SubmatrixExtractorCsrCscSym();
-			var example = SubmatricesExampleSymmetric.CreateExampleA();
+			var example = SubmatricesExample.CreateExampleSymmetricA();
 
 			int n = example.MatrixOrder;
 			(double[] values, int[] rowIndices, int[] colOffsets) A = example.MatrixCscSymmetric;
@@ -57,7 +57,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 			TestExtractorForExample(extractor, example);
 
 			// 3rd matrix B is completely different
-			example = SubmatricesExampleSymmetric.CreateExampleB();
+			example = SubmatricesExample.CreateExampleSymmetricB();
 			(double[] values, int[] rowIndices, int[] colOffsets) B = example.MatrixCscSymmetric;
 			symmCsc = SymmetricCscMatrix.CreateFromArrays(n, B.values, B.rowIndices, B.colOffsets, true);
 
@@ -76,7 +76,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 		public static void TestExtractSubmatricesOnce()
 		{
 			var extractor = new SubmatrixExtractorCsrCscSym();
-			var example = SubmatricesExampleSymmetric.CreateExampleA();
+			var example = SubmatricesExample.CreateExampleSymmetricA();
 
 			int n = example.MatrixOrder;
 			(double[] values, int[] rowIndices, int[] colOffsets) A = example.MatrixCscSymmetric;
@@ -89,7 +89,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 			TestExtractorForExample(extractor, example);
 		}
 
-		private static void TestExtractorForExample(SubmatrixExtractorCsrCscSym extractor, SubmatricesExampleSymmetric example)
+		private static void TestExtractorForExample(SubmatrixExtractorCsrCscSym extractor, SubmatricesExample example)
 		{
 			(double[] values, int[] colIndices, int[] rowOffsets) expected00 = example.Submatrix00Csr;
 			(double[] values, int[] colIndices, int[] rowOffsets) expected01 = example.Submatrix01Csr;
@@ -99,9 +99,11 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 			comparer.AssertEqual(expected00.values, extractor.Submatrix00.RawValues);
 			comparer.AssertEqual(expected00.colIndices, extractor.Submatrix00.RawColIndices);
 			comparer.AssertEqual(expected00.rowOffsets, extractor.Submatrix00.RawRowOffsets);
+
 			comparer.AssertEqual(expected01.values, extractor.Submatrix01.RawValues);
 			comparer.AssertEqual(expected01.colIndices, extractor.Submatrix01.RawColIndices);
 			comparer.AssertEqual(expected01.rowOffsets, extractor.Submatrix01.RawRowOffsets);
+
 			comparer.AssertEqual(expected11.values, extractor.Submatrix11.RawValues);
 			comparer.AssertEqual(expected11.rowIndices, extractor.Submatrix11.RawRowIndices);
 			comparer.AssertEqual(expected11.colOffsets, extractor.Submatrix11.RawColOffsets);
