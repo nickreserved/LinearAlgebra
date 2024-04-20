@@ -927,12 +927,12 @@ namespace MGroup.LinearAlgebra.Matrices
             return (this.rowIndices == other.rowIndices) && (this.colOffsets == other.colOffsets);
         }
 
-		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.AddIntoThis(this, otherMatrix);
-		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.SubtractIntoThis(this, otherMatrix);
-		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Add(this, otherMatrix);
-		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Subtract(this, otherMatrix);
-		
-		public IMinimalMatrix CreateZeroWithSameFormat() =>
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, 1);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, -1);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, 1);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, -1);
+
+		public CscMatrix CreateZeroWithSameFormat() =>
 			new CscMatrix(NumRows, NumColumns, new double[RawValues.Length], (int[])RawRowIndices.Clone(), (int[])RawColOffsets.Clone());
 		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
 	}

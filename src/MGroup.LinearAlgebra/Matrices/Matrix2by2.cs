@@ -749,10 +749,12 @@ namespace MGroup.LinearAlgebra.Matrices
         public Matrix2by2 Transpose() 
             => new Matrix2by2(new double[,] { { data[0, 0], data[1, 0] }, { data[0, 1], data[1, 1] } });
 
-		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.AddIntoThis(this, otherMatrix);
-		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.SubtractIntoThis(this, otherMatrix);
-		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Add(this, otherMatrix);
-		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Subtract(this, otherMatrix);
-		public IMinimalMatrix CreateZeroWithSameFormat() => new Matrix2by2();
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, 1);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, -1);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, 1);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, -1);
+		
+		public Matrix2by2 CreateZeroWithSameFormat() => new Matrix2by2();
+		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => new Matrix3by3();
 	}
 }

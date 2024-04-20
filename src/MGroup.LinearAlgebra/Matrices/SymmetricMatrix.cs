@@ -18,8 +18,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
 	[Serializable]
-	public class SymmetricMatrix : IMatrix, ISymmetricMatrix, IEntrywiseOperableView2D<SymmetricMatrix, SymmetricMatrix>,
-		IEntrywiseOperable2D<SymmetricMatrix>
+	public class SymmetricMatrix : IMatrix, ISymmetricMatrix
 	{
 		/// <summary>
 		/// Packed storage, column major order, upper triangle: 
@@ -31,9 +30,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			this.data = data;
 			this.Definiteness = definiteness;
-			this.Order = order;
 			this.NumRows = order;
-			this.NumColumns = order;
 		}
 
 		/// <summary>
@@ -59,12 +56,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// The number of columns of the matrix.
 		/// </summary>
-		public int NumColumns { get; }
-
-		/// <summary>
-		/// The number of rows or columns of the matrix.
-		/// </summary>
-		public int Order { get; }
+		public int NumColumns { get => NumRows; }
 
 		/// <summary>
 		/// The internal array that stores the entries of the upper triangle (packed storage format) in column major layout. 
@@ -76,14 +68,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The entry with row index = i and column index = j. Setting an entry A[i, j] = value, will also set A[j, i] = value. Therefore the matrix will stay symmetric 
 		/// This property is not that efficient, due to the necessary bound checking.
 		/// </summary>
-		/// <param name="i">The row index: 0 &lt;= i &lt; <see cref="Order"/></param>
-		/// <param name="j">The column index: 0 &lt;= j &lt; <see cref="Order"/></param>
+		/// <param name="i">The row index: 0 &lt;= i &lt; <see cref="NumRows"/></param>
+		/// <param name="j">The column index: 0 &lt;= j &lt; <see cref="NumRows"/></param>
 		/// <returns>The entry with indices i, j</returns>
 		public double this[int i, int j]
 		{
 			get //TODO: Perhaps keep the check in Debug mode only.
 			{
-				if ((i < 0) || (i >= Order) || (j < 0) || (j >= Order))
+				if ((i < 0) || (i >= NumRows) || (j < 0) || (j >= NumRows))
 				{
 					throw new IndexOutOfRangeException($"Invalid indices: ({i}, {j})");
 				}
@@ -125,13 +117,13 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="array1D">A 1-dimensional array containing the Values of the upper triangle of the matrix in column 
 		///     major order.</param>
-		/// <param name="order"> The order of the matrix. It must be positive and match the length of <see cref="array1D"/>. If a 
+		/// <param name="order"> The order of the matrix. It must be positive and match the length of <paramref name="array1D"/>. If a 
 		///     value is provided, these will not be checked. If no value is provided, the order will be calculated from 
-		///     <see cref="array1D"/> instead.</param>
+		///     <paramref name="array1D"/> instead.</param>
 		/// <param name="definiteness">If the caller knows that the matrix is positive definite etc., he can set this property 
 		///     during creation of the <see cref="SymmetricMatrix"/> object.</param>
-		/// <param name="copyArray">True to make a deep copy of <see cref="array1D"/>. 
-		///     False (default) to use <see cref="array1D"/> as its internal storage.</param>
+		/// <param name="copyArray">True to make a deep copy of <paramref name="array1D"/>. 
+		///     False (default) to use <paramref name="array1D"/> as its internal storage.</param>
 		public static SymmetricMatrix CreateFromPackedColumnMajorArray(double[] array1D, int order = 0,
 			DefiniteProperty definiteness = DefiniteProperty.Unknown, bool copyArray = false)
 		{
@@ -151,9 +143,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="array1D">A 1-dimensional array containing the Values of the upper triangle of the matrix in row 
 		///     major order.</param>
-		/// <param name="order"> The order of the matrix. It must be positive and match the length of <see cref="array1D"/>. If a 
+		/// <param name="order"> The order of the matrix. It must be positive and match the length of <paramref name="array1D"/>. If a 
 		///     value is provided, these will not be checked. If no value is provided, the order will be calculated from 
-		///     <see cref="array1D"/> instead.</param>
+		///     <paramref name="array1D"/> instead.</param>
 		/// <param name="definiteness">If the caller knows that the matrix is positive definite etc., he can set this property 
 		///     during creation of the <see cref="SymmetricMatrix"/> object.</param>
 		public static SymmetricMatrix CreateFromPackedRowMajorArray(double[] array1D, int order = 0,
@@ -215,7 +207,8 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		#endregion
 
-		public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+		/// <inheritdoc/>
+		public IMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is SymmetricMatrix casted) return Axpy(casted, otherCoefficient);
 			else return DoEntrywise(otherMatrix, (x1, x2) => x1 + otherCoefficient * x2); //TODO: optimize this
@@ -231,7 +224,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new SymmetricMatrix(result, NumColumns, DefiniteProperty.Unknown);
 		}
 
-		public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+		public void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is SymmetricMatrix casted) AxpyIntoThis(casted, otherCoefficient);
 			else if (otherMatrix is ISymmetricMatrix otherSYM)
@@ -241,13 +234,13 @@ namespace MGroup.LinearAlgebra.Matrices
 				{
 					for (int i = 0; i <= j; ++i)
 					{
-						this.data[Find1DIndex(i, j)] += otherCoefficient * otherMatrix[i, j];
+						this.data[Find1DIndex(i, j)] += otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
 					}
 				}
 			}
 			else
 			{
-				throw new SymmetricPatternModifiedException("This operation is legal only if the other matrix is also symmetric.");
+				throw new SymmetricPatternModifiedException("This operation is legal only if the otherMatrix matrix is also symmetric.");
 			}
 		}
 
@@ -285,19 +278,15 @@ namespace MGroup.LinearAlgebra.Matrices
 		public (Vector eigenvalues, Matrix eigenvectors) CalcEigensystem()
 		{
 			Preconditions.CheckSquare(this);
-			double[] fullMatrix = Conversions.PackedUpperColMajorToFullSymmColMajor(data, Order);
-			var eigensystem = SymmetricEigensystemFull.Create(Order, fullMatrix, true);
+			double[] fullMatrix = Conversions.PackedUpperColMajorToFullSymmColMajor(data, NumRows);
+			var eigensystem = SymmetricEigensystemFull.Create(NumRows, fullMatrix, true);
 			return (eigensystem.EigenvaluesReal, eigensystem.EigenvectorsRight);
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrix.Clear"/>.
-		/// </summary>
+		/// <inheritdoc/>
 		public void Clear() => Array.Clear(data, 0, data.Length);
 
-		/// <summary>
-		/// See <see cref="IMatrixView.Copy(bool)"/>.
-		/// </summary>
+		/// <inheritdoc/>
 		IMatrix IMatrixView.Copy(bool copyIndexingData) => Copy();
 
 		/// <summary>
@@ -307,18 +296,18 @@ namespace MGroup.LinearAlgebra.Matrices
 		{
 			double[] clone = new double[data.Length];
 			Array.Copy(data, clone, data.Length);
-			return new SymmetricMatrix(clone, Order, Definiteness);
+			return new SymmetricMatrix(clone, NumRows, Definiteness);
 		}
 
 		/// <summary>
-		/// Copy the entries of the matrix into a 2-dimensional array. The returned array has length(0) = <see cref="Order"/> 
-		/// and length(1) = <see cref="Order"/>. 
+		/// Copy the entries of the matrix into a 2-dimensional array. The returned array has length(0) = <see cref="NumRows"/> 
+		/// and length(1) = <see cref="NumRows"/>. 
 		/// </summary>
-		/// <returns>A new <see cref="double"/>[<see cref="Order"/>, <see cref="Order"/>] array 
+		/// <returns>A new <see cref="double"/>[<see cref="NumRows"/>, <see cref="NumRows"/>] array 
 		/// with the entries of the matrix</returns>
 		public double[,] CopyToArray2D()
 		{
-			return Conversions.PackedUpperColMajorToArray2DSymm(data, Order);
+			return Conversions.PackedUpperColMajorToArray2DSymm(data, NumRows);
 		}
 
 		/// <summary>
@@ -326,34 +315,30 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		public Matrix CopyToFullMatrix()
 		{
-			double[] fullData = Conversions.PackedUpperColMajorToFullSymmColMajor(data, Order);
-			return Matrix.CreateFromArray(fullData, Order, Order, false);
+			double[] fullData = Conversions.PackedUpperColMajorToFullSymmColMajor(data, NumRows);
+			return Matrix.CreateFromArray(fullData, NumRows, NumRows, false);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-		/// </summary>
-		public IMatrix DoEntrywise(IMatrixView other, Func<double, double, double> binaryOperation)
+		/// <inheritdoc/>
+		public IMatrix DoEntrywise(IMinimalReadOnlyMatrix other, Func<double, double, double> binaryOperation)
 		{
 			if (other is SymmetricMatrix casted) return DoEntrywise(casted, binaryOperation);
-			else return DenseStrategies.DoEntrywise(this, other, binaryOperation); //TODO: optimize this
+			else return DenseStrategies.DoEntrywise(this, (IMatrixView) other, binaryOperation); //TODO: optimize this
 		}
 
 		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
+		/// See <see cref="IMinimalReadOnlyMatrix.DoEntrywise(IMinimalReadOnlyMatrix, Func{double, double, double})"/>.
 		/// </summary>
 		public SymmetricMatrix DoEntrywise(SymmetricMatrix other, Func<double, double, double> binaryOperation)
 		{
 			Preconditions.CheckSameMatrixDimensions(this, other);
 			double[] result = new double[data.Length];
 			for (int i = 0; i < data.Length; ++i) result[i] = binaryOperation(this.data[i], other.data[i]);
-			return new SymmetricMatrix(result, Order, DefiniteProperty.Unknown);
+			return new SymmetricMatrix(result, NumRows, DefiniteProperty.Unknown);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-		/// </summary>
-		public void DoEntrywiseIntoThis(IMatrixView other, Func<double, double, double> binaryOperation)
+		/// <inheritdoc/>
+		public void DoEntrywiseIntoThis(IMinimalReadOnlyMatrix other, Func<double, double, double> binaryOperation)
 		{
 			if (other is SymmetricMatrix casted) DoEntrywiseIntoThis(casted, binaryOperation);
 			else if (other is ISymmetricMatrix otherSYM)
@@ -364,18 +349,18 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i <= j; ++i)
 					{
 						int index1D = Find1DIndex(i, j);
-						this.data[index1D] = binaryOperation(this.data[index1D], other[i, j]);
+						this.data[index1D] = binaryOperation(this.data[index1D], ((IMatrixView) other)[i, j]);
 					}
 				}
 			}
 			else
 			{
-				throw new SymmetricPatternModifiedException("This operation is legal only if the other matrix is also symmetric.");
+				throw new SymmetricPatternModifiedException("This operation is legal only if the otherMatrix matrix is also symmetric.");
 			}
 		}
 
 		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
+		/// See <see cref="IMinimalMatrix.DoEntrywiseIntoThis(IMinimalReadOnlyMatrix, Func{double, double, double})"/>.
 		/// </summary>
 		public void DoEntrywiseIntoThis(SymmetricMatrix other, Func<double, double, double> binaryOperation)
 		{
@@ -384,16 +369,14 @@ namespace MGroup.LinearAlgebra.Matrices
 			Definiteness = DefiniteProperty.Unknown;
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
-		/// </summary>
-		IMatrix IEntrywiseOperableView2D<IMatrixView, IMatrix>.DoToAllEntries(Func<double, double> unaryOperation)
+		/// <inheritdoc/>
+		IMatrix IMatrixView.DoToAllEntries(Func<double, double> unaryOperation)
 		{
 			return DoToAllEntries(unaryOperation);
 		}
 
 		/// <summary>
-		/// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
+		/// See <see cref="IMatrixView.DoToAllEntries(Func{double, double})"/>.
 		/// </summary>
 		public SymmetricMatrix DoToAllEntries(Func<double, double> unaryOperation)
 		{
@@ -405,9 +388,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new SymmetricMatrix(result, NumRows, DefiniteProperty.Unknown);
 		}
 
-		/// <summary>
-		/// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoToAllEntriesIntoThis(Func{double, double})"/>.
-		/// </summary>
+		/// <inheritdoc/>
 		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
 		{
 			for (int i = 0; i < NumRows * NumColumns; ++i)
@@ -416,9 +397,9 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 		}
 
-		public bool Equals(IIndexable2D other, double tolerance = 1e-13)
+		public bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-13)
 		{
-			return DenseStrategies.AreEqual(this, other, tolerance);
+			return DenseStrategies.AreEqual(this, (IMatrixView)otherMatrix, tolerance);
 		}
 
 		/// <summary>
@@ -458,7 +439,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <returns></returns>
 		public CholeskyPacked FactorCholesky()
 		{
-			var factor = CholeskyPacked.Factorize(Order, data);
+			var factor = CholeskyPacked.Factorize(NumRows, data);
 			Definiteness = DefiniteProperty.PositiveDefinite; // An exception would have been thrown otherwise.
 			return factor;
 		}
@@ -469,16 +450,16 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Vector GetColumn(int colIndex)
 		{
 			Preconditions.CheckIndexCol(this, colIndex);
-			var columnVector = new double[Order];
+			var columnVector = new double[NumRows];
 
 			// Upper triangle and diagonal entries of the column are stored explicitly and contiguously
 			int colOffset = (colIndex * (colIndex + 1)) / 2;
 			Array.Copy(data, colOffset, columnVector, 0, colIndex + 1);
 
 			// Lower triangle entries of the column can be found in the row with the same index
-			for (int j = colIndex + 1; j < Order; ++j) columnVector[j] = data[colIndex + (j * (j + 1)) / 2];
+			for (int j = colIndex + 1; j < NumRows; ++j) columnVector[j] = data[colIndex + (j * (j + 1)) / 2];
 
-			return Vector.CreateFromArray(columnVector);
+			return new Vector(columnVector);
 		}
 
 		/// <summary>
@@ -498,7 +479,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive)
 			=> DenseStrategies.GetSubmatrix(this, rowStartInclusive, rowEndExclusive, colStartInclusive, colEndExclusive);
 
-		public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public IMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is SymmetricMatrix casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
 			else return DoEntrywise(otherMatrix, (x1, x2) => thisCoefficient * x1 + otherCoefficient * x2); //TODO: optimize this
@@ -527,7 +508,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return new SymmetricMatrix(result, NumColumns, DefiniteProperty.Unknown);
 		}
 
-		public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+		public void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
 		{
 			if (otherMatrix is SymmetricMatrix casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
 			else if (otherMatrix is ISymmetricMatrix otherSYM)
@@ -538,12 +519,12 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i <= j; ++i)
 					{
 						int index1D = Find1DIndex(i, j);
-						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * otherMatrix[i, j];
+						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
 					}
 				}
 			}
 			else throw new SymmetricPatternModifiedException(
-				"This operation is legal only if the other matrix is also symmetric.");
+				"This operation is legal only if the otherMatrix matrix is also symmetric.");
 		}
 
 		public void LinearCombinationIntoThis(double thisCoefficient, SymmetricMatrix otherMatrix, double otherCoefficient)
@@ -584,15 +565,13 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Vector Multiply(Vector vector)
 		{
 			//TODO: this performs redundant dimension checks
-			var result = Vector.CreateZero(Order);
+			var result = new Vector(new double[NumRows]);
 			MultiplyIntoResult(vector, result);
 			return result;
 		}
 
-		/// <summary>
-		/// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
-		/// </summary>
-		public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
+		/// <inheritdoc/>
+		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
@@ -600,32 +579,33 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 			else throw new NotImplementedException();
 		}
+		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
 
 		/// <summary>
-		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = this * <paramref name="vector"/>.
+		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = this * <paramref name="lhsVector"/>.
 		/// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = A * x.
-		/// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-		/// == this.<see cref="IIndexable2D.NumColumns"/>.
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == this.<see cref="ILinearTransformation.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-		/// == this.<see cref="IIndexable2D.NumRows"/>.
+		/// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == this.<see cref="ILinearTransformation.NumRows"/>.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described contraints.
 		/// </exception>
 		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector)
 		{
 			Preconditions.CheckMultiplicationDimensions(this.NumColumns, lhsVector.Length);
 			Preconditions.CheckSystemSolutionDimensions(this.NumRows, rhsVector.Length);
-			Blas.Dspmv(StoredTriangle.Upper, Order,
-				1.0, this.data, 0, lhsVector.RawData, 0, 1,
-				0.0, rhsVector.RawData, 0, 1);
+			Blas.Dspmv(StoredTriangle.Upper, NumRows,
+				1.0, this.data, 0, lhsVector.Values, 0, 1,
+				0.0, rhsVector.Values, 0, 1);
 		}
 
 		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
@@ -658,7 +638,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			double[] result = new double[numStoredEntries];
 			Array.Copy(this.data, result, numStoredEntries);
 			Blas.Dscal(numStoredEntries, scalar, result, 0, 1);
-			return new SymmetricMatrix(result, this.Order, this.Definiteness);
+			return new SymmetricMatrix(result, this.NumRows, this.Definiteness);
 		}
 
 		public void ScaleIntoThis(double scalar) => Blas.Dscal(data.Length, scalar, data, 0, 1);
@@ -667,7 +647,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public void SetEntryRespectingPattern(int rowIdx, int colIdx, double value)
 		{
 			Definiteness = DefiniteProperty.Unknown;
-			if ((rowIdx < 0) || (rowIdx >= Order) || (colIdx < 0) || (colIdx >= Order))
+			if ((rowIdx < 0) || (rowIdx >= NumRows) || (colIdx < 0) || (colIdx >= NumRows))
 			{
 				throw new IndexOutOfRangeException($"Invalid indices: ({rowIdx}, {colIdx})");
 			}
@@ -682,10 +662,17 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public SymmetricMatrix Transpose(bool copyInternalArray)
 		{
-			return SymmetricMatrix.CreateFromPackedColumnMajorArray(data, Order, Definiteness, copyInternalArray);
+			return SymmetricMatrix.CreateFromPackedColumnMajorArray(data, NumRows, Definiteness, copyInternalArray);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal int Find1DIndex(int i, int j) => i + (j * (j + 1)) / 2;
+
+		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false) => throw new NotImplementedException();
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, 1);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, -1);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, 1);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, -1);
+		public IMinimalMatrix CreateZeroWithSameFormat() => new SymmetricMatrix(new double[data.Length], NumRows, Definiteness);
 	}
 }

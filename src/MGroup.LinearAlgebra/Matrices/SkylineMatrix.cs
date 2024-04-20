@@ -14,7 +14,7 @@ using System.Linq;
 using MGroup.LinearAlgebra.Reordering;
 using MGroup.LinearAlgebra.Providers;
 
-//TODO: Also linear combinations with other matrix types may be useful, e.g. Skyline (K) with diagonal (M), but I think 
+//TODO: Also linear combinations with otherMatrix matrix types may be useful, e.g. Skyline (K) with diagonal (M), but I think 
 //      that for global matrices, this should be done through concrete class to use DoEntrywiseIntoThis methods. 
 //TODO: Checks like: col - row <= colHeight can be written more efficiently without calculating the height:
 //      entryOffset = diagOffsets[col] + col - row, entryOffset <= diagOffsets[col+1]
@@ -205,7 +205,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// The tolerance used to determine if an entry is zero. It will also be used to check, if <paramref name="original"/>
         /// is symmetric (<paramref name="original"/>[i, j] == <paramref name="original"/>[j, i]).
         /// </param>
-        public static SkylineMatrix CreateFromMatrix(IIndexable2D original, double tolerance = 1E-10)
+        public static SkylineMatrix CreateFromMatrix(IMatrixView original, double tolerance = 1E-10)
         {
             if (!original.IsSymmetric(tolerance)) throw new ArgumentException("The original matrix must be symmetric.");
             
@@ -246,7 +246,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <paramref name="diagOffsets"/>. The stored entries will initially be 0.
         /// </summary>
         /// <param name="order">The number of rows/columns of the new matrix.</param>
-        /// <param name="diagOffsets">Contains the indices into <paramref name="values"/> of the diagonal entries of the matrix. 
+        /// <param name="diagOffsets">Contains the indices into <see cref="values"/> of the diagonal entries of the matrix. 
         ///     Its length is <paramref name="order"/> + 1, with the last entry being equal to nnz.</param>
         /// <param name="checkInput">If true, <paramref name="diagOffsets"/> will be checked to make sure it is a valid Skyline  
         ///     array, which is safer. If false, no such check will take place, which is faster.</param>
@@ -264,10 +264,8 @@ namespace MGroup.LinearAlgebra.Matrices
             return new SkylineMatrix(order, new double[nnz], diagOffsets);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Axpy(IMatrixView, double)"/>.
-        /// </summary>
-        public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is SkylineMatrix otherSKY) // In case both matrices have the exact same index arrays
             {
@@ -289,7 +287,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, 1.0, otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, 1.0, (IMatrixView) otherMatrix, otherCoefficient);
         }
 
         /// <summary>
@@ -323,14 +321,12 @@ namespace MGroup.LinearAlgebra.Matrices
             return new SkylineMatrix(NumColumns, resultValues, this.diagOffsets);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
-        /// </summary>
-        public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is SkylineMatrix casted) AxpyIntoThis(casted, otherCoefficient);
             else throw new SparsityPatternModifiedException(
-                 "This operation is legal only if the other matrix has the same sparsity pattern");
+                 "This operation is legal only if the otherMatrix matrix has the same sparsity pattern");
         }
 
         /// <summary>
@@ -369,24 +365,20 @@ namespace MGroup.LinearAlgebra.Matrices
                     if (thisColTop < otherColTop) throw new SparsityPatternModifiedException(
                         $"Column {j} of this matrix is shorter, which would result in overflow");
 
-                    // Do the operation between the two columns. The column of this matrix is taller or equal to the other one.
-                    for (int i = j; i >= otherColTop; --i) // non zero entries of shortest=other column, including diagonal
+                    // Do the operation between the two columns. The column of this matrix is taller or equal to the otherMatrix one.
+                    for (int i = j; i >= otherColTop; --i) // non zero entries of shortest=otherMatrix column, including diagonal
                     {
                         this.values[thisDiagOffset + j - i] += otherCoefficient * otherMatrix.values[otherDiagOffset + j - i];
                     }
-                    // Don't do anything to the non zero entries of the above the shortest=other column (this[i,j] += a*0)
+                    // Don't do anything to the non zero entries of the above the shortest=otherMatrix column (this[i,j] += a*0)
                 }
             }
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.Clear"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void Clear() => Array.Clear(values, 0, values.Length);
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Copy(bool)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         IMatrix IMatrixView.Copy(bool copyIndexingData) => Copy(copyIndexingData);
 
         /// <summary>
@@ -432,9 +424,7 @@ namespace MGroup.LinearAlgebra.Matrices
             return array2D;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.CopyToFullMatrix()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public Matrix CopyToFullMatrix()
         {
             Matrix fullMatrix = Matrix.CreateZero(this.NumColumns, this.NumColumns);
@@ -458,12 +448,10 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public int CountNonZeros() => values.Length;
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public IMatrix DoEntrywise(IMatrixView other, Func<double, double, double> binaryOperation)
+        /// <inheritdoc/>
+        public IMatrix DoEntrywise(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
         {
-            if (other is SkylineMatrix otherSKY) // In case both matrices have the exact same index arrays
+            if (otherMatrix is SkylineMatrix otherSKY) // In case both matrices have the exact same index arrays
             {
 				if (otherSKY.values.Length == 0)
 				{
@@ -485,13 +473,11 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.DoEntrywise(this, other, binaryOperation);
+            return DenseStrategies.DoEntrywise(this, (IMatrixView) otherMatrix, binaryOperation);
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public void DoEntrywiseIntoThis(IMatrixView other, Func<double, double, double> binaryOperation)
+        /// <inheritdoc/>
+        public void DoEntrywiseIntoThis(IMinimalReadOnlyMatrix other, Func<double, double, double> binaryOperation)
         {
             if (other is SkylineMatrix sky)
             {
@@ -517,7 +503,7 @@ namespace MGroup.LinearAlgebra.Matrices
                         if (thisColTop < otherColTop) throw new SparsityPatternModifiedException(
                             $"Column {j} of this matrix is shorter, which would result in overflow");
 
-                        // Do the operation between the two columns. The column of this matrix is taller or equal to the other one.
+                        // Do the operation between the two columns. The column of this matrix is taller or equal to the otherMatrix one.
                         for (int i = j; i >= otherColTop; --i) // non zero entries of shortest column, including diagonal
                         {
                             int thisIndex = thisDiagOffset + j - i;
@@ -532,12 +518,10 @@ namespace MGroup.LinearAlgebra.Matrices
                 }
             }
             else throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other matrix has the same sparsity pattern");
+                "This operation is legal only if the otherMatrix matrix has the same sparsity pattern");
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public IMatrix DoToAllEntries(Func<double, double> unaryOperation)
         {
             // Only apply the operation on non zero entries
@@ -557,9 +541,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoToAllEntriesIntoThis(Func{double, double})"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
         {
             if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0))
@@ -572,9 +554,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="ISparseMatrix.EnumerateNonZeros"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public IEnumerable<(int row, int col, double value)> EnumerateNonZeros()
         {
             for (int j = 0; j < NumColumns; ++j)
@@ -591,10 +571,8 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1E-13)
+        /// <inheritdoc/>
+        public bool Equals(IMinimalReadOnlyMatrix other, double tolerance = 1E-13)
         {
             if ((this.NumRows != other.NumRows) || (this.NumColumns != other.NumColumns)) return false;
             var comparer = new ValueComparer(1e-13);
@@ -604,14 +582,14 @@ namespace MGroup.LinearAlgebra.Matrices
                 int columnTop = j - diagOffsets[j+1] + colOffset + 1;
                 for (int i = 0; i < columnTop; ++i) // zero entries above stored column
                 {
-                    if (!( comparer.AreEqual(0.0, other[i, j]) && comparer.AreEqual(0.0, other[j, i]) )) return false;
+                    if (!( comparer.AreEqual(0.0, ((IMatrixView)other)[i, j]) && comparer.AreEqual(0.0, ((IMatrixView)other)[j, i]) )) return false;
                 }
                 for (int i = columnTop; i < j; ++i) // non zero entries of column, excluding diafonal
                 {
                     double value = values[colOffset + j - i];
-                    if (!(comparer.AreEqual(value, other[i, j]) && comparer.AreEqual(value, other[j, i]))) return false;
+                    if (!(comparer.AreEqual(value, ((IMatrixView)other)[i, j]) && comparer.AreEqual(value, ((IMatrixView)other)[j, i]))) return false;
                 }
-                if (!comparer.AreEqual(values[colOffset], other[j, j])) return false; // non zero diagonal entry
+                if (!comparer.AreEqual(values[colOffset], ((IMatrixView)other)[j, j])) return false; // non zero diagonal entry
             }
             return true; // At this point all entries have been checked and are equal
         }
@@ -623,10 +601,10 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="inPlace">
         /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
-        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
+        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members 
         /// afterwards.
         /// </param>
-        /// <param name="pivotTolerance">
+        /// <param name="tolerance">
         /// If a diagonal entry is closer to zero than this tolerance, an <see cref="IndefiniteMatrixException"/> exception will
         /// be thrown.
         /// </param>
@@ -662,7 +640,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="inPlace">
         /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
-        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
+        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members 
         /// afterwards.
         /// </param>
         /// <param name="tolerance">
@@ -701,7 +679,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="inPlace">
         /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
-        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
+        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members 
         /// afterwards.
         /// </param>
         /// <param name="pivotTolerance">
@@ -743,7 +721,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="inPlace">
         /// False, to copy the internal non zero entries before factorization. True, to overwrite them with the factorized Values, 
-        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any other members 
+        /// thus saving memory and time. However, that will make this object unusable, so you MUST NOT call any otherMatrix members 
         /// afterwards.
         /// </param>
         /// <param name="pivotTolerance">
@@ -784,13 +762,13 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             if (isOverwritten) throw new MatrixDataOverwrittenException();
             Preconditions.CheckIndexCol(this, colIndex);
-            return Vector.CreateFromArray(SkylineSlicing.GetColumn(values, diagOffsets, colIndex));
+            return new Vector(SkylineSlicing.GetColumn(values, diagOffsets, colIndex));
         }
 
         /// <summary>
         /// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal.
         /// </summary>
-        public Vector GetDiagonal() => Vector.CreateFromArray(GetDiagonalAsArray(), false);
+        public Vector GetDiagonal() => new Vector(GetDiagonalAsArray());
 
         /// <summary>
         /// Returns an array with the entries of the matrix's main diagonal.
@@ -879,10 +857,8 @@ namespace MGroup.LinearAlgebra.Matrices
             return SkylineSlicing.GetSubmatrixSymmetricSkyline(values, diagOffsets, indices);
         }
         
-        /// <summary>
-        /// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
-        /// </summary>
-        public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is SkylineMatrix otherSKY) // In case both matrices have the exact same index arrays
             {
@@ -918,17 +894,15 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, thisCoefficient, otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
-        /// </summary>
-        public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is SkylineMatrix casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
             else throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other matrix has the same sparsity pattern");
+                "This operation is legal only if the otherMatrix matrix has the same sparsity pattern");
         }
 
         /// <summary>
@@ -976,7 +950,7 @@ namespace MGroup.LinearAlgebra.Matrices
                     if (thisColTop < otherColTop) throw new SparsityPatternModifiedException(
                         $"Column {j} of this matrix is shorter, which would result in overflow");
 
-                    // Do the operation between the two columns. The column of this matrix is taller or equal to the other one.
+                    // Do the operation between the two columns. The column of this matrix is taller or equal to the otherMatrix one.
                     for (int i = j; i >= otherColTop; --i) // non zero entries of shortest column, including diagonal
                     {
                         int thisIndex = thisDiagOffset + j - i;
@@ -992,93 +966,75 @@ namespace MGroup.LinearAlgebra.Matrices
             }            
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyLeft(IMatrixView, bool, bool)"/>.
-        /// </summary>
-        /// <remarks>
-        /// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
-        /// </remarks>
-        public Matrix MultiplyLeft(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+        /// <inheritdoc/>
+        public Matrix MultiplyLeft(IMatrixView otherMatrix, bool transposeThis = false, bool transposeOther = false)
         {
-            return DenseStrategies.Multiply(other, this, transposeOther, transposeThis);
+            return DenseStrategies.Multiply(otherMatrix, this, transposeOther, transposeThis);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyRight(IMatrixView, bool, bool)"/>.
-        /// </summary>
-        /// <remarks>
-        /// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
-        /// </remarks>
-        public Matrix MultiplyRight(IMatrixView other, bool transposeThis = false, bool transposeOther = false)
+		/// <inheritdoc/>
+		public Matrix MultiplyRight(IMatrixView otherMatrix, bool transposeThis = false, bool transposeOther = false)
         {
-            return DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
+            return DenseStrategies.Multiply(this, otherMatrix, transposeThis, transposeOther);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
-        /// </summary>
-        /// <remarks>
-        /// <paramref name="transposeThis"/> does not affect the result, as a <see cref="SkylineMatrix"/> is symmetric.
-        /// </remarks>
-        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
+        /// <inheritdoc/>
+        public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector casted) return Multiply(casted);
             else throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: this * <paramref name="vector"/> = <paramref name="vector"/> * this.
-        /// </summary>
-        /// <param name="vector">A vector with <see cref="IIndexable1D.Length"/> being equal to 
-        ///     this.<see cref="NumColumns"/>.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IIndexable1D.Length"/> of
-        ///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of this.</exception>
-        public Vector Multiply(Vector vector)
+		/// <summary>
+		/// Performs the matrix-vector multiplication: this * <paramref name="vector"/> = <paramref name="vector"/> * this.
+		/// </summary>
+		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to 
+		///     this.<see cref="NumColumns"/>.</param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+		///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of this.</exception>
+		public Vector Multiply(Vector vector)
         {
             //TODO: this performs redundant dimension checks
-            var result = Vector.CreateZero(NumColumns);
+            var result = new Vector(new double[NumColumns]);
             MultiplyIntoResult(vector, result);
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
-        /// </summary>
-        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
+        /// <inheritdoc/>
+        public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
         {
 			if (this.values.Length == 0)
 			{
 				return;
 			}
 
-            if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
+            if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense) && !transposeThis)
             {
                 MultiplyIntoResult(lhsDense, rhsDense);
             }
             else throw new NotImplementedException();
         }
+		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = this * <paramref name="vector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
-        /// </summary>
-        /// <param name="lhsVector">
-        /// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = A * x.
-        /// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == this.<see cref="IIndexable2D.NumColumns"/>.
-        /// </param>
-        /// <param name="rhsVector">
-        /// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-        /// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == this.<see cref="IIndexable2D.NumRows"/>.
-        /// </param>
-        /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
-        /// violate the described contraints.
-        /// </exception>
-        public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector)
+		/// <summary>
+		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = this * <paramref name="lhsVector"/>.
+		/// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
+		/// </summary>
+		/// <param name="lhsVector">
+		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = A * x.
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == this.<see cref="ILinearTransformation.NumColumns"/>.
+		/// </param>
+		/// <param name="rhsVector">
+		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
+		/// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == this.<see cref="ILinearTransformation.NumRows"/>.
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">
+		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// violate the described contraints.
+		/// </exception>
+		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector)
         {
             Preconditions.CheckMultiplicationDimensions(NumColumns, lhsVector.Length);
             Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
@@ -1088,7 +1044,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 
 			ManagedSparseBlasProvider.UniqueInstance.Dskymv(
-                NumColumns, values, diagOffsets, lhsVector.RawData, rhsVector.RawData);
+                NumColumns, values, diagOffsets, lhsVector.Values, rhsVector.Values);
         }
 
         /// <summary>
@@ -1123,9 +1079,7 @@ namespace MGroup.LinearAlgebra.Matrices
             return new SkylineMatrix(this.NumColumns, resultValues, this.diagOffsets);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void ScaleIntoThis(double scalar) => Blas.Dscal(values.Length, scalar, values, 0, 1);
 
         /// <summary>
@@ -1155,5 +1109,12 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         private bool HasSameIndexer(SkylineMatrix other) => this.diagOffsets == other.diagOffsets;
-    }
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, 1);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, -1);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, 1);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, -1);
+
+		public SkylineMatrix CreateZeroWithSameFormat() => new SkylineMatrix(NumColumns, new double[values.Length], (int[])diagOffsets.Clone());
+		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
+	}
 }

@@ -1008,10 +1008,12 @@ namespace MGroup.LinearAlgebra.Matrices
 
         private bool HasSameIndexer(CsrMatrix other) => (colIndices == other.colIndices) && (rowOffsets == other.rowOffsets);
 
-		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.AddIntoThis(this,	otherMatrix);
-		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => IMinimalMatrix.SubtractIntoThis(this, otherMatrix);
-		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Add(this, otherMatrix);
-		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => IMinimalReadOnlyMatrix.Subtract(this, otherMatrix);
-		public IMinimalMatrix CreateZeroWithSameFormat() => new CsrMatrix(NumRows, NumColumns, new double[RawValues.Length], (int[])RawColIndices.Clone(), (int[])RawRowOffsets.Clone());
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, 1);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, -1);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, 1);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, -1);
+		
+		public CsrMatrix CreateZeroWithSameFormat() => new CsrMatrix(NumRows, NumColumns, new double[RawValues.Length], (int[])RawColIndices.Clone(), (int[])RawRowOffsets.Clone());
+		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
 	}
 }
