@@ -1,15 +1,13 @@
 namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Text;
 
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.SchurComplements.IntegerMatrices;
 
-	public class SubmatrixExtractorCsrCscSym : SubmatrixExtractorCscSymBase
+	public class SubmatrixExtractorPckCsrCscSym : SubmatrixExtractorCscSymBase
 	{
-		public CsrMatrix Submatrix00 { get; private set; }
+		public SymmetricMatrix Submatrix00 { get; private set; }
 
 		public override void Clear()
 		{
@@ -37,7 +35,9 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 				}
 			}
 
-			CopyValuesArray(originalMatrix.RawValues, Submatrix00.RawValues, map00);
+			// A00 is in full format, thus it may contain zeros that were not present in A. These entries will have a -1 index
+			// into A.values.
+			CopyValuesArrayAndZeros(originalMatrix.RawValues, Submatrix00.RawData, map00);
 			CopyValuesArray(originalMatrix.RawValues, Submatrix01.RawValues, map01);
 			CopyValuesArray(originalMatrix.RawValues, Submatrix11.RawValues, map11);
 		}
@@ -46,11 +46,12 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 		{
 			int n0 = indicesGroup0.Length;
 			int n1 = indicesGroup1.Length;
-			var submatrix00 = IntDokRowMajor.CreateZero(n0, n0);
+			var submatrix00 = IntSymMatrixColMajor.CreateZero(n0);
+			Fill(submatrix00.RawValues, -1); // Later, -1 index will be overwritten by all entries, except explicit zeros of A00
 			var submatrix01 = IntDokRowMajor.CreateZero(n0, n1);
 			var submatrix11 = IntDokSymColMajor.CreateZero(n1);
 
-			// Original matrix indices to submatrix indices. Group 0 indices i0 are stored as: -i0-1. 
+			// Original matrix indices to submatrix indices. Group 0 indices i0 are stored as: -i0-1.
 			// Group 1 indices are stored as they are
 			int[] originalToSubIndices = MapOriginalToSubmatrixIndices(originalMatrix.NumRows, indicesGroup0, indicesGroup1);
 
@@ -99,11 +100,9 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 			}
 
 			// Finalize the data structures required to represent the submatrices
-			// A00 CSR
-			int[] colIndices00, rowOffsets00;
-			(this.map00, colIndices00, rowOffsets00) = submatrix00.BuildCsrArrays();
-			this.Submatrix00 = CsrMatrix.CreateFromArrays(
-				n0, n0, new double[this.map00.Length], colIndices00, rowOffsets00, false);
+			// A00 dense, col major
+			this.Submatrix00 = SymmetricMatrix.CreateZero(n0);
+			this.map00 = submatrix00.RawValues;
 
 			// A01 CSR
 			int[] colIndices01, rowOffsets01;

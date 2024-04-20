@@ -78,6 +78,8 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		internal (double[] values, int[] rowIndices, int[] colOffsets) MatrixCscSymmetric
 			=> FormatConversions.ArrayToSymmetricCsc(Matrix);
 
+		internal double[] MatrixPackedUpper => FormatConversions.ArrayToPackedUpper(Matrix);
+
 		internal double[,] Submatrix00 => ArrayUtilities.GetSubmatrix(Matrix, Indices0, Indices0);
 
 		internal (double[] values, int[] colIndices, int[] rowOffsets) Submatrix00Csr
@@ -88,6 +90,9 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 
 		internal (double[] values, int[] rowIndices, int[] colOffsets) Submatrix00CscSymmetric
 			=> FormatConversions.ArrayToSymmetricCsc(Submatrix00);
+
+		internal double[] Submatrix00PackedUpper => FormatConversions.ArrayToPackedUpper(Submatrix00);
+
 
 		internal double[,] Submatrix01 => ArrayUtilities.GetSubmatrix(Matrix, Indices0, Indices1);
 
@@ -115,5 +120,7 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 
 		internal (double[] values, int[] rowIndices, int[] colOffsets) Submatrix11CscSymmetric
 			=> FormatConversions.ArrayToSymmetricCsc(Submatrix11);
+
+		internal double[] Submatrix11PackedUpper => FormatConversions.ArrayToPackedUpper(Submatrix11);
 	}
 }

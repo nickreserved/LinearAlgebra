@@ -75,7 +75,11 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 		{
 			int m = matrix.GetLength(0);
 			int n = matrix.GetLength(1);
-			Xunit.Assert.Equal(m, n);
+			if (m != n)
+			{
+				throw new ArgumentException("The provided matrix is not square");
+			}
+
 			int nnz = CountNonZerosUpperDiagonal(matrix, zeroEntryTol);
 
 			var values = new double[nnz];
@@ -100,6 +104,29 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			}
 
 			return (values, rowIndices, colOffsets);
+		}
+
+		public static double[] ArrayToPackedUpper(double[,] matrix)
+		{
+			int m = matrix.GetLength(0);
+			int n = matrix.GetLength(1);
+			if (m != n)
+			{
+				throw new ArgumentException("The provided matrix is not square");
+			}
+
+			var values = new double[(n * (n + 1)) / 2];
+			int counter = 0;
+			for (int j = 0; j < n; ++j)
+			{
+				for (int i = 0; i <= j; ++i)
+				{
+					values[counter] = matrix[i, j];
+					++counter;
+				}
+			}
+
+			return values;
 		}
 
 		private static int CountNonZeros(double[,] matrix, double zeroEntryTolerance)
