@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 		public static void TestClear()
 		{
 			var extractor = new SubmatrixExtractorFullCsrCsc();
-			var example = SubmatricesExample.CreateExampleNonSymmetricA();
+			var example = SchurComplementExample.CreateExampleNonSymmetricA();
 
 			int n = example.MatrixOrder;
 			(double[] values, int[] colIndices, int[] rowOffsets) A = example.MatrixCsr;
@@ -38,7 +38,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 		public static void TestExtractSubmatricesMultiple()
 		{
 			var extractor = new SubmatrixExtractorFullCsrCsc();
-			var example = SubmatricesExample.CreateExampleNonSymmetricA();
+			var example = SchurComplementExample.CreateExampleNonSymmetricA();
 
 			int n = example.MatrixOrder;
 			(double[] values, int[] colIndices, int[] rowOffsets) A = example.MatrixCsr;
@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 			TestExtractorForExample(extractor, example);
 
 			// 3rd matrix B is completely different
-			example = SubmatricesExample.CreateExampleNonSymmetricB();
+			example = SchurComplementExample.CreateExampleNonSymmetricB();
 			(double[] values, int[] colIndices, int[] rowOffsets) B = example.MatrixCsr;
 			csr = CsrMatrix.CreateFromArrays(n, n, B.values, B.colIndices, B.rowOffsets, true);
 
@@ -77,7 +77,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 		public static void TestExtractSubmatricesOnce()
 		{
 			var extractor = new SubmatrixExtractorFullCsrCsc();
-			var example = SubmatricesExample.CreateExampleNonSymmetricA();
+			var example = SchurComplementExample.CreateExampleNonSymmetricA();
 
 			int n = example.MatrixOrder;
 			(double[] values, int[] colIndices, int[] rowOffsets) A = example.MatrixCsr;
@@ -90,7 +90,7 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 			TestExtractorForExample(extractor, example);
 		}
 
-		private static void TestExtractorForExample(SubmatrixExtractorFullCsrCsc extractor, SubmatricesExample example)
+		private static void TestExtractorForExample(SubmatrixExtractorFullCsrCsc extractor, SchurComplementExample example)
 		{
 			double[] expected00 = example.Submatrix00FullColMajor;
 			(double[] values, int[] colIndices, int[] rowOffsets) expected01 = example.Submatrix01Csr;

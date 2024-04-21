@@ -18,14 +18,14 @@ namespace MGroup.LinearAlgebra.Tests.SchurComplements.SubmatrixExtractors
 		[InlineData("B", 1)]
 		public static void TestExtractSparsityPattern(string exampleLetter, int indexGroupNumber)
 		{
-			SubmatricesExample example;
+			SchurComplementExample example;
 			if (exampleLetter == "A")
 			{
-				example = SubmatricesExample.CreateExampleSymmetricA();
+				example = SchurComplementExample.CreateExampleSymmetricA();
 			}
 			else if (exampleLetter == "B")
 			{
-				example = SubmatricesExample.CreateExampleSymmetricB();
+				example = SchurComplementExample.CreateExampleSymmetricB();
 			}
 			else
 			{
