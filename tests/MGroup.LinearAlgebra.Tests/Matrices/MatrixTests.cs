@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -60,6 +62,20 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			var matrix = Matrix.CreateFromArray(SparseRectangular10by5.Matrix);
 			matrix.Clear();
 			comparer.AssertEqual(zero, matrix);
+		}
+
+		[Fact]
+		private static void TestCreateWithValue()
+		{
+			int m = 35;
+			int n = 20;
+			double val = -3.33;
+			var matrix = Matrix.CreateWithValue(m, n, val);
+
+			var expected = new double[m, n];
+			LinearAlgebra.Tests.Utilities.ArrayUtilities.SetAll(expected, val);
+			var comparer = new MatrixComparer(1E-15);
+			comparer.AssertEqual(expected, matrix);
 		}
 
 		[Fact]
@@ -286,6 +302,21 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
 				Assert.True(originalMatrix.Equals(deserializedMatrix));
 			}
+		}
+
+		[Fact]
+		private static void TestSetAll()
+		{
+			int m = 35;
+			int n = 20;
+			double val = -3.33;
+			var matrix = Matrix.CreateZero(m, n);
+			matrix.SetAll(val);
+
+			var expected = new double[m, n];
+			LinearAlgebra.Tests.Utilities.ArrayUtilities.SetAll(expected, val);
+			var comparer = new MatrixComparer(1E-15);
+			comparer.AssertEqual(expected, matrix);
 		}
 
 		[Theory]

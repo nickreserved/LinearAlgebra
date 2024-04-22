@@ -229,7 +229,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static Matrix CreateWithValue(int numRows, int numColumns, double value)
 		{
 			double[] data = new double[numRows * numColumns];
-			for (int i = 0; i < data.Length; ++i) data[i] = value;
+			ArrayUtilities.MemSet(data, value);
 			return new Matrix(data, numRows, numColumns);
 		}
 
@@ -1281,10 +1281,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Sets all entries of this matrix to be equal to <paramref name="value"/>.
 		/// </summary>
 		/// <param name="value">The value that all entries of the this matrix will be equal to.</param>
-		public void SetAll(double value)
-		{
-			for (int i = 0; i < data.Length; ++i) data[i] = value;
-		}
+		public void SetAll(double value) => ArrayUtilities.MemSet(data, value);
 
 		/// <summary>
 		/// Sets some consecutive entries of the column with index = <paramref name="colIdx"/> to be equal to 

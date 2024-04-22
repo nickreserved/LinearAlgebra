@@ -1,6 +1,9 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+
+using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
@@ -63,6 +66,17 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 			var vector = Vector.CreateFromArray(TestVectors.Vector1, true);
 			vector.Clear();
 			comparer.AssertEqual(zero, vector);
+		}
+
+		[Fact]
+		private static void TestCreateWithValue()
+		{
+			int n = 100;
+			double val = 3.33;
+			var vector = Vector.CreateWithValue(n, val);
+
+			var comparer = new MatrixComparer(1E-15);
+			comparer.AssertEqual(Enumerable.Repeat(val, n).ToArray(), vector);
 		}
 
 		[Theory]
@@ -165,6 +179,18 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 
 				Assert.True(originalVector.Equals(deserializedVector));
 			}
+		}
+
+		[Fact]
+		private static void TestSetAll()
+		{
+			int n = 100;
+			double val = 3.33;
+			var vector = Vector.CreateZero(n);
+			vector.SetAll(val);
+
+			var comparer = new MatrixComparer(1E-15);
+			comparer.AssertEqual(Enumerable.Repeat(val, n).ToArray(), vector);
 		}
 
 		[Theory]

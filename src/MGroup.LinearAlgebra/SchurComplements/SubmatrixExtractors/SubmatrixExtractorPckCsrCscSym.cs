@@ -2,6 +2,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 {
 	using System;
 
+	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.SchurComplements.IntegerMatrices;
 
@@ -45,7 +46,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 			int n0 = indicesGroup0.Length;
 			int n1 = indicesGroup1.Length;
 			var submatrix00 = IntSymMatrixColMajor.CreateZero(n0);
-			Fill(submatrix00.RawValues, -1); // Later, -1 index will be overwritten by all entries, except explicit zeros of A00
+			ArrayUtilities.MemSet(submatrix00.RawValues, -1); // Later, -1 index will be overwritten by all entries, except explicit zeros of A00 
 			var submatrix01 = IntDokRowMajor.CreateZero(n0, n1);
 			var submatrix11 = IntDokSymColMajor.CreateZero(n1);
 

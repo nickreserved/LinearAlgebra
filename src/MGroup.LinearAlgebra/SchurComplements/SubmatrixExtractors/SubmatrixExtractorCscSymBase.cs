@@ -4,6 +4,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 	using System.Collections.Generic;
 	using System.Text;
 
+	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Matrices;
 
 	/// <summary>
@@ -88,7 +89,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 
 			// Original matrix indices to submatrix indices. Indices not belonging to group 0 will be marked as -1.
 			var originalToSubIndices = new int[originalMatrix.NumRows];
-			Fill(originalToSubIndices, -1);
+			ArrayUtilities.MemSet(originalToSubIndices, -1);
 			for (int i0 = 0; i0 < rowsColsToKeep.Length; ++i0)
 			{
 				originalToSubIndices[rowsColsToKeep[i0]] = i0;
@@ -193,15 +194,6 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 			}
 
 			return (rowIndices, colOffsets);
-		}
-
-		//TODO: There must be a faster way to do this
-		internal static void Fill<T>(T[] array, T value)
-		{
-			for (int i = 0; i < array.Length; ++i)
-			{
-				array[i] = value;
-			}
 		}
 
 		/// <summary>

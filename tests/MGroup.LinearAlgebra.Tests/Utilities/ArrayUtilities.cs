@@ -107,5 +107,16 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
 			Array.Copy(original, clone, original.Length);
 			return clone;
 		}
+
+		internal static void SetAll<T>(T[,] array, T value)
+		{
+			for (int i = 0; i < array.GetLength(0); ++i)
+			{
+				for (int j = 0; j < array.GetLength(1); ++j)
+				{
+					array[i,j] = value;
+				}
+			}
+		}
 	}
 }
