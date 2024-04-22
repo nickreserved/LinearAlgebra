@@ -37,9 +37,9 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 				}
 			}
 
-			CopyValuesArray(originalMatrix.RawValues, Submatrix00.RawValues, map00);
-			CopyValuesArray(originalMatrix.RawValues, Submatrix01.RawValues, map01);
-			CopyValuesArray(originalMatrix.RawValues, Submatrix11.RawValues, map11);
+			mapper00.CopyValuesArrayToSubmatrix(originalMatrix.RawValues, Submatrix00.RawValues);
+			mapper01.CopyValuesArrayToSubmatrix(originalMatrix.RawValues, Submatrix01.RawValues);
+			mapper11.CopyValuesArrayToSubmatrix(originalMatrix.RawValues, Submatrix11.RawValues);
 		}
 
 		private void ExtractMaps(SymmetricCscMatrix originalMatrix, int[] indicesGroup0, int[] indicesGroup1)
@@ -100,22 +100,22 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 
 			// Finalize the data structures required to represent the submatrices
 			// A00 CSR
-			int[] colIndices00, rowOffsets00;
-			(this.map00, colIndices00, rowOffsets00) = submatrix00.BuildCsrArrays();
+			(int[] submatrixToOriginalValues00, int[] colIndices00, int[] rowOffsets00) = submatrix00.BuildCsrArrays();
 			this.Submatrix00 = CsrMatrix.CreateFromArrays(
-				n0, n0, new double[this.map00.Length], colIndices00, rowOffsets00, false);
+				n0, n0, new double[colIndices00.Length], colIndices00, rowOffsets00, false);
+			this.mapper00 = new SameSparsityValuesArrayMapper(submatrixToOriginalValues00);
 
 			// A01 CSR
-			int[] colIndices01, rowOffsets01;
-			(this.map01, colIndices01, rowOffsets01) = submatrix01.BuildCsrArrays();
+			(int[] submatrixToOriginalValues01, int[] colIndices01, int[] rowOffsets01) = submatrix01.BuildCsrArrays();
 			this.Submatrix01 = CsrMatrix.CreateFromArrays(
-				n0, n1, new double[this.map01.Length], colIndices01, rowOffsets01, false);
+				n0, n1, new double[colIndices01.Length], colIndices01, rowOffsets01, false);
+			this.mapper01 = new SameSparsityValuesArrayMapper(submatrixToOriginalValues01);
 
 			// A11 CSC upper triangle
-			int[] rowIndices11, colOffsets11;
-			(this.map11, rowIndices11, colOffsets11) = submatrix11.BuildCscArrays();
+			(int[] submatrixToOriginalValues11, int[] rowIndices11, int[] colOffsets11) = submatrix11.BuildCscArrays();
 			this.Submatrix11 = SymmetricCscMatrix.CreateFromArrays(
-				n1, new double[this.map11.Length], rowIndices11, colOffsets11, false);
+				n1, new double[rowIndices11.Length], rowIndices11, colOffsets11, false);
+			this.mapper11 = new SameSparsityValuesArrayMapper(submatrixToOriginalValues11);
 		}
 	}
 }

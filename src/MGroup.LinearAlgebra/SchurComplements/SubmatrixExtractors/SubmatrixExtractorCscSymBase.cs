@@ -20,22 +20,19 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 		protected SymmetricCscMatrix originalMatrix;
 
 		/// <summary>
-		/// Maps indices of the values arrays between the original matrix A and its submatrix A00
-		/// A00.Values[i] = A.Values[map00[i]].
+		/// Maps the values array of the original matrix A to the values array of its submatrix A00.
 		/// </summary>
-		protected int[] map00;
+		protected IValuesArrayMapper mapper00;
 
 		/// <summary>
-		/// Maps indices of the values arrays between the original matrix A and its submatrix A01
-		/// A01.Values[i] = A.Values[map01[i]].
+		/// Maps the values array of the original matrix A to the values array of its submatrix A01.
 		/// </summary>
-		protected int[] map01;
+		protected IValuesArrayMapper mapper01;
 
 		/// <summary>
-		/// Maps indices of the values arrays between the original matrix A and its submatrix A11
-		/// A11.Values[i] = A.Values[map11[i]].
+		/// Maps the values array of the original matrix A to the values array of its submatrix A11.
 		/// </summary>
-		protected int[] map11;
+		protected IValuesArrayMapper mapper11;
 
 		/// <summary>
 		/// A01 of A = [A00, A01; A10, A11] (using Matlab notation). It is equal to transpose(A10).
@@ -59,9 +56,9 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 
 			Submatrix01 = null;
 			Submatrix11 = null;
-			map00 = null;
-			map01 = null;
-			map11 = null;
+			mapper00 = null;
+			mapper01 = null;
+			mapper11 = null;
 		}
 
 		/// <summary>
@@ -196,45 +193,6 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 			}
 
 			return (rowIndices, colOffsets);
-		}
-
-		/// <summary>
-		/// <paramref name="submatrixValues"/>[i] = <paramref name="originalValues"/>[<paramref name="map"/>[i]]
-		/// </summary>
-		/// <param name="originalValues"></param>
-		/// <param name="submatrixValues"></param>
-		/// <param name="map">All entries correspond to indices into <paramref name="originalValues"/>.</param>
-		internal static void CopyValuesArray(double[] originalValues, double[] submatrixValues, int[] map)
-		{
-			for (int i = 0; i < submatrixValues.Length; ++i)
-			{
-				submatrixValues[i] = originalValues[map[i]];
-			}
-		}
-
-		/// <summary>
-		/// Same as <see cref="CopyValuesArray(double[], double[], int[])"/>, but takes into account that some entries of
-		/// <paramref name="submatrixValues"/> are zeros, not originally stored in <paramref name="originalValues"/>.
-		/// If <paramref name="map"/>[i] negative then <paramref name="submatrixValues"/>[i] = 0, else
-		/// <paramref name="submatrixValues"/>[i] = <paramref name="originalValues"/>[<paramref name="map"/>[i]]
-		/// </summary>
-		/// <param name="originalValues"></param>
-		/// <param name="submatrixValues"></param>
-		/// <param name="map">All entries correspond to indices into <paramref name="originalValues"/>.</param>
-		internal static void CopyValuesArrayAndZeros(double[] originalValues, double[] submatrixValues, int[] map)
-		{
-			for (int i = 0; i < submatrixValues.Length; ++i)
-			{
-				int indexOriginal = map[i];
-				if (indexOriginal >= 0)
-				{
-					submatrixValues[i] = originalValues[indexOriginal];
-				}
-				else
-				{
-					submatrixValues[i] = 0.0;
-				}
-			}
 		}
 
 		//TODO: There must be a faster way to do this

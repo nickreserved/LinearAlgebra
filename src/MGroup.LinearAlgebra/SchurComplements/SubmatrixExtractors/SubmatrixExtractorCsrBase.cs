@@ -18,28 +18,24 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 		protected CsrMatrix originalMatrix;
 
 		/// <summary>
-		/// Maps indices of the values arrays between the original matrix A and its submatrix A00
-		/// A00.Values[i] = A.Values[map00[i]].
+		/// Maps the values array of the original matrix A to the values array of its submatrix A00.
 		/// </summary>
-		protected int[] map00;
+		protected IValuesArrayMapper mapper00;
 
 		/// <summary>
-		/// Maps indices of the values arrays between the original matrix A and its submatrix A01
-		/// A01.Values[i] = A.Values[map01[i]].
+		/// Maps the values array of the original matrix A to the values array of its submatrix A01.
 		/// </summary>
-		protected int[] map01;
+		protected IValuesArrayMapper mapper01;
 
 		/// <summary>
-		/// Maps indices of the values arrays between the original matrix A and its submatrix A01
-		/// A10.Values[i] = A.Values[map10[i]].
+		/// Maps the values array of the original matrix A to the values array of its submatrix A10.
 		/// </summary>
-		protected int[] map10;
+		protected IValuesArrayMapper mapper10;
 
 		/// <summary>
-		/// Maps indices of the values arrays between the original matrix A and its submatrix A11
-		/// A11.Values[i] = A.Values[map11[i]].
+		/// Maps the values array of the original matrix A to the values array of its submatrix A11.
 		/// </summary>
-		protected int[] map11;
+		protected IValuesArrayMapper mapper11;
 
 		/// <summary>
 		/// A01 of A = [A00, A01; A10, A11] (using Matlab notation).
@@ -69,10 +65,10 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 			Submatrix01 = null;
 			Submatrix10 = null;
 			Submatrix11 = null;
-			map00 = null;
-			map01 = null;
-			map10 = null;
-			map11 = null;
+			mapper00 = null;
+			mapper01 = null;
+			mapper10 = null;
+			mapper11 = null;
 		}
 	}
 }
