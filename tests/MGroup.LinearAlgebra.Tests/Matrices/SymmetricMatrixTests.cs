@@ -71,15 +71,15 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			{
 				// invertible
 				var A1 = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
-				var x1 = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
-				var b1Expected = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
+				var x1 = new Vector(SymmPosDef10by10.Lhs);
+				var b1Expected = new Vector(SymmPosDef10by10.Rhs);
 				Vector b1Computed = A1.Multiply(x1);
 				comparer.AssertEqual(b1Expected, b1Computed);
 
 				// singular
 				var A2 = SymmetricMatrix.CreateFromArray(SymmSingular10by10.Matrix);
-				var x2 = Vector.CreateFromArray(SymmSingular10by10.Lhs);
-				var b2Expected = Vector.CreateFromArray(SymmSingular10by10.Rhs);
+				var x2 = new Vector(SymmSingular10by10.Lhs);
+				var b2Expected = new Vector(SymmSingular10by10.Rhs);
 				Vector b2Computed = A2.Multiply(x1);
 				comparer.AssertEqual(b2Expected, b2Computed);
 			});
@@ -95,9 +95,10 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
-				var x = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
-				var bExpected = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
-				Vector bComputed = Vector.CreateWithValue(A.NumRows, 1.0);
+				var x = new Vector(SymmPosDef10by10.Lhs);
+				var bExpected = new Vector(SymmPosDef10by10.Rhs);
+				Vector bComputed = new Vector(A.NumRows);
+				bComputed.SetAll(1);
 				A.MultiplyIntoResult(x, bComputed, false);
 				comparer.AssertEqual(bExpected, bComputed);
 			});

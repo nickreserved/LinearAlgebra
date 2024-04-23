@@ -73,11 +73,11 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			{
 				// The original matrix is overwritten by the eigenvectors
 				var eigenvectors = Matrix.CreateFromArray(matrix, order, order);
-				return new SymmetricEigensystemFull(order, Vector.CreateFromArray(eigenvalues), eigenvectors);
+				return new SymmetricEigensystemFull(order, new Vector(eigenvalues), eigenvectors);
 			}
 			else
 			{
-				return new SymmetricEigensystemFull(order, Vector.CreateFromArray(eigenvalues), null);
+				return new SymmetricEigensystemFull(order, new Vector(eigenvalues), null);
 			}
 		}
 	}

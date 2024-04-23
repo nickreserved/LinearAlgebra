@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Matrices
         private DiagonalMatrix(double[] diagonal)
         {
             this.diagonal = diagonal;
-            this.diagonalVector = Vector.CreateFromArray(diagonal, false);
+            this.diagonalVector = new Vector(diagonal);
             this.NumColumns = this.NumRows = diagonal.Length;
         }
 
@@ -32,12 +32,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		MatrixSymmetry IIndexable2D.MatrixSymmetry => MatrixSymmetry.Symmetric;
 
 		/// <summary>
-		/// See <see cref="IIndexable2D.NumColumns"/>.
+		/// See <see cref="IBounded2D.NumColumns"/>.
 		/// </summary>
 		public int NumColumns { get; }
 
         /// <summary>
-        /// See <see cref="IIndexable2D.NumRows"/>.
+        /// See <see cref="IBounded2D.NumRows"/>.
         /// </summary>
         public int NumRows { get; }
 
@@ -171,7 +171,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="vector">
         /// The vector that will be multiplied. Constraints: 
-        /// <paramref name="vector"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="IIndexable2D.NumColumns"/>.
+        /// <paramref name="vector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="IBounded2D.NumColumns"/>.
         /// </param>
         /// <exception cref="Exceptions.NonMatchingDimensionsException">
         /// Thrown if <paramref name="vector"/> violates the described constraint.
@@ -179,8 +179,9 @@ namespace MGroup.LinearAlgebra.Matrices
         public Vector Multiply(Vector vector)
         {
             Preconditions.CheckMultiplicationDimensions(this.NumColumns, vector.Length);
-            return diagonalVector.MultiplyEntrywise(vector);
-        }
+			return diagonalVector.DoEntrywise(vector, (x, y) => x * y);
+
+		}
 
         public Matrix MultiplyLeft(Matrix matrix)
         {
@@ -206,9 +207,9 @@ namespace MGroup.LinearAlgebra.Matrices
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1E-13) => DenseStrategies.AreEqual(this, other, tolerance);
+		/// <summary>
+		/// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
+		/// </summary>
+		public bool Equals(IIndexable2D other, double tolerance = 1E-13) => DenseStrategies.AreEqual(this, other, tolerance);
     }
 }

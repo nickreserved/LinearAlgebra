@@ -14,10 +14,10 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
     {
         private IMinimalVector residualOld;
 
-        /// <summary>
-        /// See <see cref="IPcgBetaParameterCalculation.Initialize(IMinimalReadOnlyVector)"/>.
-        /// </summary>
-        public void Initialize(PcgAlgorithmBase pcg) => residualOld = pcg.Residual.Copy();
+		/// <summary>
+		/// See <see cref="IPcgBetaParameterCalculation.Initialize(PcgAlgorithmBase)"/>.
+		/// </summary>
+		public void Initialize(PcgAlgorithmBase pcg) => residualOld = pcg.Residual.Copy();
 
         /// <summary>
         /// See <see cref="IPcgBetaParameterCalculation.CalculateBeta(PcgAlgorithmBase)"/>.

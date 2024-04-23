@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
         public virtual IPcgResidualUpdater ResidualUpdater { get; set; } = new RegularPcgResidualUpdater();
 
         /// <summary>
-        /// The PCG algorithm will converge when sqrt(r*inv(M)*r) / sqrt(r0*inv(M)*r0) &lt;= <paramref name="ResidualTolerance"/>,
+        /// The PCG algorithm will converge when sqrt(r*inv(M)*r) / sqrt(r0*inv(M)*r0) &lt;= <see cref="ResidualTolerance"/>,
         /// where M is the preconditioner, r = A*x is the current residual vector and r0 = A*x0 the initial residual vector.
         /// </summary>
         public double ResidualTolerance { get; set; } = 1E-10;

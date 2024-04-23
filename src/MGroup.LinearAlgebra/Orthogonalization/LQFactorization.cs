@@ -123,9 +123,9 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// there are infinite solutions to A*x=b.
         /// </summary>
         /// <param name="rhsVector">The right hand side vector b. It may lie outside the column space of the original matrix. Its 
-        ///     <see cref="IIndexable1D.Length"/> must be equal to this.<see cref="NumRows"/>.</param>
+        ///     <see cref="IMinimalReadOnlyVector.Length"/> must be equal to this.<see cref="NumRows"/>.</param>
         /// <exception cref="Exceptions.LapackException">Thrown if tha call to LAPACK fails due to <paramref name="rhsVector"/> 
-        ///     having a different <see cref="IIndexable1D.Length"/> than this.<see cref="NumRows"/>.</exception>
+        ///     having a different <see cref="IMinimalReadOnlyVector.Length"/> than this.<see cref="NumRows"/>.</exception>
         public Vector SolveMinNorm(Vector rhsVector) //TODO: perhaps I should use the driver routines of LAPACKE
         {
             if (NumRows > NumColumns)
@@ -156,7 +156,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
             LapackLeastSquares.Dormlq(MultiplicationSide.Left, TransposeMatrix.Transpose, numRowsC, numColsC, k, 
                 reflectorsAndL, 0, leadingDimA, reflectorScalars, 0, c, 0, leadingDimC);
 
-            return Vector.CreateFromArray(c, false);
+            return new Vector(c);
         }
     }
 }

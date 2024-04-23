@@ -21,8 +21,8 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
             {
                 var sparse = SparseVector.CreateFromArrays(SparseVector10.Length, SparseVector10.NonZeroValues,
                     SparseVector10.NonZeroIndices, true, false);
-                var dense = Vector.CreateFromArray(SparseVector10.OtherVector);
-                var expected = Vector.CreateFromArray(SparseVector10.OtherVectorPlusThisVectorTimes3);
+                var dense = new Vector(SparseVector10.OtherVector);
+                var expected = new Vector(SparseVector10.OtherVectorPlusThisVectorTimes3);
 
                 // Axpy()
                 comparer.AssertEqual(expected, dense.Axpy(sparse, 3.0));

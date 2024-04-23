@@ -27,12 +27,12 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <paramref name="solution"/>.
         /// </summary>
         /// <param name="rhs">
-        /// The right hand side vector. Its <see cref="IIndexable1D.Length"/> must be equal to 
-        /// <see cref="Matrices.IIndexable2D.NumRows"/> of the original matrix A.
+        /// The right hand side vector. Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to 
+        /// <see cref="Matrices.IBounded2D.NumRows"/> of the original matrix A.
         /// </param>
         /// <param name="solution">
-        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IIndexable1D.Length"/>  
-        /// must be equal to <see cref="Matrices.IIndexable2D.NumColumns"/> of the original matrix A.
+        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IMinimalReadOnlyVector.Length"/>  
+        /// must be equal to <see cref="Matrices.IBounded2D.NumColumns"/> of the original matrix A.
         /// </param>
         /// <exception cref="Exceptions.NonMatchingDimensionsException">
         /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.

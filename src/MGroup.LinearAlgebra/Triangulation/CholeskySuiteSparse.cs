@@ -147,7 +147,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <param name="rowIdx">The index of the row/column to modify. Constraints: 
         ///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="Order"/>.</param>
         /// <param name="newRow">The entries of the row/column before factorization. Constraints:
-        ///     <paramref name="newRow"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="newRow"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> violates the described constraints.
         ///     </exception>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="newRow"/> violates the described 
@@ -168,10 +168,10 @@ namespace MGroup.LinearAlgebra.Triangulation
                     + $"{Order}-by-{Order} factorized matrix, but was {newRow.Length}-by-1");
             }
 
-            int nnz = newRow.CountNonZeros();
+            int nnz = newRow.ToIndex - newRow.FromIndex;
             int[] colOffsets = { 0, nnz };
             int status = SuiteSparsePInvokes.RowAdd(Order, factorizedMatrix, rowIdx,
-                nnz, newRow.RawValues, newRow.RawIndices, colOffsets, common);
+                nnz, newRow.Values, newRow.Indices, colOffsets, common);
             if (status != 1)
             {
                 throw new SuiteSparseException("NumRows addition did not succeed. This could be caused by insufficent memory");
@@ -183,7 +183,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </summary>
         /// <param name="rhsVector">The right hand side vector b of the linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVector"/> violates the described 
         ///     constraints.</exception>
         /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Values has been 
@@ -193,7 +193,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         {
             var solution = new double[rhsVector.Length];
             SolveInternal(SystemType.BackSubstitution, rhsVector, solution);
-            return Vector.CreateFromArray(solution);
+            return new Vector(solution);
         }
 
     /// <summary>
@@ -201,7 +201,7 @@ namespace MGroup.LinearAlgebra.Triangulation
     /// the diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
     /// </summary>
     /// <param name="rhsVectors">A matrix whose columns are the right hand side vectors b of the linear systems. Constraints:
-    ///     <paramref name="rhsVectors"/>.<see cref="IIndexable2D.NumRows"/> == this.<see cref="Order"/>.</param>
+    ///     <paramref name="rhsVectors"/>.<see cref="IBounded2D.NumRows"/> == this.<see cref="Order"/>.</param>
     /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVectors"/> violates the described 
     ///     constraints.</exception>
     /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Values has been 
@@ -264,7 +264,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </summary>
         /// <param name="rhsVector">The right hand side vector b of the linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVector"/> violates the described 
         ///     constraints.</exception>
         /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Values has been 
@@ -274,7 +274,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         {
             var solution = new double[rhsVector.Length];
             SolveInternal(SystemType.ForwardSubstitution, rhsVector, solution);
-            return Vector.CreateFromArray(solution);
+            return new Vector(solution);
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// the diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </summary>
         /// <param name="rhsVectors">A matrix whose columns are the right hand side vectors b of the linear systems. Constraints:
-        ///     <paramref name="rhsVectors"/>.<see cref="IIndexable2D.NumRows"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="rhsVectors"/>.<see cref="IBounded2D.NumRows"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVectors"/> violates the described 
         ///     constraints.</exception>
         /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Values has been 
@@ -304,7 +304,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         public void SolveLinearSystem(Vector rhsVector, Vector solution)
         {
             Preconditions.CheckMultiplicationDimensions(Order, solution.Length);
-            SolveInternal(SystemType.Regular, rhsVector, solution.RawData);
+            SolveInternal(SystemType.Regular, rhsVector, solution.Values);
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// (and D the diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </summary>
         /// <param name="rhsVectors">A matrix whose columns are the right hand side vectors b of the linear systems. Constraints:
-        ///     <paramref name="rhsVectors"/>.<see cref="IIndexable2D.NumRows"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="rhsVectors"/>.<see cref="IBounded2D.NumRows"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVectors"/> violates the described 
         ///     constraints.</exception>
         /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Values has been 
@@ -348,7 +348,7 @@ namespace MGroup.LinearAlgebra.Triangulation
             }
             Preconditions.CheckSystemSolutionDimensions(Order, rhs.Length);
 
-            int status = SuiteSparsePInvokes.Solve((int)system, Order, 1, factorizedMatrix, rhs.RawData, solution, common);
+            int status = SuiteSparsePInvokes.Solve((int)system, Order, 1, factorizedMatrix, rhs.Values, solution, common);
             if (status != 1) throw new SuiteSparseException("System solution failed.");
         }
 

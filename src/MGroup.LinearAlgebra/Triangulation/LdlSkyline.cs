@@ -78,7 +78,7 @@ namespace MGroup.LinearAlgebra.Triangulation
                 }
 
             }
-            return (Vector.CreateFromArray(diag, false), upper);
+            return (new Vector(diag), upper);
         }
 
         /// <summary>
@@ -99,13 +99,13 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// <param name="rhsVectors">
 		/// A matrix that contains the right hand side vectors as its columns. Constraints: 
 		/// a) Its <see cref="IBounded2D.NumRows"/> must be equal to the <see cref="IBounded2D.NumRows"/> of the original 
-		/// matrix A. b) Its <see cref="IIndexable2D.Order"/> must be equal to the <see cref="IIndexable2D.Order"/> of
+		/// matrix A. b) Its <see cref="IBounded2D.NumRows"/> must be equal to the <see cref="IBounded2D.NumRows"/> of
 		/// <paramref name="solutionVectors"/>.
 		/// </param>
 		/// <param name="solutionVectors">
 		/// Output matrix that will be overwritten with the solutions of the linear system as its columns. Constraints:
 		/// a) Its <see cref="IBounded2D.NumRows"/> must be equal to the <see cref="IBounded2D.NumRows"/> of the original 
-		/// matrix A. b) Its <see cref="IIndexable2D.Order"/> must be equal to the <see cref="IIndexable2D.Order"/> of
+		/// matrix A. b) Its <see cref="IBounded2D.NumRows"/> must be equal to the <see cref="IBounded2D.NumRows"/> of
 		/// <paramref name="rhsVectors"/>.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
@@ -132,7 +132,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 
             for (int j = 0; j < rhsVectors.NumColumns; ++j)
             {
-                double[] rhsColumn = rhsVectors.GetColumn(j).RawData;
+                double[] rhsColumn = rhsVectors.GetColumn(j).Values;
                 int offset = j * NumRows;
                 SolveWithOffsets(Order, values, diagOffsets, rhsColumn, 0, solutionVectors.RawData, offset);
             }

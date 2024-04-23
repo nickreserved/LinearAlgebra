@@ -139,10 +139,10 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
             }
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1E-13)
+		/// <summary>
+		/// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
+		/// </summary>
+		public bool Equals(IIndexable2D other, double tolerance = 1E-13)
         {
             return DenseStrategies.AreEqual(this, other, tolerance);
         }
@@ -200,7 +200,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
                 }
                 result[wholeCol.Key] = sum;
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         private Vector MultiplyUntransposed(Vector vector)
@@ -215,7 +215,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
                     result[rowSign.Key] += rowSign.Value * vector[wholeCol.Key];
                 }
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         private Matrix MultiplyRightTransposed(Matrix other)

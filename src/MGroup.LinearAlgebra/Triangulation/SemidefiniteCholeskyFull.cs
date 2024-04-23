@@ -59,7 +59,6 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// sets the dependent ones equal to columns of the identity matrix and return the nullspace of the matrix. Requires 
         /// extra memory for the basis vectors of the nullspace.
         /// </summary>
-        /// <param name="order">The number of rows/ columns of the square matrix.</param>
         /// <param name="matrix">The matrix to factorize. It will be overwritten with the factorization Values.</param>
         /// <param name="pivotTolerance">
         /// If a diagonal entry is &lt;= <paramref name="pivotTolerance"/> it means that the corresponding column is dependent 
@@ -89,12 +88,12 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// Performs the operation: <paramref name="result"/> = generalized_inverse(A) * <paramref name="vector"/>
         /// </summary>
-        /// <param name="vector">The vector that will be multiplied. Its <see cref="IIndexable1D.Length"/> must be equal to 
-        /// <see cref="IIndexable2D.NumRows"/> of the original matrix A.
+        /// <param name="vector">The vector that will be multiplied. Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to 
+        /// <see cref="IBounded2D.NumRows"/> of the original matrix A.
         /// </param>
         /// <param name="result">
-        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IIndexable1D.Length"/>  
-        /// must be equal to <see cref="IIndexable2D.NumColumns"/> of the original matrix A.
+        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IMinimalReadOnlyVector.Length"/>  
+        /// must be equal to <see cref="IBounded2D.NumColumns"/> of the original matrix A.
         /// </param>
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="vector"/> or <paramref name="result"/> violate the described constraints.
@@ -108,8 +107,8 @@ namespace MGroup.LinearAlgebra.Triangulation
             Preconditions.CheckMultiplicationDimensions(Order, result.Length);
 
             // TODO: Is this correct?
-            CholeskyFactorizations.ForwardSubstitutionFullUpper(Order, upperFactorized, vector.RawData, result.RawData);
-            CholeskyFactorizations.BackSubstitutionFullUpper1(Order, upperFactorized, result.RawData);
+            CholeskyFactorizations.ForwardSubstitutionFullUpper(Order, upperFactorized, vector.Values, result.Values);
+            CholeskyFactorizations.BackSubstitutionFullUpper1(Order, upperFactorized, result.Values);
         }
     }
 }

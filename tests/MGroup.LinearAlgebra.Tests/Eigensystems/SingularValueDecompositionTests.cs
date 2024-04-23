@@ -24,7 +24,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
 
 			(Vector lambda, Matrix X) = SpectralUtilities.SortSingularValues(
-				Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues),
+				new Vector(SymmPosDef10by10.Eigenvalues),
 				Matrix.CreateFromArray(SymmPosDef10by10.Eigenvectors), 
 				descending:true);
 			var decompExpected = new SpectralDecomposition(lambda, X, tol);

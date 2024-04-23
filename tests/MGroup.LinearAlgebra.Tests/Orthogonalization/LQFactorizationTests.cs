@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Orthogonalization;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -41,8 +41,8 @@ namespace MGroup.LinearAlgebra.Tests.Orthogonalization
             TestSettings.RunMultiproviderTest(providers, delegate ()
             {
                 var A = Matrix.CreateFromArray(RectangularFullRank10by5.Matrix).Transpose();
-                var b = Vector.CreateFromArray(RectangularFullRank10by5.RhsMinNorm);
-                var xExpected = Vector.CreateFromArray(RectangularFullRank10by5.LhsMinNorm);
+                var b = new Vector(RectangularFullRank10by5.RhsMinNorm);
+                var xExpected = new Vector(RectangularFullRank10by5.LhsMinNorm);
 
                 LQFactorization factorization = A.FactorLQ();
                 Vector xComputed = factorization.SolveMinNorm(b);

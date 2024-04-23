@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Matrices.Builders
@@ -45,9 +46,9 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		/// Adds the provided <paramref name="value"/> to the entry (<paramref name="rowIdx"/>, <paramref name="colIdx"/>). 
 		/// </summary>
 		/// <param name="rowIdx">The row index of the entry to modify. Constraints: 
-		///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IIndexable2D.NumRows"/>.</param>
+		///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IBounded2D.NumRows"/>.</param>
 		/// <param name="colIdx">The column index of the entry to modify. Constraints: 
-		///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IIndexable2D.NumColumns"/>.</param>
+		///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="IBounded2D.NumColumns"/>.</param>
 		/// <param name="value">The value that will be added to the entry (<paramref name="colIdx"/>, <paramref name="colIdx"/>).
 		///     </param>
 		public void AddToEntry(int rowIdx, int colIdx, double value)
@@ -68,22 +69,22 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         }
 
         /// <summary>
-        /// Performs the matrix-vector multiplication: this * <paramref name="vector"/>.
+        /// Performs the matrix-vector multiplication: this * <paramref name="otherVector"/>.
         /// </summary>
-        /// <param name="other">A vector with <see cref="IIndexable1D.Length"/> being equal to 
+        /// <param name="otherVector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to 
         ///     this.<see cref="NumColumns"/>.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IIndexable1D.Length"/> of
-        ///     <paramref name="vector"/> is different than the this.<see cref="NumColumns"/>.</exception>
-        public SparseVector MultiplyRight(Vector vector)
+        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+        ///     <paramref name="otherVector"/> is different than the this.<see cref="NumColumns"/>.</exception>
+        public SparseVector MultiplyRight(Vector otherVector)
         {
-            Preconditions.CheckMultiplicationDimensions(NumColumns, vector.Length);
+            Preconditions.CheckMultiplicationDimensions(NumColumns, otherVector.Length);
             var result = new SortedDictionary<int, double>();
             foreach (var wholeRow in rows)
             {
                 double dot = 0.0;
                 foreach (var colValPair in wholeRow.Value)
                 {
-                    dot += colValPair.Value * vector[colValPair.Key];
+                    dot += colValPair.Value * otherVector[colValPair.Key];
                 }
                 result[wholeRow.Key] = dot;
             }

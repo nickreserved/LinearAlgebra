@@ -58,7 +58,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 
         /// <summary>
         /// If true, the original matrix before the factorization is not invertible. In this case, 
-        /// <see cref="SolveLinearSystem(Vector)"/> and <see cref="Invert(bool)"/> will throw an exception. If false, the 
+        /// <see cref="SolveLinearSystem"/> and <see cref="Invert(bool)"/> will throw an exception. If false, the 
         /// original matrix is invertible and those methods are safe to call.
         /// </summary>
         public bool IsSingular { get; }
@@ -223,7 +223,7 @@ namespace MGroup.LinearAlgebra.Triangulation
             int numRhs = 1; // rhs is a n x nRhs matrix, stored in b
             int leadingDimB = n; // column major ordering: leading dimension of b is n 
             LapackLinearEquations.Dgetrs(TransposeMatrix.NoTranspose, n, numRhs, lowerUpper, 0, n, rowExchanges, 0, 
-                solution.RawData, 0, leadingDimB);
+                solution.Values, 0, leadingDimB);
         }
 
         private void CheckOverwritten()

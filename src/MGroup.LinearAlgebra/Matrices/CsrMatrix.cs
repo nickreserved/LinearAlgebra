@@ -407,7 +407,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
+        /// See <see cref="IMinimalReadOnlyMatrix.DoToAllEntries(Func{double, double})"/>.
         /// </summary>
         public IMatrix DoToAllEntries(Func<double, double> unaryOperation)
         {
@@ -431,7 +431,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoToAllEntriesIntoThis(Func{double, double})"/>.
+        /// See <see cref="IMinimalMatrix.DoToAllEntriesIntoThis(Func{double, double})"/>.
         /// </summary>
         public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
         {

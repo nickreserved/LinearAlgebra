@@ -24,7 +24,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 
 		/// <summary>
 		/// The left eigenvectors of a matrix. Each column j is an eigenvector v that corresponds to 
-		/// lambda=<see cref="Eigenvalues"/>[j], such as transpose(v)*A = lambda * v.
+		/// lambda=<see cref="EigenvaluesReal"/>[j], such as transpose(v)*A = lambda * v.
 		/// If eigenvalue j is real, then the corresponding left eigenvector is equal to <see cref="EigenvectorsLeft"/>[j].
 		/// If eigenvalues j, j+1 are a complex conjugate pair, then the corresponding left eigenvectors are: 
 		/// u(j) = <see cref="EigenvectorsLeft"/>[j] + i * <see cref="EigenvectorsLeft"/>[j+1] and
@@ -35,7 +35,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 
 		/// <summary>
 		/// The right eigenvectors of a matrix. Each column j is an eigenvector v that corresponds to 
-		/// lambda=<see cref="Eigenvalues"/>[j], such as A*v = lambda * v.
+		/// lambda=<see cref="EigenvaluesReal"/>[j], such as A*v = lambda * v.
 		/// If eigenvalue j is real, then the corresponding right eigenvector is equal to <see cref="EigenvectorsRight"/>[j].
 		/// If eigenvalues j, j+1 are a complex conjugate pair, then the corresponding right eigenvectors are: 
 		/// u(j) = <see cref="EigenvectorsRight"/>[j] + i * <see cref="EigenvectorsRight"/>[j+1] and

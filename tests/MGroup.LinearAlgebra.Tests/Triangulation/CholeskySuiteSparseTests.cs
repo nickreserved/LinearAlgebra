@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Matrices.Builders;
@@ -24,7 +24,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
 
             Matrix original = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
-            Vector rhs = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+            Vector rhs = new Vector(SparsePosDef10by10.Rhs);
 
             // Start the matrix as diagonal
             var matrixExpected = Matrix.CreateIdentity(original.NumColumns);
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
 
             Matrix original = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
-            Vector rhs = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+            Vector rhs = new Vector(SparsePosDef10by10.Rhs);
 
             // Start the matrix as diagonal
             var matrixExpected = Matrix.CreateIdentity(original.NumColumns);
@@ -89,7 +89,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
 
             Matrix original = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
-            Vector rhs = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+            Vector rhs = new Vector(SparsePosDef10by10.Rhs);
 
             // Start the matrix from the original
             var matrixExpected = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
@@ -106,7 +106,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             for (int i = 0; i < matrixExpected.NumRows; ++i)
             {
                 // Update matrix
-                Vector identityRow = Vector.CreateZero(matrixExpected.NumColumns);
+                Vector identityRow = new Vector(matrixExpected.NumColumns);
                 identityRow[i] = 1.0;
                 matrixExpected.SetSubrow(i, identityRow);
                 matrixExpected.SetSubcolumn(i, identityRow);
@@ -126,8 +126,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             Skip.IfNot(TestSettings.TestSuiteSparse, TestSettings.MessageWhenSkippingSuiteSparse);
 
             // Define linear system
-            var rhs = Vector.CreateFromArray(new double[] { 6.0, 14.0, 11.0, 12.0 });
-            var solutionExpected = Vector.CreateFromArray(new double[] { 1.0, 1.0, 1.0, 1.0 });
+            var rhs = new Vector(new double[] { 6.0, 14.0, 11.0, 12.0 });
+            var solutionExpected = new Vector(new double[] { 1.0, 1.0, 1.0, 1.0 });
             var matrixDOK = DokSymmetric.CreateEmpty(4);
             matrixDOK[0, 0] = 4.0; matrixDOK[0, 2] = 2.0;
             matrixDOK[1, 1] = 10.0; matrixDOK[1, 2] = 1.0; matrixDOK[1, 3] = 3.0;
@@ -170,7 +170,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
                     if (dense[i, j] != 0) dok[i, j] = dense[i, j];
                 }
             }
-            Vector b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+            Vector b = new Vector(SparsePosDef10by10.Rhs);
             Matrix B = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
 
             // Solve using dense algebra

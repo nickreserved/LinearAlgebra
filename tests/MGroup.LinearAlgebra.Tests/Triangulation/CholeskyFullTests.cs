@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
@@ -72,8 +72,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             {
                 // positive definite
                 var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
-                var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
-                var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
+                var b = new Vector(SymmPosDef10by10.Rhs);
+                var xExpected = new Vector(SymmPosDef10by10.Lhs);
                 CholeskyFull factorization = A.FactorCholesky(true);
                 Vector xComputed = factorization.SolveLinearSystem(b);
                 comparer.AssertEqual(xExpected, xComputed);

@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Triangulation;
+using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Matrices.Builders;
 using MGroup.LinearAlgebra.Tests.TestData;
@@ -24,8 +24,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             var skyline = SkylineMatrix.CreateFromArrays(order, SparsePosDef10by10.SkylineValues,
                 SparsePosDef10by10.SkylineDiagOffsets, true, true);
             var dok = DokColMajor.CreateFromSparseMatrix(skyline);
-            var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-            var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
+            var b = new Vector(SparsePosDef10by10.Rhs);
+            var xExpected = new Vector(SparsePosDef10by10.Lhs);
 
             (double[] cscValues, int[] cscRowIndices, int[] cscColOffsets) = dok.BuildCscArrays(true);
             var factor = LUCSparseNet.Factorize(order, cscValues.Length, cscValues, cscRowIndices, cscColOffsets, pivotTolerance);
@@ -40,7 +40,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             int order = SparseSymm5by5.Order;
             var csc = CscMatrix.CreateFromArrays(order, order, SparseSymm5by5.CscValues, SparseSymm5by5.CscRowIndices, 
                 SparseSymm5by5.CscColOffsets, true);
-            var xExpected = Vector.CreateWithValue(order, 1.0);
+			var xExpected = new Vector(order);
+			xExpected.SetAll(1);
             var b = csc.Multiply(xExpected);
 
             var factor = LUCSparseNet.Factorize(order, csc.NumNonZeros, csc.RawValues, csc.RawRowIndices, csc.RawColOffsets,
@@ -54,8 +55,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
         {
             double pivotTolerance = 0.5;
             int order = SquareInvertible10by10.Order;
-            var b = Vector.CreateFromArray(SquareInvertible10by10.Rhs);
-            var xExpected = Vector.CreateFromArray(SquareInvertible10by10.Lhs);
+            var b = new Vector(SquareInvertible10by10.Rhs);
+            var xExpected = new Vector(SquareInvertible10by10.Lhs);
 
             var dok = DokColMajor.CreateEmpty(order, order);
             for (int j = 0; j < order; ++j)

@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Exceptions;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
@@ -147,21 +147,21 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             {
                 // invertible (rank = 10)
                 var A1 = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
-                var b1 = Vector.CreateFromArray(SquareInvertible10by10.Rhs);
-                var x1Expected = Vector.CreateFromArray(SquareInvertible10by10.Lhs);
+                var b1 = new Vector(SquareInvertible10by10.Rhs);
+                var x1Expected = new Vector(SquareInvertible10by10.Lhs);
                 LUFactorization factorization1 = A1.FactorLU();
                 Vector x1Computed = factorization1.SolveLinearSystem(b1);
                 comparer.AssertEqual(x1Expected, x1Computed);
 
                 // singular (rank = 8)
                 var A2 = Matrix.CreateFromArray(SquareSingular10by10.Matrix);
-                var b2 = Vector.CreateFromArray(SquareSingular10by10.Rhs);
+                var b2 = new Vector(SquareSingular10by10.Rhs);
                 LUFactorization factorization2 = A2.FactorLU();
                 Assert.Throws<SingularMatrixException>(() => factorization2.SolveLinearSystem(b2));
 
                 // singular (rank = 9)
                 var A3 = Matrix.CreateFromArray(SquareSingularSingleDeficiency10by10.Matrix);
-                var b3 = Vector.CreateFromArray(SquareSingularSingleDeficiency10by10.Rhs);
+                var b3 = new Vector(SquareSingularSingleDeficiency10by10.Rhs);
                 LUFactorization factorization3 = A3.FactorLU();
                 Assert.Throws<SingularMatrixException>(() => factorization3.SolveLinearSystem(b3));
             });

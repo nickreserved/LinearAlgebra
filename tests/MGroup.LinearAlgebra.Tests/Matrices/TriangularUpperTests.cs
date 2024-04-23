@@ -69,15 +69,15 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             {
                 // invertible
                 var A1 = TriangularUpper.CreateFromArray(UpperInvertible10by10.Matrix);
-                var x1 = Vector.CreateFromArray(UpperInvertible10by10.Lhs);
-                var b1Expected = Vector.CreateFromArray(UpperInvertible10by10.Rhs);
+                var x1 = new Vector(UpperInvertible10by10.Lhs);
+                var b1Expected = new Vector(UpperInvertible10by10.Rhs);
                 Vector b1Computed = A1.Multiply(x1);
                 comparer.AssertEqual(b1Expected, b1Computed);
 
                 // singular
                 var A2 = TriangularUpper.CreateFromArray(UpperSingular10by10.Matrix);
-                var x2 = Vector.CreateFromArray(UpperSingular10by10.Lhs);
-                var b2Expected = Vector.CreateFromArray(UpperSingular10by10.Rhs);
+                var x2 = new Vector(UpperSingular10by10.Lhs);
+                var b2Expected = new Vector(UpperSingular10by10.Rhs);
                 Vector b2Computed = A2.Multiply(x1);
                 comparer.AssertEqual(b2Expected, b2Computed);
             });
@@ -93,9 +93,10 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             TestSettings.RunMultiproviderTest(providers, delegate ()
             {
                 var A = TriangularUpper.CreateFromArray(UpperInvertible10by10.Matrix);
-                var x = Vector.CreateFromArray(UpperInvertible10by10.Lhs);
-                var bExpected = Vector.CreateFromArray(UpperInvertible10by10.Rhs);
-                Vector bComputed = Vector.CreateWithValue(A.NumRows, 1.0);
+                var x = new Vector(UpperInvertible10by10.Lhs);
+                var bExpected = new Vector(UpperInvertible10by10.Rhs);
+				Vector bComputed = new Vector(A.NumRows);
+				bComputed.SetAll(1);
                 A.MultiplyIntoResult(x, bComputed, false);
                 comparer.AssertEqual(bExpected, bComputed);
             });
@@ -109,15 +110,15 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
             {
                 // invertible
                 var A1 = TriangularUpper.CreateFromArray(UpperInvertible10by10.Matrix);
-                var b1 = Vector.CreateFromArray(UpperInvertible10by10.Rhs);
-                var x1Expected = Vector.CreateFromArray(UpperInvertible10by10.Lhs);
+                var b1 = new Vector(UpperInvertible10by10.Rhs);
+                var x1Expected = new Vector(UpperInvertible10by10.Lhs);
                 Vector x1Computed = A1.SolveLinearSystem(b1);
                 comparer.AssertEqual(x1Expected, x1Computed);
 
                 // singular
                 var A2 = TriangularUpper.CreateFromArray(UpperSingular10by10.Matrix);
-                var b2 = Vector.CreateFromArray(UpperSingular10by10.Rhs);
-                var x2Expected = Vector.CreateFromArray(UpperSingular10by10.Lhs);
+                var b2 = new Vector(UpperSingular10by10.Rhs);
+                var x2Expected = new Vector(UpperSingular10by10.Lhs);
                 Vector x2Computed = A2.SolveLinearSystem(b2);
                 Assert.False(comparer.AreEqual(x2Expected, x2Computed));
 

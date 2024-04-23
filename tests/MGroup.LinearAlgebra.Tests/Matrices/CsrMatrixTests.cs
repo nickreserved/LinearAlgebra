@@ -81,9 +81,8 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 		{
 			var denseMatrix = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
 			var csrMatrix = CsrMatrix.CreateFromDense(denseMatrix);
-			var diagonalExpected = Vector.CreateFromArray(SquareInvertible10by10.Diagonal, true);
-
-			var diagonalComputed = Vector.CreateFromArray(csrMatrix.GetDiagonalAsArray());
+			var diagonalExpected = new Vector((double[]) SquareInvertible10by10.Diagonal.Clone());
+			var diagonalComputed = new Vector(csrMatrix.GetDiagonalAsArray());
 			comparer.AssertEqual(diagonalExpected, diagonalComputed);
 
 		}
@@ -153,21 +152,30 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
                 var A = CsrMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
                     SparseRectangular10by5.CsrValues, SparseRectangular10by5.CsrColIndices, SparseRectangular10by5.CsrRowOffsets,
                     true);
-                var x5 = Vector.CreateFromArray(SparseRectangular10by5.Lhs5);
-                var b10Expected = Vector.CreateFromArray(SparseRectangular10by5.Rhs10);
+                var x5 = new Vector(SparseRectangular10by5.Lhs5);
+                var b10Expected = new Vector(SparseRectangular10by5.Rhs10);
                 Vector b10Computed = A.Multiply(x5, false);
                 comparer.AssertEqual(b10Expected, b10Computed);
 
                 // MultiplyRight() - transposed - rows > cols
-                var x10 = Vector.CreateFromArray(SparseRectangular10by5.Lhs10);
-                var b5Expected = Vector.CreateFromArray(SparseRectangular10by5.Rhs5);
+                var x10 = new Vector(SparseRectangular10by5.Lhs10);
+                var b5Expected = new Vector(SparseRectangular10by5.Rhs5);
                 Vector b5Computed = A.Multiply(x10, true);
                 comparer.AssertEqual(b5Expected, b5Computed);
 
-                // MultiplyVectorSection()
-                var x15 = Vector.CreateWithValue(5, 1000.0).Append(x5);
-                var b20Expected = Vector.CreateWithValue(10, 10.0).Append(A.Multiply(x5, false));
-                var b20Computed = Vector.CreateWithValue(20, 10.0);
+				// MultiplyVectorSection()
+				var x15 = new Vector(5 + x5.Length);
+				x15.View(0, 5).SetAll(1000);
+				x15.View(5, x15.Length).CopyFrom(x5);
+
+				var temp = A.Multiply(x5, false);
+				var b20Expected = new Vector(10 + temp.Length);
+				b20Expected.View(0, 10).SetAll(10);
+				b20Expected.View(10, b20Expected.Length).CopyFrom(temp);
+
+                var b20Computed = new Vector(20);
+				b20Computed.SetAll(10);
+
                 A.MultiplyVectorSection(x15, 5, b20Computed, 10);
                 comparer.AssertEqual(b20Expected, b20Computed);
 
@@ -175,14 +183,14 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
                 var B = CsrMatrix.CreateFromArrays(SparseRectangular10by5.NumCols, SparseRectangular10by5.NumRows,
                     SparseRectangular10by5.CscValues, SparseRectangular10by5.CscRowIndices, SparseRectangular10by5.CscColOffsets,
                     true);
-                var y10 = Vector.CreateFromArray(SparseRectangular10by5.Lhs10);
-                var c5Expected = Vector.CreateFromArray(SparseRectangular10by5.Rhs5);
+                var y10 = new Vector(SparseRectangular10by5.Lhs10);
+                var c5Expected = new Vector(SparseRectangular10by5.Rhs5);
                 Vector c5Computed = B.Multiply(y10, false);
                 comparer.AssertEqual(c5Expected, c5Computed);
 
                 // MultiplyRight() - transposed - rows < cols
-                var y5 = Vector.CreateFromArray(SparseRectangular10by5.Lhs5);
-                var c10Expected = Vector.CreateFromArray(SparseRectangular10by5.Rhs10);
+                var y5 = new Vector(SparseRectangular10by5.Lhs5);
+                var c10Expected = new Vector(SparseRectangular10by5.Rhs10);
                 Vector c10Computed = B.Multiply(y5, true);
                 comparer.AssertEqual(c10Expected, c10Computed);
             });
@@ -201,17 +209,19 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
                 var A = CsrMatrix.CreateFromArrays(SparseRectangular10by5.NumRows, SparseRectangular10by5.NumCols,
                     SparseRectangular10by5.CsrValues, SparseRectangular10by5.CsrColIndices, SparseRectangular10by5.CsrRowOffsets,
                     true);
-                var x5 = Vector.CreateFromArray(SparseRectangular10by5.Lhs5);
-                var b10Expected = Vector.CreateFromArray(SparseRectangular10by5.Rhs10);
-                Vector b10Computed = Vector.CreateWithValue(SparseRectangular10by5.NumRows, 1.0);
+                var x5 = new Vector(SparseRectangular10by5.Lhs5);
+                var b10Expected = new Vector(SparseRectangular10by5.Rhs10);
+                Vector b10Computed = new Vector(SparseRectangular10by5.NumRows);
+				b10Computed.SetAll(1);
                 //Vector bComputed = Vector.CreateZeroWithSameFormat(SparseRectangular10by5.NumRows);
                 A.MultiplyIntoResult(x5, b10Computed, false);
                 comparer.AssertEqual(b10Expected, b10Computed);
 
                 // MultiplyIntoResult() - transposed
-                var x10 = Vector.CreateFromArray(SparseRectangular10by5.Lhs10);
-                var b5Expected = Vector.CreateFromArray(SparseRectangular10by5.Rhs5);
-                Vector b5Computed = Vector.CreateWithValue(SparseRectangular10by5.NumCols, 1.0);
+                var x10 = new Vector(SparseRectangular10by5.Lhs10);
+                var b5Expected = new Vector(SparseRectangular10by5.Rhs5);
+                Vector b5Computed = new Vector(SparseRectangular10by5.NumCols);
+				b5Computed.SetAll(1);
                 A.MultiplyIntoResult(x10, b5Computed, true);
                 comparer.AssertEqual(b5Expected, b5Computed);
             });

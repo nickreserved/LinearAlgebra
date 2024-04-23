@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal.
 		/// </summary>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
-		public Vector GetDiagonal() => Vector.CreateFromArray(this.GetDiagonalAsArray(), false);
+		public Vector GetDiagonal() => new Vector(GetDiagonalAsArray());
 
 		/// <summary>
 		/// Returns an array with the entries of the matrix's main diagonal.

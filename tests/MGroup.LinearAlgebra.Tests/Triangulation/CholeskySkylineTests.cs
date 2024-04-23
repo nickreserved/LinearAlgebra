@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Triangulation;
+using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -42,8 +42,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
             var skyline = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order, SparsePosDef10by10.SkylineValues,
                  SparsePosDef10by10.SkylineDiagOffsets, true, true);
-            var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-            var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
+            var b = new Vector(SparsePosDef10by10.Rhs);
+            var xExpected = new Vector(SparsePosDef10by10.Lhs);
             CholeskySkyline factor = skyline.FactorCholesky(false);
             Vector xComputed = factor.SolveLinearSystem(b);
             comparer.AssertEqual(xExpected, xComputed);

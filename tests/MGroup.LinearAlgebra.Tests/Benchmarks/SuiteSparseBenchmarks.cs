@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Triangulation;
@@ -26,8 +26,9 @@ namespace MGroup.LinearAlgebra.Tests.Benchmarks
                 dok[0, 0] = 10.0;
 
                 SymmetricCscMatrix matrix = dok.BuildSymmetricCscMatrix(true);
-                var rhs = Vector.CreateWithValue(order, 2.0);
-                var solution = Vector.CreateZero(order);
+				var rhs = new Vector(order);
+				rhs.SetAll(2);
+                var solution = new Vector(order);
 
                 using (var factorization = CholeskySuiteSparse.Factorize(matrix, true))
                 {

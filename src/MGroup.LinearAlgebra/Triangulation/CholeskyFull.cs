@@ -150,7 +150,7 @@ namespace MGroup.LinearAlgebra.Triangulation
             solution.CopyFrom(rhs);
             int numRhs = 1; // rhs is a n x nRhs matrix, stored in b
             int leadingDimB = Order; // column major ordering: leading dimension of b is n 
-            LapackLinearEquations.Dpotrs(StoredTriangle.Upper, Order, numRhs, data, 0, Order, solution.RawData, 0, 
+            LapackLinearEquations.Dpotrs(StoredTriangle.Upper, Order, numRhs, data, 0, Order, solution.Values, 0, 
                 leadingDimB);
         }
 
@@ -158,12 +158,12 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// Solves a series of linear systems L * L^T * x = b (or L * D * L^T * x = b), where L is the lower triangular factor   
         /// (and D the diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </summary>
-        /// <param name="rhsVectors">
+        /// <param name="rhs">
         /// A matrix whose columns are the right hand side vectors b of the linear systems. Constraints:
-        /// <paramref name="rhsVectors"/>.<see cref="IIndexable2D.NumRows"/> == this.<see cref="Order"/>.
+        /// <paramref name="rhs"/>.<see cref="IBounded2D.NumRows"/> == this.<see cref="Order"/>.
         /// </param>
         /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if <paramref name="rhsVectors"/> violates the described constraints.
+        /// Thrown if <paramref name="rhs"/> violates the described constraints.
         /// </exception>
         /// <exception cref="AccessViolationException">
         /// Thrown if the unmanaged memory that holds the factorization Values has been released.

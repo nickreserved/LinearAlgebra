@@ -192,7 +192,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
                     result[col] += vector[wholeRow.Key];
                 }
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         private Vector MultiplyUntransposed(Vector vector)
@@ -208,7 +208,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
                 }
                 result[wholeRow.Key] = sum;
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         private Matrix MultiplyRightTransposed(Matrix other)

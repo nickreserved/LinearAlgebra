@@ -12,7 +12,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// <param name="diagonal">
 		/// A vector that contains the entries of matrix's main diagonal (or the inverse).
 		/// If vector is overlapping on distributed environment, it contains the diagonal entries of each local matrix that corresponds to a 
-		/// <see cref="ComputeNode"/> of the environment. If an entry is overlapping, namely if it exists
+		/// <c>ComputeNode</c> of the environment. If an entry is overlapping, namely if it exists
 		/// in many neighboring local diagonal vectors, then its value must be the same in all these local vectors.
 		/// </param>
 		/// <param name="alreadyInverted">Diagonal vector is already inverted</param>

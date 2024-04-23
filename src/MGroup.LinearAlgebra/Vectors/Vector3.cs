@@ -78,7 +78,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="entry0">The first entry of the new otherVector.</param>
 		/// <param name="entry1">The second entry of the new otherVector.</param>
 		/// <param name="entry2">The third entry of the new otherVector.</param>
-		[Obsolete("Use new Vector3(x,y,z)")]
+//		[Obsolete("Use new Vector3(x,y,z)")]
         public static Vector3 Create(double entry0, double entry1, double entry2) => new Vector3(entry0, entry1, entry2);
 
 		/// <summary>
@@ -89,14 +89,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     will have a reference to the copy, which is safer. If false, the new otherVector will have a reference to 
 		///     <paramref name="data"/> itself, which is faster.</param>
 		/// <returns></returns>
-		[Obsolete("Use new Vector3(data) or new Vector((double[]) data.Clone())")]
+//		[Obsolete("Use new Vector3(data) or new Vector((double[]) data.Clone())")]
 		new public static Vector3 CreateFromArray(double[] data, bool copyArray = false) => new Vector3(copyArray ? (double[])data.Clone() : data);
 
 		/// <summary>
 		/// Creates an new instance of <see cref="Vector3"/> with all entries being equal to 0.
 		/// </summary>
-		[Obsolete("Use new Vector3()")]
-        new public static Vector3 CreateZero() => new Vector3(new double[3]);
+//		[Obsolete("Use new Vector3()")]
+        public static Vector3 CreateZero() => new Vector3(new double[3]);
 
 		
 

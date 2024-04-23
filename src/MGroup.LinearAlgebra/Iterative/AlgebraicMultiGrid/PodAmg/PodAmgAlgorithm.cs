@@ -81,11 +81,11 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 		{
 			Preconditions.CheckSquareLinearSystemDimensions(_fineMatrix, rhs, solution);
 			int n0 = _fineMatrix.NumRows;
-			var r0 = Vector.CreateZero(n0);
-			var e0 = Vector.CreateZero(n0);
+			var r0 = new Vector(n0);
+			var e0 = new Vector(n0);
 			int n1 = _coarseMatrixFactorized.Order;
-			var r1 = Vector.CreateZero(n1);
-			var e1 = Vector.CreateZero(n1);
+			var r1 = new Vector(n1);
+			var e1 = new Vector(n1);
 			Vector previousX0 = solution.Copy();
 
 			// Determine termination criteria

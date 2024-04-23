@@ -113,7 +113,7 @@ namespace MGroup.LinearAlgebra.Reordering
         /// Like <see cref="AddEntry(int, int)"/>, but will not check or transpose the entry.
         /// </summary>
         /// <param name="rowIdx">The row index of the new non-zero entry.</param>
-        /// <param name="colIdx">The column index of the new non-zero entry.</para
+        /// <param name="colIdx">The column index of the new non-zero entry.</param>
         public void AddEntryUpper(int rowIdx, int colIdx) => columns[colIdx].Add(rowIdx);
 
         /// <summary>
@@ -172,10 +172,10 @@ namespace MGroup.LinearAlgebra.Reordering
             return count;
         }
 
-        /// <summary>
-        /// See <see cref="ISparsityPatternSymmetric.CountNonZeros"/>.
-        /// </summary>
-        public int CountNonZerosUpper()
+		/// <summary>
+		/// See <see cref="ISparsityPatternSymmetric.CountNonZerosUpper"/>.
+		/// </summary>
+		public int CountNonZerosUpper()
         {
             int count = 0;
             for (int j = 0; j < order; ++j) count += columns[j].Count;

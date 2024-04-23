@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -131,14 +132,13 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             return CreateFromSparsePattern(matrix.NumColumns, matrix.EnumerateNonZeros());
         }
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="DokSymmetric"/> with the specified matrix dimensions and the 
-        /// non-zero entries defined by the provided pattern.
-        /// </summary>
-        /// <param name="numRows">The number of rows/columns of the symmetric matrix to build.</param>
-        /// <param name="nonZeroEntries">The non-zero entries of the symmetric matrix to build. Its symmetry will not be 
-        ///     checked explicitly.</param>
-        public static DokSymmetric CreateFromSparsePattern(int order, 
+		/// <summary>
+		/// Initializes a new instance of <see cref="DokSymmetric"/> with the specified matrix dimensions and the 
+		/// non-zero entries defined by the provided pattern.
+		/// </summary>
+		/// <param name="nonZeroEntries">The non-zero entries of the symmetric matrix to build. Its symmetry will not be 
+		///     checked explicitly.</param>
+		public static DokSymmetric CreateFromSparsePattern(int order, 
             IEnumerable<(int row, int col, double value)> nonZeroEntries)
         {
             DokSymmetric dok = CreateEmpty(order);
@@ -165,7 +165,6 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// Initializes a new instance of <see cref="DokSymmetric"/> with the specified matrix dimensions and the 
         /// non-zero entries defined by the provided symmetric pattern.
         /// </summary>
-        /// <param name="numRows">The number of rows/columns of the symmetric matrix to build.</param>
         /// <param name="nonZeroEntries">The non-zero entries of the symmetric matrix to build.</param>
         public static DokSymmetric CreateFromSparseSymmetricPattern(int order,
             IEnumerable<(int row, int col, double value)> nonZeroEntries)
@@ -369,16 +368,16 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             return SkylineMatrix.CreateFromArrays(NumColumns, values, diagOffsets, false, false);
         }
 
-        /// <summary>
-        /// Creates the values and indexing arrays in CSC storage format of the upper triangle of the current symmetric matrix. 
-        /// This method should be called after fully defining the matrix in <see cref="DokSymmetric"/> format.
-        /// </summary>
-        /// <param name="sortColsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
-        ///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
-        ///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
-        ///     unordered will be faster during creation of the CSC matrix.</param>
-        /// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
-        public (double[] values, int[] rowIndices, int[] columnOffsets) BuildSymmetricCscArrays(bool sortRowsOfEachCol)
+		/// <summary>
+		/// Creates the values and indexing arrays in CSC storage format of the upper triangle of the current symmetric matrix. 
+		/// This method should be called after fully defining the matrix in <see cref="DokSymmetric"/> format.
+		/// </summary>
+		/// <param name="sortRowsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
+		///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
+		///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
+		///     unordered will be faster during creation of the CSC matrix.</param>
+		/// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
+		public (double[] values, int[] rowIndices, int[] columnOffsets) BuildSymmetricCscArrays(bool sortRowsOfEachCol)
         {
             int[] colOffsets = new int[order + 1];
             int nnz = 0;
@@ -421,16 +420,16 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             return (values, rowIndices, colOffsets);
         }
 
-        /// <summary>
-        /// Initializes a <see cref="SymmetricCscMatrix"/> representation of the current matrix. This method should be 
-        /// called after fully defining the matrix in <see cref="DokSymmetric"/> format.
-        /// </summary>
-        /// <param name="sortColsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
-        ///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
-        ///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
-        ///     unordered will be faster during creation of the CSC matrix.</param>
-        /// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
-        public SymmetricCscMatrix BuildSymmetricCscMatrix(bool sortRowsOfEachCol)
+		/// <summary>
+		/// Initializes a <see cref="SymmetricCscMatrix"/> representation of the current matrix. This method should be 
+		/// called after fully defining the matrix in <see cref="DokSymmetric"/> format.
+		/// </summary>
+		/// <param name="sortRowsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
+		///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
+		///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
+		///     unordered will be faster during creation of the CSC matrix.</param>
+		/// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
+		public SymmetricCscMatrix BuildSymmetricCscMatrix(bool sortRowsOfEachCol)
         {
             (double[] values, int[] rowIndices, int[] colOffsets) = BuildSymmetricCscArrays(sortRowsOfEachCol);
             return SymmetricCscMatrix.CreateFromArrays(NumColumns, values, rowIndices, colOffsets, false);
@@ -504,23 +503,23 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         }
 
         /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
+        /// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
         /// </summary>
         public bool Equals(IIndexable2D other, double tolerance = 1e-13)
         {
             return DenseStrategies.AreEqual(this, other, tolerance);
         }
 
-        /// <summary>
-        /// Returns the column with index = <paramref name="colIdx"/> as a sparse vector. Note that the length of the returned 
-        /// vector is equal to this.<see cref="NumRows"/>. Since the matrix is symmetric, this method also works for getting
-        /// the row with index = <paramref name="colIdx"/>.
-        /// </summary>
-        /// <param name="colIdx">The index of the column to return. Constraints: Column <paramref name="colIdx"/> must be stored
-        ///     and 0 &lt;= <paramref name="colIdx"/> &lt; this.<see cref="NumColumns"/>.</param>
-        /// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="colIdx"/> or <paramref name="tabooRows"/> 
-        ///     violate the described constraints.</exception>
-        public SparseVector GetColumn(int colIdx)
+		/// <summary>
+		/// Returns the column with index = <paramref name="colIdx"/> as a sparse vector. Note that the length of the returned 
+		/// vector is equal to this.<see cref="NumRows"/>. Since the matrix is symmetric, this method also works for getting
+		/// the row with index = <paramref name="colIdx"/>.
+		/// </summary>
+		/// <param name="colIdx">The index of the column to return. Constraints: Column <paramref name="colIdx"/> must be stored
+		///     and 0 &lt;= <paramref name="colIdx"/> &lt; this.<see cref="NumColumns"/>.</param>
+		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="colIdx"/> or <paramref name="colIdx"/> 
+		///     violate the described constraints.</exception>
+		public SparseVector GetColumn(int colIdx)
         { //TODO: implement another Values structure that only holds some sparse columns, but is efficient in returning them whole
             // The super-diagonal part is readily available.
             var wholeColumn = new SortedDictionary<int, double>(columns[colIdx]);
@@ -578,7 +577,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         public (Vector diagonal, int firstZeroIdx) GetDiagonal()
         {
             (double[] diagonal, int firstZeroIdx) = GetDiagonalAsArray();
-            return (Vector.CreateFromArray(diagonal, false), firstZeroIdx);
+            return (new Vector(diagonal), firstZeroIdx);
         }
 
         /// <summary>
@@ -684,13 +683,13 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		/// <param name="colIdx">The index of the column to modify. Constraints:
 		///     and 0 &lt;= <paramref name="colIdx"/> &lt; this.<see cref="NumColumns"/>.</param>
 		/// <param name="newColumn">The new values that column <paramref name="colIdx"/> will be set to. Constraints:
-		///     <paramref name="newColumn"/>.<see cref="IIndexable1D.Length"/> == this.<see cref="NumRows"/>.</param>
+		///     <paramref name="newColumn"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="NumRows"/>.</param>
 		public void SetColumn(int colIdx, SparseVector newColumn)
         {
             SetColumnToZero(colIdx); // First remove everything
 
-            int[] rowIndices = newColumn.RawIndices;
-            double[] values = newColumn.RawValues;
+            int[] rowIndices = newColumn.Indices;
+            double[] values = newColumn.Values;
 
             // The super-diagonal part is straightforward
             int t = 0;
@@ -773,19 +772,19 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             }
         }
 
-        /// <summary>
-        /// Use this method if 1) both the global DOK and the element matrix are symmetric and 2) the rows and columns correspond
-        /// to the same degrees of freedom. The caller is responsible for making sure that both matrices are symmetric and that 
-        /// the dimensions and dofs of the element matrix and dof mappings match.
-        /// </summary>
-        /// <param name="elementMatrix">The element submatrix, entries of which will be added to the global DOK. It must be 
-        ///     symmetric and its <see cref="IIndexable2D.NumColumns"/> = <see cref="IIndexable2D.NumRows"/> must be equal to
-        ///     elemenDofs.Length = globalDofs.Length.</param>
-        /// <param name="elementDofs">The entries in the element matrix to be added to the global matrix. Specificaly, pairs of 
-        ///     (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
-        /// <param name="globalDofs">The entries in the global matrix where element matrix entries will be added to. Specificaly,
-        ///     pairs of (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
-        private void AddSubmatrixSymmetricOLD(IIndexable2D elementMatrix, int[] elementDofs, int[] globalDofs) //TODO: this should be reworked
+		/// <summary>
+		/// Use this method if 1) both the global DOK and the element matrix are symmetric and 2) the rows and columns correspond
+		/// to the same degrees of freedom. The caller is responsible for making sure that both matrices are symmetric and that 
+		/// the dimensions and dofs of the element matrix and dof mappings match.
+		/// </summary>
+		/// <param name="elementMatrix">The element submatrix, entries of which will be added to the global DOK. It must be 
+		///     symmetric and its <see cref="IBounded2D.NumColumns"/> = <see cref="IBounded2D.NumRows"/> must be equal to
+		///     elemenDofs.Length = globalDofs.Length.</param>
+		/// <param name="elementDofs">The entries in the element matrix to be added to the global matrix. Specificaly, pairs of 
+		///     (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
+		/// <param name="globalDofs">The entries in the global matrix where element matrix entries will be added to. Specificaly,
+		///     pairs of (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>
+		private void AddSubmatrixSymmetricOLD(IIndexable2D elementMatrix, int[] elementDofs, int[] globalDofs) //TODO: this should be reworked
         {
             int n = elementDofs.Length;
             for (int j = 0; j < n; ++j)

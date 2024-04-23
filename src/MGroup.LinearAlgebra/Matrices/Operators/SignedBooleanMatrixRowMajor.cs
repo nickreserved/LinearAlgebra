@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Output.Formatting;
 using MGroup.LinearAlgebra.Providers;
 using MGroup.LinearAlgebra.Vectors;
@@ -181,7 +182,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
                 {
                     var rowVector = new double[NumColumns];
                     foreach (var colValuePair in columns) rowVector[colValuePair.Key] = colValuePair.Value;
-                    nonZeroRows.Add(i, Vector.CreateFromArray(rowVector));
+                    nonZeroRows.Add(i, new Vector(rowVector));
                 }
             }
             return nonZeroRows;
@@ -211,10 +212,10 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
             }
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1E-13)
+		/// <summary>
+		/// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
+		/// </summary>
+		public bool Equals(IIndexable2D other, double tolerance = 1E-13)
         {
             return DenseStrategies.AreEqual(this, other, tolerance);
         }
@@ -240,7 +241,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
         /// </summary>
         /// <param name="rowIdx">
         /// The index of the row to return. Constraints: 
-        /// 0 &lt;= <paramref name="rowIdx"/> &lt; <see cref="IIndexable2D.NumRows"/>.
+        /// 0 &lt;= <paramref name="rowIdx"/> &lt; <see cref="IBounded2D.NumRows"/>.
         /// </param>
         /// <exception cref="IndexOutOfRangeException">
         /// Thrown if <paramref name="rowIdx"/> violates the described constraints.
@@ -253,7 +254,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
             {
                 foreach (var colValuePair in columns) rowVector[colValuePair.Key] = colValuePair.Value;
             }
-            return Vector.CreateFromArray(rowVector);
+            return new Vector(rowVector);
         }
 
         /// <summary>
@@ -289,12 +290,12 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
         /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
         /// </summary>
         /// <param name="vector">
-        /// A vector with <see cref="IIndexable1D.Length"/> being equal to the <see cref="IIndexable2D.NumColumns"/> 
+        /// A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the <see cref="IBounded2D.NumColumns"/> 
         /// of oper(this).
         /// </param>
         /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
         /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="vector"/> is different 
+        /// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="vector"/> is different 
         /// than the <see cref="NumColumns"/> of oper(this).
         /// </exception>
         public Vector Multiply(Vector vector, bool transposeThis = false)
@@ -343,7 +344,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
                 }
                 
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         private Vector MultiplyUntransposed(Vector vector)
@@ -359,7 +360,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
                 }
                 result[wholeRow.Key] = sum;
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         private Matrix MultiplyRightTransposed(Matrix other)

@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Triangulation;
+using MGroup.LinearAlgebra.Triangulation;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Matrices.Builders;
 using MGroup.LinearAlgebra.Tests.TestData;
@@ -23,8 +23,8 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
             var skyline = SkylineMatrix.CreateFromArrays(order, SparsePosDef10by10.SkylineValues,
                 SparsePosDef10by10.SkylineDiagOffsets, true, true);
             var dok = DokSymmetric.CreateFromSparseMatrix(skyline);
-            var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-            var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
+            var b = new Vector(SparsePosDef10by10.Rhs);
+            var xExpected = new Vector(SparsePosDef10by10.Lhs);
 
             (double[] cscValues, int[] cscRowIndices, int[] cscColOffsets) = dok.BuildSymmetricCscArrays(true);
             var factor = CholeskyCSparseNet.Factorize(order, cscValues.Length, cscValues, cscRowIndices, cscColOffsets);

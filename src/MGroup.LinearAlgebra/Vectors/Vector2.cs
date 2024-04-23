@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="entry0">The first entry of the new otherVector.</param>
 		/// <param name="entry1">The second entry of the new otherVector.</param>
-		[Obsolete("Use new Vector2(entry0, entry1)")]
+//		[Obsolete("Use new Vector2(entry0, entry1)")]
 		public static Vector2 Create(double entry0, double entry1) => new Vector2(new double[] { entry0, entry1 });
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     will have a reference to the copy, which is safer. If false, the new otherVector will have a reference to 
 		///     <paramref name="data"/> itself, which is faster.</param>
 		/// <returns></returns>
-		[Obsolete("Use new Vector2(data) or new Vector2((double[])data.Clone())")]
+//		[Obsolete("Use new Vector2(data) or new Vector2((double[])data.Clone())")]
 		new public static Vector2 CreateFromArray(double[] data, bool copyArray = false)
         {
             if (data.Length != 2) throw new NonMatchingDimensionsException($"The provided array had length = {data.Length} instead of 2");
@@ -65,8 +65,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <summary>
 		/// Creates an new instance of <see cref="Vector2"/> with all entries being equal to 0.
 		/// </summary>
-		[Obsolete("Use new Vector2()")]
-        new public static Vector2 CreateZero() => new Vector2(new double[2]);
+//		[Obsolete("Use new Vector2()")]
+        public static Vector2 CreateZero() => new Vector2(new double[2]);
 
 
 

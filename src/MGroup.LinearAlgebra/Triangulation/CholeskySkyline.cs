@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Matrices;
@@ -93,8 +93,8 @@ namespace MGroup.LinearAlgebra.Triangulation
             Preconditions.CheckSystemSolutionDimensions(this, rhs);
             Preconditions.CheckMultiplicationDimensions(Order, solution.Length);
 
-            SubstituteForward(Order, values, diagOffsets, rhs.RawData, solution.RawData);
-            SubstituteBack(Order, values, diagOffsets, solution.RawData);
+            SubstituteForward(Order, values, diagOffsets, rhs.Values, solution.Values);
+            SubstituteBack(Order, values, diagOffsets, solution.Values);
         }
 
         internal static void FactorizeInternal(int order, double[] values, int[] diagOffsets, double pivotTolerance)

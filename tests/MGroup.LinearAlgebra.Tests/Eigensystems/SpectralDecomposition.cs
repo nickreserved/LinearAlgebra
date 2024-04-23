@@ -55,7 +55,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			int n = originalMatrix.NumRows;
 			Matrix invX = eigenvectorsRight.Invert();
 			//Matrix invX = eigenvectorsRight.Transpose(); // Only for spd matrices.
-			Matrix reconstructed = eigenvectorsRight * Matrix.CreateFromDiagonal(n, n, eigenvaluesReal.RawData) * invX;
+			Matrix reconstructed = eigenvectorsRight * Matrix.CreateFromDiagonal(n, n, eigenvaluesReal.Values) * invX;
 
 			var comparer = new MatrixComparer(tolerance);
 			return comparer.AreEqual(originalMatrix, reconstructed);

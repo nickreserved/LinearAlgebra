@@ -14,7 +14,7 @@ using Xunit;
 namespace MGroup.LinearAlgebra.Tests.Iterative
 {
 	/// <summary>
-	/// Tests for <see cref="GaussSeidel"/>.
+	/// Tests for GaussSeidel.
 	/// Authors: Gerasimos Sotiropoulos 
 	/// </summary>
 	public static class GaussSeidelTests
@@ -40,8 +40,8 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 				gsIteration = new GaussSeidelIterationGeneral();
 			}
 
-			var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-			var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
+			var b = new Vector(SparsePosDef10by10.Rhs);
+			var xExpected = new Vector(SparsePosDef10by10.Lhs);
 
 			var builder = new GaussSeidelAlgorithm.Builder();
 			//builder.ConvergenceCriterion = new SolutionNeverConvergesCriterion(); // We would use this, but to test we need to track the convergence rate.
@@ -50,7 +50,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.MaxIterationsProvider = new FixedMaxIterationsProvider(numIterations);
 			builder.ForwardGaussSeidel = forwardGaussSeidel;
 			var gs = builder.Build(gsIteration);
-			var xComputed = Vector.CreateZero(b.Length);
+			var xComputed = new Vector(b.Length);
 
 			IterativeStatistics stats = gs.Solve(matrix, b, xComputed);
 

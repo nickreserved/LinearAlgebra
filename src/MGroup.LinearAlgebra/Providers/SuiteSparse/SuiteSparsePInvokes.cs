@@ -106,8 +106,7 @@ namespace MGroup.LinearAlgebra.Providers.PInvoke
         ///	    3 if not enough memory can be allocated.
         /// </summary> 
         /// <param name="order">Number of rows = number of columns.</param>
-        /// <param name="rowIndices">Array containing the row indices of the non zero entries of the upper triangle. 
-        ///     Length = <paramref name="nnz"/>. They must be sorted.</param>
+        /// <param name="rowIndices">Array containing the row indices of the non zero entries of the upper triangle. They must be sorted.</param>
         /// <param name="colOffsets">Array containing the indices into <paramref name="rowIndices"/> of the first entry of each 
         ///     column. Length = <paramref name="order"/> + 1. They must be sorted. 
         ///     The first entry is <paramref name="colOffsets"/>[0] = 0. 

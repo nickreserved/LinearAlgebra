@@ -104,12 +104,12 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// Performs the operation: <paramref name="result"/> = generalized_inverse(A) * <paramref name="vector"/>
         /// </summary>
-        /// <param name="vector">The vector that will be multiplied. Its <see cref="IIndexable1D.Length"/> must be equal to 
-        /// <see cref="IIndexable2D.NumRows"/> of the original matrix A.
+        /// <param name="vector">The vector that will be multiplied. Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to 
+        /// <see cref="IBounded2D.NumRows"/> of the original matrix A.
         /// </param>
         /// <param name="result">
-        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IIndexable1D.Length"/>  
-        /// must be equal to <see cref="IIndexable2D.NumColumns"/> of the original matrix A.
+        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IMinimalReadOnlyVector.Length"/>  
+        /// must be equal to <see cref="IBounded2D.NumColumns"/> of the original matrix A.
         /// </param>
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="vector"/> or <paramref name="result"/> violate the described constraints.
@@ -122,7 +122,7 @@ namespace MGroup.LinearAlgebra.Triangulation
             Preconditions.CheckSystemSolutionDimensions(Order, vector.Length);
             Preconditions.CheckMultiplicationDimensions(Order, result.Length);
 
-            LdlSkyline.Solve(Order, values, diagOffsets, vector.RawData, result.RawData);
+            LdlSkyline.Solve(Order, values, diagOffsets, vector.Values, result.Values);
         }
     }
 }

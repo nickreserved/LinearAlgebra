@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Matrices.Builders;
@@ -54,7 +54,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
             {
                 vector[i] = rand.NextDouble();
             }
-            return Vector.CreateFromArray(vector, false);
+            return new Vector(vector);
         }
     }
 }

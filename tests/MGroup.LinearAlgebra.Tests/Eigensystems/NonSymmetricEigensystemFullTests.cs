@@ -24,8 +24,8 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
-				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
-				var eigenvaluesImaginaryExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesImaginaryPart);
+				var eigenvaluesRealExpected = new Vector(SquareInvertible10by10.EigenvaluesRealPart);
+				var eigenvaluesImaginaryExpected = new Vector(SquareInvertible10by10.EigenvaluesImaginaryPart);
 				var eigensystem = NonSymmetricEigensystemFull.Create(A.NumRows, A.RawData, false, false);
 
 				// Check
@@ -43,8 +43,8 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
-				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
-				var eigenvaluesImaginaryExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesImaginaryPart);
+				var eigenvaluesRealExpected = new Vector(SquareInvertible10by10.EigenvaluesRealPart);
+				var eigenvaluesImaginaryExpected = new Vector(SquareInvertible10by10.EigenvaluesImaginaryPart);
 				var eigenvectorsRightExpected = Matrix.CreateFromArray(SquareInvertible10by10.EigenvectorsRight);
 				var eigensystem = NonSymmetricEigensystemFull.Create(A.NumRows, A.RawData, false, true);
 
@@ -63,8 +63,8 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
-				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
-				var eigenvaluesImaginaryExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesImaginaryPart);
+				var eigenvaluesRealExpected = new Vector(SquareInvertible10by10.EigenvaluesRealPart);
+				var eigenvaluesImaginaryExpected = new Vector(SquareInvertible10by10.EigenvaluesImaginaryPart);
 				var eigenvectorsLeftExpected = Matrix.CreateFromArray(SquareInvertible10by10.EigenvectorsLeft);
 				var eigensystem = NonSymmetricEigensystemFull.Create(A.NumRows, A.RawData, true, false);
 
@@ -83,8 +83,8 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
-				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
-				var eigenvaluesImaginaryExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesImaginaryPart);
+				var eigenvaluesRealExpected = new Vector(SquareInvertible10by10.EigenvaluesRealPart);
+				var eigenvaluesImaginaryExpected = new Vector(SquareInvertible10by10.EigenvaluesImaginaryPart);
 				var eigenvectorsRightExpected = Matrix.CreateFromArray(SquareInvertible10by10.EigenvectorsRight);
 				var eigenvectorsLeftExpected = Matrix.CreateFromArray(SquareInvertible10by10.EigenvectorsLeft);
 				var eigensystem = NonSymmetricEigensystemFull.Create(A.NumRows, A.RawData, true, true);
@@ -104,8 +104,8 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SquareInvertible10by10.Matrix);
-				var eigenvaluesRealExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesRealPart);
-				var eigenvaluesImaginaryExpected = Vector.CreateFromArray(SquareInvertible10by10.EigenvaluesImaginaryPart);
+				var eigenvaluesRealExpected = new Vector(SquareInvertible10by10.EigenvaluesRealPart);
+				var eigenvaluesImaginaryExpected = new Vector(SquareInvertible10by10.EigenvaluesImaginaryPart);
 				var eigenvectorsRightExpected = Matrix.CreateFromArray(SquareInvertible10by10.EigenvectorsRight);
 				var eigenvectorsLeftExpected = Matrix.CreateFromArray(SquareInvertible10by10.EigenvectorsLeft);
 				(Vector eigenvaluesReal, Vector eigenvaluesImaginary, Matrix eigenvectorsRight, Matrix eigenvectorsLeft) =

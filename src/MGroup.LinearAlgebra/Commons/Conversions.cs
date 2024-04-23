@@ -480,16 +480,16 @@ namespace MGroup.LinearAlgebra.Commons
             return full;
         }
 
-        /// <summary>
-        /// Converts a symmetric matrix from packed column major format to full column major format.
-        /// </summary>
-        /// <param name="packed">The matrix entries in packed format. Its length must be n*(n+1)/2, where n is the order of the 
-        ///     matrix.</param>
-        /// <param name="order">The order of the matrix. It must be positive and match the length of <see cref="packed"/>. If a 
-        ///     value is provided, these will not be checked. If no value is provided, the order will be calculated from 
-        ///     <see cref="packed"/> instead.</param>
-        /// <returns></returns>
-        internal static double[] PackedUpperColMajorToFullSymmColMajor(double[] packed, int order = 0)
+		/// <summary>
+		/// Converts a symmetric matrix from packed column major format to full column major format.
+		/// </summary>
+		/// <param name="packed">The matrix entries in packed format. Its length must be n*(n+1)/2, where n is the order of the 
+		///     matrix.</param>
+		/// <param name="order">The order of the matrix. It must be positive and match the length of <paramref name="packed"/>. If a 
+		///     value is provided, these will not be checked. If no value is provided, the order will be calculated from 
+		///     <paramref name="packed"/> instead.</param>
+		/// <returns></returns>
+		internal static double[] PackedUpperColMajorToFullSymmColMajor(double[] packed, int order = 0)
         {
             int n = (order == 0) ? PackedLengthToOrder(packed.Length) : order;
             double[] full = new double[n * n];

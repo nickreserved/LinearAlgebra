@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	{
 		/// <summary>
 		/// Performs the operation: result[i, j] = <paramref name="matrix1"/>[i, j] + <paramref name="matrix2"/>[i, j], 
-		/// for 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>.
+		/// for 0 &lt;= i &lt; <see cref="IBounded2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IBounded2D.NumColumns"/>.
 		/// The resulting entries are written to a new <see cref="IMatrixView"/> instance.
 		/// </summary>
 		/// <param name="matrix1">The first <see cref="IMatrixView"/> operand. It must have as many rows and columns as 
@@ -28,14 +28,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="matrix2">The second <see cref="IMatrixView"/> operand. It must have as many rows and columns as 
 		///     <paramref name="matrix1"/>.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrix1"/> and <paramref name="matrix2"/>
-		///     have a different number of <see cref="IIndexable2D.NumRows"/> or 
-		///     <see cref="IIndexable2D.NumColumns"/>.</exception>
+		///     have a different number of <see cref="IBounded2D.NumRows"/> or 
+		///     <see cref="IBounded2D.NumColumns"/>.</exception>
 		public static IMatrix Add(this IMatrixView matrix1, IMatrixView matrix2) => matrix1.Axpy(matrix2, 1.0);
 
 		/// <summary>
 		/// Performs the operation: 
 		/// <paramref name="matrix1"/>[i, j] = <paramref name="matrix1"/>[i, j] + <paramref name="matrix2"/>[i, j], 
-		/// for 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>.
+		/// for 0 &lt;= i &lt; <see cref="IBounded2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IBounded2D.NumColumns"/>.
 		/// The resulting matrix overwrites the entries of <paramref name="matrix1"/>.
 		/// </summary>
 		/// <param name="matrix1">The first <see cref="IMatrix"/> operand. It must have as many rows and columns as 
@@ -43,8 +43,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="matrix2">The second <see cref="IMatrixView"/> operand. It must have as many rows and columns as 
 		///     <paramref name="matrix1"/>.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrix1"/> and <paramref name="matrix2"/>
-		///     have a different number of <see cref="IIndexable2D.NumRows"/> or 
-		///     <see cref="IIndexable2D.NumColumns"/>.</exception>
+		///     have a different number of <see cref="IBounded2D.NumRows"/> or 
+		///     <see cref="IBounded2D.NumColumns"/>.</exception>
 		/// <exception cref="PatternModifiedException">Thrown if an <paramref name="matrix1"/>[i, j] needs to be 
 		///     overwritten, but that is not permitted by the matrix storage format.</exception>
 		public static void AddIntoThis(this IMatrix matrix1, IMatrixView matrix2) => matrix1.AxpyIntoThis(matrix2, 1.0);
@@ -98,8 +98,8 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// Returns true if <paramref name="matrix"/>[i, j] and <paramref name="matrix"/>[j, i] are equal or at least within the 
-		/// specified <paramref name="tolerance"/> for all 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 
-		/// 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>. 
+		/// specified <paramref name="tolerance"/> for all 0 &lt;= i &lt; <see cref="IBounded2D.NumRows"/>, 
+		/// 0 &lt;= j &lt; <see cref="IBounded2D.NumColumns"/>. 
 		/// </summary>
 		/// <param name="matrix">The matrix that will be checked for symmetry.</param>
 		/// <param name="tolerance">The entries at (i, j), (j, i) the matrix will be considered equal, if
@@ -126,11 +126,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="thisMatrix">A matrix.</param>
 		/// <param name="otherMatrix">
-		/// A matrix with the same <see cref="IIndexable2D.NumRows"/> and <see cref="IIndexable2D.NumColumns"/> as this matrix.
+		/// A matrix with the same <see cref="IBounded2D.NumRows"/> and <see cref="IBounded2D.NumColumns"/> as this matrix.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="IIndexable2D.NumRows"/> or 
-		/// <see cref="IIndexable2D.NumColumns"/> than this matrix.
+		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="IBounded2D.NumRows"/> or 
+		/// <see cref="IBounded2D.NumColumns"/> than this matrix.
 		/// </exception>
 		public static Matrix MultiplyEntrywise(this Matrix thisMatrix, Matrix otherMatrix)
 			=> thisMatrix.DoEntrywise(otherMatrix, (x, y) => x * y); //TODO: This should be implemented similarly to Vector.MultiplyEntrywise()
@@ -142,11 +142,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="thisMatrix">A matrix.</param>
 		/// <param name="otherMatrix">
-		/// A matrix with the same <see cref="IIndexable2D.NumRows"/> and <see cref="IIndexable2D.NumColumns"/> as this matrix.
+		/// A matrix with the same <see cref="IBounded2D.NumRows"/> and <see cref="IBounded2D.NumColumns"/> as this matrix.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="IIndexable2D.NumRows"/> or 
-		/// <see cref="IIndexable2D.NumColumns"/> than this matrix.
+		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="IBounded2D.NumRows"/> or 
+		/// <see cref="IBounded2D.NumColumns"/> than this matrix.
 		/// </exception>
 		/// <exception cref="PatternModifiedException">
 		/// Thrown if an entry this[i, j] needs to be overwritten, but that is not permitted by the matrix storage format.
@@ -157,7 +157,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <summary>
 		/// Computes the Reduced Row Echelon Form (rref) of the matrix and finds the independent columns of the matrix.  
 		/// See https://en.wikipedia.org/wiki/Row_echelon_form#Reduced_row_echelon_form.
-		/// </param>
+		/// </summary>
 		public static (Matrix rref, List<int> independentCols) ReducedRowEchelonForm(this IMatrixView matrix)
 			=> ReducedRowEchelonForm(matrix,
 				GlobalConstants.MachinePrecisionDouble * Math.Max(matrix.NumRows, matrix.NumColumns) * matrix.NormInf());
@@ -287,11 +287,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </param>
 		public static Vector Reshape(this Matrix matrix, bool columnMajor)
 		{
-			if (columnMajor) return Vector.CreateFromArray(matrix.RawData, true);
+			if (columnMajor) return new Vector((double[])matrix.RawData.Clone());
 			else
 			{
 				double[] rowMajorEntries = Conversions.ColumnMajorToRowMajor(matrix.RawData, matrix.NumRows, matrix.NumColumns);
-				return Vector.CreateFromArray(rowMajorEntries, false);
+				return new Vector(rowMajorEntries);
 			}
 		}
 
@@ -392,7 +392,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// Performs the operation: result[i, j] = <paramref name="matrix1"/>[i, j] - <paramref name="matrix2"/>[i, j], 
-		/// for 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>.
+		/// for 0 &lt;= i &lt; <see cref="IBounded2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IBounded2D.NumColumns"/>.
 		/// The resulting entries are written to a new <see cref="IMatrixView"/> instance.
 		/// </summary>
 		/// <param name="matrix1">The first <see cref="IMatrixView"/> operand. It must have as many rows and columns as 
@@ -400,14 +400,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="matrix2">The second <see cref="IMatrixView"/> operand. It must have as many rows and columns as 
 		///     <paramref name="matrix1"/>.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrix1"/> and <paramref name="matrix2"/>
-		///     have a different number of <see cref="IIndexable2D.NumRows"/> or 
-		///     <see cref="IIndexable2D.NumColumns"/>.</exception>
+		///     have a different number of <see cref="IBounded2D.NumRows"/> or 
+		///     <see cref="IBounded2D.NumColumns"/>.</exception>
 		public static IMatrix Subtract(this IMatrixView matrix1, IMatrixView matrix2) => matrix1.Axpy(matrix2, -1.0);
 
 		/// <summary>
 		/// Performs the operation: 
 		/// <paramref name="matrix1"/>[i, j] = <paramref name="matrix1"/>[i, j] + <paramref name="matrix2"/>[i, j], 
-		/// for 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>.
+		/// for 0 &lt;= i &lt; <see cref="IBounded2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IBounded2D.NumColumns"/>.
 		/// The resulting matrix overwrites the entries of <paramref name="matrix1"/>.
 		/// </summary>
 		/// <param name="matrix1">The first <see cref="IMatrix"/> operand. It must have as many rows and columns as 
@@ -415,8 +415,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="matrix2">The second <see cref="IMatrixView"/> operand. It must have as many rows and columns as 
 		///     <paramref name="matrix1"/>.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="matrix1"/> and <paramref name="matrix2"/>
-		///     have a different number of <see cref="IIndexable2D.NumRows"/> or 
-		///     <see cref="IIndexable2D.NumColumns"/>.</exception>
+		///     have a different number of <see cref="IBounded2D.NumRows"/> or 
+		///     <see cref="IBounded2D.NumColumns"/>.</exception>
 		/// <exception cref="PatternModifiedException">Thrown if an <paramref name="matrix1"/>[i, j] needs to be 
 		///     overwritten, but that is not permitted by the matrix storage format.</exception>
 		public static void SubtractIntoThis(this IMatrix matrix1, IMatrixView matrix2) => matrix1.AxpyIntoThis(matrix2, -1.0);

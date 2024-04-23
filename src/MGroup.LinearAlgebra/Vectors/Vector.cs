@@ -139,7 +139,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		///     will have a reference to the copy, which is safer. If false, the new vector will have a reference to 
 		///     <paramref name="data"/> itself, which is faster.</param>
 		/// <returns></returns>
-		[Obsolete("Use new Vector(data) or new Vector((double[])data.Clone())")]
+//		[Obsolete("Use new Vector(data) or new Vector((double[])data.Clone())")]
 		public static Vector CreateFromArray(double[] data, bool copyArray = false) => new Vector(copyArray ? (double[])data.Clone() : data);
 
 		/// <summary>
@@ -147,7 +147,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <paramref name="original"/>.
 		/// </summary>
 		/// <param name="original">The original vector to copy.</param>
-		[Obsolete("Use new Vector(original.CopyToArray()) or new Vector(original)")]
+//		[Obsolete("Use new Vector(original.CopyToArray()) or new Vector(original)")]
 		public static Vector CreateFromVector(IExtendedReadOnlyVector original) => new Vector(original);
 
 		/// <summary>
@@ -155,7 +155,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="length">The number of entries of the new <see cref="Vector"/> instance.</param>
 		/// <param name="value">The value that all entries of the new vector will be initialized to.</param>
-		[Obsolete("Use v = new Vector(length); v.SetAll(value);")]
+//		[Obsolete("Use v = new Vector(length); v.SetAll(value);")]
 		public static Vector CreateWithValue(int length, double value)
 		{
 			var result = new Vector(length);
@@ -167,7 +167,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Initializes a new instance of <see cref="Vector"/> with all entries being equal to 0.
 		/// </summary>
 		/// <param name="length">The number of entries of the new <see cref="Vector"/> instance.</param>
-		[Obsolete("Use new Vector(length)")]
+//		[Obsolete("Use new Vector(length)")]
 		public static Vector CreateZero(int length) => new Vector(length);
 
 

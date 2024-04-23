@@ -109,56 +109,56 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             Iteration = -1;
         }
 
-        /// <summary>
-        /// Solves the linear system A * x = b, where A = <paramref name="matrix"/> and b = <paramref name="rhs"/>.
-        /// Initially x = <paramref name="initialGuess"/> and then it converges to the solution.
-        /// </summary>
-        /// <param name="matrix">The matrix A of the linear system A * x = b. It must be symmetric positive definite.</param>
-        /// <param name="rhs">
-        /// The right hand side vector b of the linear system A * x = b. Constraints:
-        /// <paramref name="rhs"/>.<see cref="IIndexable1D.Length"/> 
-        /// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.
-        /// </param>
-        /// <param name="solution">
-        /// The vector from which to start refining the solution vector x. Constraints:
-        /// <paramref name="solution"/>.<see cref="IIndexable1D.Length"/>
-        /// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumColumns"/>.
-        /// </param>
-        /// <param name="initialGuessIsZero">
-        /// If <paramref name="solution"/> is 0, then set <paramref name="initialGuessIsZero"/> to true to avoid performing the
-        /// operation b-A*0 before starting.
-        /// </param>
-        /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
-        /// </exception>
-        public IterativeStatistics Solve(IMatrixView matrix, IMinimalReadOnlyVector rhs, IMinimalVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
+		/// <summary>
+		/// Solves the linear system A * x = b, where A = <paramref name="matrix"/> and b = <paramref name="rhs"/>.
+		/// Initially x = <paramref name="solution"/> and then it converges to the solution.
+		/// </summary>
+		/// <param name="matrix">The matrix A of the linear system A * x = b. It must be symmetric positive definite.</param>
+		/// <param name="rhs">
+		/// The right hand side vector b of the linear system A * x = b. Constraints:
+		/// <paramref name="rhs"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == <paramref name="matrix"/>.<see cref="IBounded2D.NumRows"/>.
+		/// </param>
+		/// <param name="solution">
+		/// The vector from which to start refining the solution vector x. Constraints:
+		/// <paramref name="solution"/>.<see cref="IMinimalReadOnlyVector.Length"/>
+		/// == <paramref name="matrix"/>.<see cref="IBounded2D.NumColumns"/>.
+		/// </param>
+		/// <param name="initialGuessIsZero">
+		/// If <paramref name="solution"/> is 0, then set <paramref name="initialGuessIsZero"/> to true to avoid performing the
+		/// operation b-A*0 before starting.
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">
+		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
+		/// </exception>
+		public IterativeStatistics Solve(IMatrixView matrix, IMinimalReadOnlyVector rhs, IMinimalVector solution, bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
             => Solve(new ExplicitMatrixTransformation(matrix), rhs, solution, initialGuessIsZero);
 
-        /// <summary>
-        /// Solves the linear system A * x = b, where A = <paramref name="matrix"/> and b = <paramref name="rhs"/>.
-        /// Initially x = <paramref name="initialGuess"/> and then it converges to the solution.
-        /// </summary>
-        /// <param name="matrix">
-        /// Represents the matrix A of the linear system A * x = b, which must be symmetric positive definite.
-        /// </param>
-        /// <param name="rhs">
-        /// The right hand side vector b of the linear system A * x = b. Constraints:
-        /// <paramref name="rhs"/>.<see cref="IIndexable1D.Length"/> 
-        /// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.
-        /// </param>
-        /// <param name="solution">
-        /// The vector from which to start refining the solution vector x. Constraints:
-        /// <paramref name="solution"/>.<see cref="IIndexable1D.Length"/>
-        /// == <paramref name="matrix"/>.<see cref="IIndexable2D.NumColumns"/>.
-        /// </param>
-        /// <param name="initialGuessIsZero">
-        /// If <paramref name="solution"/> is 0, then set <paramref name="initialGuessIsZero"/> to true to avoid performing the
-        /// operation b-A*0 before starting.
-        /// </param>
-        /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
-        /// </exception>
-        public IterativeStatistics Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhs, IMinimalVector solution, 
+		/// <summary>
+		/// Solves the linear system A * x = b, where A = <paramref name="matrix"/> and b = <paramref name="rhs"/>.
+		/// Initially x = <paramref name="solution"/> and then it converges to the solution.
+		/// </summary>
+		/// <param name="matrix">
+		/// Represents the matrix A of the linear system A * x = b, which must be symmetric positive definite.
+		/// </param>
+		/// <param name="rhs">
+		/// The right hand side vector b of the linear system A * x = b. Constraints:
+		/// <paramref name="rhs"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == <paramref name="matrix"/>.<see cref="IBounded2D.NumRows"/>.
+		/// </param>
+		/// <param name="solution">
+		/// The vector from which to start refining the solution vector x. Constraints:
+		/// <paramref name="solution"/>.<see cref="IMinimalReadOnlyVector.Length"/>
+		/// == <paramref name="matrix"/>.<see cref="IBounded2D.NumColumns"/>.
+		/// </param>
+		/// <param name="initialGuessIsZero">
+		/// If <paramref name="solution"/> is 0, then set <paramref name="initialGuessIsZero"/> to true to avoid performing the
+		/// operation b-A*0 before starting.
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">
+		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
+		/// </exception>
+		public IterativeStatistics Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhs, IMinimalVector solution, 
             bool initialGuessIsZero) //TODO: find a better way to handle the case x0=0
         {
             //TODO: these will also be checked by the matrix vector multiplication.
@@ -266,7 +266,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             public ICGResidualUpdater ResidualUpdater { get; set; } = new RegularCGResidualUpdater();
 
             /// <summary>
-            /// Normally the CG will converge when norm2(r) / norm2(r0) &lt;= <paramref name="ResidualTolerance"/>, 
+            /// Normally the CG will converge when norm2(r) / norm2(r0) &lt;= <see cref="ResidualTolerance"/>, 
             /// where r = A*x is the current residual vector and r0 = A*x0 the initial residual vector. Depending on 
             /// <see cref="ResidualConvergence"/>, some other criterion might be used.
             /// </summary>

@@ -165,7 +165,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 				// δnew = r * s 
 				resDotPrecondRes = residual.DotProduct(precondResidual);
 
-				/// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
+				// At this point we can check if CG has converged and exit, thus avoiding the uneccesary operations that follow.
 				residualNormRatio = Convergence.EstimateResidualNormRatio(this);
 				//Debug.WriteLine($"Reorthogonalized PCG iteration = {iteration}: residual norm ratio = {residualNormRatio}");
 				Stagnation.StoreNewError(residualNormRatio);

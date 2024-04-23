@@ -21,7 +21,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
 
 			(Vector lambda, Matrix X) = SpectralUtilities.SortSingularValues(
-				Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues),
+				new Vector(SymmPosDef10by10.Eigenvalues),
 				Matrix.CreateFromArray(SymmPosDef10by10.Eigenvectors),
 				descending: true);
 			var decompExpected = new SpectralDecomposition(lambda, X, tol);
@@ -43,7 +43,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
-				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);
+				var eigenvaluesExpected = new Vector(SymmPosDef10by10.Eigenvalues);
 				var eigenvectorsExpected = Matrix.CreateFromArray(SymmPosDef10by10.Eigenvectors);
 				var eigensystem = SymmetricEigensystemFull.Create(A.NumRows, A.RawData, true);
 
@@ -62,7 +62,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
-				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);
+				var eigenvaluesExpected = new Vector(SymmPosDef10by10.Eigenvalues);
 				var eigenvectorsExpected = Matrix.CreateFromArray(SymmPosDef10by10.Eigenvectors);
 				var eigensystem = SymmetricEigensystemFull.Create(A.NumRows, A.RawData, false);
 
@@ -81,7 +81,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
-				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);
+				var eigenvaluesExpected = new Vector(SymmPosDef10by10.Eigenvalues);
 				var eigenvectorsExpected = Matrix.CreateFromArray(SymmPosDef10by10.Eigenvectors);
 				(Vector eigenvalues, Matrix eigenvectors) = A.CalcEigensystemSymmetric();
 
@@ -98,7 +98,7 @@ namespace MGroup.LinearAlgebra.Tests.Eigensystems
 			TestSettings.RunMultiproviderTest(providers, delegate ()
 			{
 				var A = SymmetricMatrix.CreateFromArray(SymmPosDef10by10.Matrix);
-				var eigenvaluesExpected = Vector.CreateFromArray(SymmPosDef10by10.Eigenvalues);
+				var eigenvaluesExpected = new Vector(SymmPosDef10by10.Eigenvalues);
 				var eigenvectorsExpected = Matrix.CreateFromArray(SymmPosDef10by10.Eigenvectors);
 				(Vector eigenvalues, Matrix eigenvectors) = A.CalcEigensystem();
 

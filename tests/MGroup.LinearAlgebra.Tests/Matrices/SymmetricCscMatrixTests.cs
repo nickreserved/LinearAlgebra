@@ -40,26 +40,26 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 					true);
 
 				// MultiplyIntoResult() - untransposed
-				var x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-				var bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+				var x = new Vector(SparsePosDef10by10.Lhs);
+				var bExpected = new Vector(SparsePosDef10by10.Rhs);
 				IExtendedVector bComputed = A.Multiply(x, false);
 				comparer.AssertEqual(bExpected, bComputed);
 
 				// MultiplyIntoResult() - transposed
-				x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-				bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs); // same as before, since the matrix is symmetric
+				x = new Vector(SparsePosDef10by10.Lhs);
+				bExpected = new Vector(SparsePosDef10by10.Rhs); // same as before, since the matrix is symmetric
 				bComputed = A.Multiply(x, true);
 				comparer.AssertEqual(bExpected, bComputed);
 
 				// MultiplyRight() - untransposed
-				x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-				bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+				x = new Vector(SparsePosDef10by10.Lhs);
+				bExpected = new Vector(SparsePosDef10by10.Rhs);
 				Vector bDenseComputed = A.MultiplyRight(x, false);
 				comparer.AssertEqual(bExpected, bDenseComputed);
 
 				// MultiplyRight() - transposed
-				x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-				bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs); // same as before, since the matrix is symmetric
+				x = new Vector(SparsePosDef10by10.Lhs);
+				bExpected = new Vector(SparsePosDef10by10.Rhs); // same as before, since the matrix is symmetric
 				bDenseComputed = A.MultiplyRight(x, true);
 				comparer.AssertEqual(bExpected, bDenseComputed);
 			});
@@ -79,16 +79,18 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 					true);
 
 				// MultiplyIntoResult() - untransposed
-				var x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-				var bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-				Vector bComputed = Vector.CreateWithValue(SparsePosDef10by10.Order, 1.0);
+				var x = new Vector(SparsePosDef10by10.Lhs);
+				var bExpected = new Vector(SparsePosDef10by10.Rhs);
+				Vector bComputed = new Vector(SparsePosDef10by10.Order);
+				bComputed.SetAll(1);
 				A.MultiplyIntoResult(x, bComputed, false);
 				comparer.AssertEqual(bExpected, bComputed);
 
 				// MultiplyIntoResult() - transposed
-				x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-				bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-				bComputed = Vector.CreateWithValue(SparsePosDef10by10.Order, 1.0);
+				x = new Vector(SparsePosDef10by10.Lhs);
+				bExpected = new Vector(SparsePosDef10by10.Rhs);
+				bComputed = new Vector(SparsePosDef10by10.Order);
+				bComputed.SetAll(1);
 				A.MultiplyIntoResult(x, bComputed, true);
 				comparer.AssertEqual(bExpected, bComputed);
 			});

@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
+
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Vectors;
 
 //TODO: Most of the multiplications C = A^T * B* A will need updating if the individual matrix multiplication are updated, in 
@@ -17,17 +19,17 @@ namespace MGroup.LinearAlgebra.Matrices
         /// To multiply rowVector * <paramref name="matrix"/>, set <paramref name="transposeThis"/> to true.
         /// </summary>
         /// <param name="matrix">The matrix to multiply.</param>
-        /// <param name="vector">A vector with <see cref="IIndexable1D.Length"/> being equal to the 
-        ///     <see cref="IIndexable2D.NumColumns"/> of oper(<paramref name="matrix"/>).</param>
+        /// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
+        ///     <see cref="IBounded2D.NumColumns"/> of oper(<paramref name="matrix"/>).</param>
         /// <param name="transposeThis">If true, oper(<paramref name="matrix"/>) = transpose(<paramref name="matrix"/>). 
         ///     Otherwise oper(<paramref name="matrix"/>) = <paramref name="matrix"/>.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IIndexable1D.Length"/> of
-        ///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of 
+        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+        ///     <paramref name="vector"/> is different than the <see cref="IBounded2D.NumColumns"/> of 
         ///     oper(<paramref name="matrix"/>).</exception>
         public static double[] MultiplyRight(this CscMatrix matrix, double[] vector, bool transposeThis)
         { //TODO: delete this once legacy vectors, matrices are no longer used.
-            var asVector = Vector.CreateFromArray(vector, false);
-            return matrix.Multiply(asVector, transposeThis).RawData;
+            var asVector = new Vector(vector);
+            return matrix.Multiply(asVector, transposeThis).Values;
         }
 
         public static Matrix ThisTimesOtherTimesThisTranspose(this IMatrixView thisMatrix, IMatrixView other)

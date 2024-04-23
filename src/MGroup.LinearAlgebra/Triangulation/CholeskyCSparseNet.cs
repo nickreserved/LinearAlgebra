@@ -1,4 +1,5 @@
 using System;
+
 using CSparse;
 using CSparse.Double;
 using CSparse.Double.Factorization;
@@ -108,9 +109,9 @@ namespace MGroup.LinearAlgebra.Triangulation
         }
 
         /// <summary>
-        /// See <see cref="ITriangulation.SolveLinearSystem(Vector, Vector)"/>.
+        /// See <see cref="ITriangulation.SolveLinearSystem"/>.
         /// </summary>
         public void SolveLinearSystem(Vectors.Vector rhs, Vectors.Vector solution)
-            => factorization.Solve(rhs.RawData, solution.RawData);
+            => factorization.Solve(rhs.Values, solution.Values);
     }
 }

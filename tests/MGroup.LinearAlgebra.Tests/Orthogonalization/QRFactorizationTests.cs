@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Matrices;
+using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Orthogonalization;
 using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
@@ -65,14 +65,14 @@ namespace MGroup.LinearAlgebra.Tests.Orthogonalization
                 QRFactorization factorization = A.FactorQR();
 
                 // RHS is in the column space
-                var b1 = Vector.CreateFromArray(RectangularFullRank10by5.Rhs10);
-                var x1Expected = Vector.CreateFromArray(RectangularFullRank10by5.Lhs5);
+                var b1 = new Vector(RectangularFullRank10by5.Rhs10);
+                var x1Expected = new Vector(RectangularFullRank10by5.Lhs5);
                 Vector x1Computed = factorization.SolveLeastSquares(b1);
                 comparer.AssertEqual(x1Expected, x1Computed);
 
                 // RHS is not in the column space
-                var b2 = Vector.CreateFromArray(RectangularFullRank10by5.RhsLsq);
-                var x2Expected = Vector.CreateFromArray(RectangularFullRank10by5.LhsLsq);
+                var b2 = new Vector(RectangularFullRank10by5.RhsLsq);
+                var x2Expected = new Vector(RectangularFullRank10by5.LhsLsq);
                 Vector x2Computed = factorization.SolveLeastSquares(b2);
                 comparer.AssertEqual(x2Expected, x2Computed);
             });

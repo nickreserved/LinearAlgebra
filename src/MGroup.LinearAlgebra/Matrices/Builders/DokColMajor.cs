@@ -262,16 +262,16 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             }
         }
 
-        /// <summary>
-        /// Creates the values and indexing arrays in CSC storage format of the current matrix. This method should be 
-        /// called after fully defining the matrix in <see cref="DokColMajor"/> format.
-        /// </summary>
-        /// <param name="sortColsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
-        ///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
-        ///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
-        ///     unordered will be faster during creation of the CSC matrix.</param>
-        /// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
-        public (double[] values, int[] rowIndices, int[] colOffsets) BuildCscArrays(bool sortRowsOfEachCol)
+		/// <summary>
+		/// Creates the values and indexing arrays in CSC storage format of the current matrix. This method should be 
+		/// called after fully defining the matrix in <see cref="DokColMajor"/> format.
+		/// </summary>
+		/// <param name="sortRowsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
+		///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
+		///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
+		///     unordered will be faster during creation of the CSC matrix.</param>
+		/// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
+		public (double[] values, int[] rowIndices, int[] colOffsets) BuildCscArrays(bool sortRowsOfEachCol)
         {
             int[] colOffsets = new int[NumColumns + 1];
             int nnz = 0;
@@ -311,16 +311,16 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             return (values, rowIndices, colOffsets);
         }
 
-        /// <summary>
-        /// Initializes a <see cref="CscMatrix"/> representation of the current matrix. This method should be 
-        /// called after fully defining the matrix in <see cref="DokColMajor"/> format.
-        /// </summary>
-        /// <param name="sortColsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
-        ///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
-        ///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
-        ///     unordered will be faster during creation of the CSC matrix.</param>
-        /// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
-        public CscMatrix BuildCscMatrix(bool sortRowsOfEachCol)
+		/// <summary>
+		/// Initializes a <see cref="CscMatrix"/> representation of the current matrix. This method should be 
+		/// called after fully defining the matrix in <see cref="DokColMajor"/> format.
+		/// </summary>
+		/// <param name="sortRowsOfEachCol">True to sort the column indices of the CSC matrix between colOffsets[j] and 
+		///     colOffsets[j+1] in ascending order. False to leave them unordered. Ordered rows might result in better  
+		///     performance during multiplications or they might be required by 3rd party libraries. Conversely, leaving them 
+		///     unordered will be faster during creation of the CSC matrix.</param>
+		/// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
+		public CscMatrix BuildCscMatrix(bool sortRowsOfEachCol)
         {
             (double[] values, int[] rowIndices, int[] colOffsets) = BuildCscArrays(sortRowsOfEachCol);
             return CscMatrix.CreateFromArrays(NumRows, NumColumns, values, rowIndices, colOffsets, false);
@@ -357,7 +357,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         }
 
         /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
+        /// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
         /// </summary>
         public bool Equals(IMinimalReadOnlyMatrix other, double tolerance = 1e-13)
         {
@@ -372,7 +372,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         public (Vector diagonal, int firstZeroIdx) GetDiagonal()
         {
             (double[] diagonal, int firstZeroIdx) = GetDiagonalAsArray();
-            return (Vector.CreateFromArray(diagonal, false), firstZeroIdx);
+            return (new Vector(diagonal), firstZeroIdx);
         }
 
         /// <summary>
@@ -458,7 +458,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		/// the dimensions and dofs of the element matrix and dof mappings match.
 		/// </summary>
 		/// <param name="subMatrix">The element submatrix, entries of which will be added to the global DOK. It must be 
-		///     symmetric and its <see cref="IIndexable2D.NumColumns"/> = <see cref="IIndexable2D.NumRows"/> must be equal to
+		///     symmetric and its <see cref="IBounded2D.NumColumns"/> = <see cref="IBounded2D.NumRows"/> must be equal to
 		///     elemenDofs.Length = globalDofs.Length.</param>
 		/// <param name="subDofs">The entries in the element matrix to be added to the global matrix. Specificaly, pairs of 
 		///     (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>

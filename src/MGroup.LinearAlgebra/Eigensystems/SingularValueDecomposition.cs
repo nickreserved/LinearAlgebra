@@ -46,7 +46,7 @@ namespace MGroup.LinearAlgebra.Eigensystems
 
 			//TODO: sorting and storage formats should be handled inside this SVD for more efficiency
 			(Vector valuesSorted, Matrix vectorsSorted) = SpectralUtilities.SortSingularValues(
-				Vector.CreateFromArray(singularValues), Matrix.CreateFromArray(singularVectors), descending: true);
+				new Vector(singularValues), Matrix.CreateFromArray(singularVectors), descending: true);
 			if (valuesSorted[n - 1] < 0)
 			{
 				//TODO: add tolerance, dedicated exception class and perhaps make this test optional.

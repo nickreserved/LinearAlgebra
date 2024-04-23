@@ -114,12 +114,12 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// Performs the operation: <paramref name="result"/> = generalized_inverse(A) * <paramref name="vector"/>. 
         /// The resulting vector overwrites <paramref name="result"/>.
         /// </summary>
-        /// <param name="vector">The vector that will be multiplied. Its <see cref="IIndexable1D.Length"/> must be equal to 
-        /// <see cref="IIndexable2D.NumRows"/> of the original matrix A.
+        /// <param name="vector">The vector that will be multiplied. Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to 
+        /// <see cref="IBounded2D.NumRows"/> of the original matrix A.
         /// </param>
         /// <param name="result">
-        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IIndexable1D.Length"/>  
-        /// must be equal to <see cref="IIndexable2D.NumColumns"/> of the original matrix A.
+        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IMinimalReadOnlyVector.Length"/>  
+        /// must be equal to <see cref="IBounded2D.NumColumns"/> of the original matrix A.
         /// </param>
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="vector"/> or <paramref name="result"/> violate the described constraints.
@@ -131,8 +131,8 @@ namespace MGroup.LinearAlgebra.Triangulation
 
             // A^+ * b = [ Aii^-1 * bi; 0], where i are the independent rows/columns
             // TODO: Is this correct?
-            CholeskySkyline.SubstituteForward(Order, values, diagOffsets, vector.RawData, result.RawData);
-            CholeskySkyline.SubstituteBack(Order, values, diagOffsets, result.RawData);
+            CholeskySkyline.SubstituteForward(Order, values, diagOffsets, vector.Values, result.Values);
+            CholeskySkyline.SubstituteBack(Order, values, diagOffsets, result.Values);
             foreach (int row in DependentColumns) result[row] = 0.0;
         }
 
@@ -140,15 +140,15 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// Performs the operation: result = generalized_inverse(A) * <paramref name="vector"/>. The resul is written to a new
         /// vector and returned.
         /// </summary>
-        /// <param name="vector">The vector that will be multiplied. Its <see cref="IIndexable1D.Length"/> must be equal to 
-        /// <see cref="IIndexable2D.NumRows"/> of the original matrix A.
+        /// <param name="vector">The vector that will be multiplied. Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to 
+        /// <see cref="IBounded2D.NumRows"/> of the original matrix A.
         /// </param>
         /// <exception cref="NonMatchingDimensionsException">
         /// Thrown if <paramref name="vector"/> violates the described constraint.
         /// </exception>
         public Vector MultiplyGeneralizedInverseMatrixTimesVector(Vector vector)
         {
-            var result = Vector.CreateZero(Order);
+            var result = new Vector(Order);
             MultiplyGeneralizedInverseMatrixTimesVector(vector, result);
             return result;
         }

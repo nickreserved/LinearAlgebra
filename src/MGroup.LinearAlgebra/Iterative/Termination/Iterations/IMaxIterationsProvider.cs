@@ -1,4 +1,4 @@
-﻿namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
+namespace MGroup.LinearAlgebra.Iterative.Termination.Iterations
 {
 	/// <summary>
 	/// Determines the maximum number of iterations that will be run by an iterative algorithm.
@@ -9,7 +9,7 @@
 		/// <summary>
 		/// Returns the max number of iterations appropriate for the specified order of the linear system's matrix.
 		/// </summary>
-		/// <param name="matrix">The order of the linear system's matrix.</param>
+		/// <param name="matrixOrder">The order of the linear system's matrix.</param>
 		int GetMaxIterations(int matrixOrder);
 	}
 }

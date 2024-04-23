@@ -22,9 +22,11 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			if (samplesAreMoreThanProblemDimension)
 			{
 				throw new NotImplementedException();
+				/*unreachable code:
 				samples = Matrix.CreateFromArray(DataSet3.Samples);
 				principalComponentsExpected = Matrix.CreateFromArray(DataSet3.PrincipalComponents);
 				tol = 0;
+				*/
 			}
 			else
 			{

@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Tests.Triangulation
 
 			for (int j = 0; j < nullity; ++j)
 			{
-				var x = Vector.CreateFromArray(nullSpaceBasis[j]);
+				var x = new Vector(nullSpaceBasis[j]);
 				nullSpaceMatrix.SetSubcolumn(j, x);
 
 				// Check that each vector belongs to the nullspace

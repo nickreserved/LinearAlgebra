@@ -15,7 +15,7 @@ namespace MGroup.LinearAlgebra.Providers
 		RowMajor,
 
 		/// Column major layout. Entries corresponding to consecutive rows are stored consecutively. This is the default in 
-		/// FORTRAN and most linear algebra libraries that use the BLAS & LAPACK interfaces.
+		/// FORTRAN and most linear algebra libraries that use the BLAS &amp; LAPACK interfaces.
 		ColMajor
 	}
 
@@ -127,7 +127,7 @@ namespace MGroup.LinearAlgebra.Providers
 	}
 
 	/// <summary>
-	/// Extension methods to convert BLAS & LAPACK oriented enums into the strings expected by the actual BLAS & LAPACK 
+	/// Extension methods to convert BLAS &amp; LAPACK oriented enums into the strings expected by the actual BLAS & LAPACK 
 	/// methods.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>

@@ -359,10 +359,10 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
             }
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1e-13)
+		/// <summary>
+		/// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
+		/// </summary>
+		public bool Equals(IIndexable2D other, double tolerance = 1e-13)
         {
             return DenseStrategies.AreEqual(this, other, tolerance);
         }
@@ -375,7 +375,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         public (Vector diagonal, int firstZeroIdx) GetDiagonal()
         {
             (double[] diagonal, int firstZeroIdx) = GetDiagonalAsArray();
-            return (Vector.CreateFromArray(diagonal, false), firstZeroIdx);
+            return (new Vector(diagonal), firstZeroIdx);
         }
 
         /// <summary>
@@ -456,19 +456,19 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 			return result;
 		}
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: this * <paramref name="vector"/>. This method is at least as fast as 
-        /// creating a CSR matrix and multiplying it with 1 vector. If more than 1 multiplications are needed, then the CSR 
-        /// matrix should be created.
-        /// </summary>
-        /// <param name="vector">A vector with <see cref="IIndexable1D.Length"/> being equal to this.<see cref="NumColumns"/>.
-        ///     </param>
-        /// <param name="avoidBuilding">If true, no matrices will be built internally. If false, such matrices may be built if 
-        ///     the method decides that using them is faster (e.g. fast native library), however that requires memory for 
-        ///     building them, which may not be available.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if 
-        ///     <paramref name="vector"/>.<see cref="IIndexable1D.Length"/> != this.<see cref="NumColumns"/>.</exception>
-        public Vector MultiplyRight(Vector vector, bool avoidBuilding = false)
+		/// <summary>
+		/// Performs the matrix-vector multiplication: this * <paramref name="vector"/>. This method is at least as fast as 
+		/// creating a CSR matrix and multiplying it with 1 vector. If more than 1 multiplications are needed, then the CSR 
+		/// matrix should be created.
+		/// </summary>
+		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to this.<see cref="NumColumns"/>.
+		///     </param>
+		/// <param name="avoidBuilding">If true, no matrices will be built internally. If false, such matrices may be built if 
+		///     the method decides that using them is faster (e.g. fast native library), however that requires memory for 
+		///     building them, which may not be available.</param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if 
+		///     <paramref name="vector"/>.<see cref="IMinimalReadOnlyVector.Length"/> != this.<see cref="NumColumns"/>.</exception>
+		public Vector MultiplyRight(Vector vector, bool avoidBuilding = false)
         {
             // SparseBLAS functions are way faster than managed code. Just don't sort the CSR.
             bool buildCSR = (!avoidBuilding) && (LibrarySettings.SparseBlas is MklSparseBlasProvider); 
@@ -482,7 +482,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
                 foreach (var colValPair in rows[i]) dot += colValPair.Value * vector[colValPair.Key];
                 result[i] = dot;
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         /// <summary>
@@ -491,7 +491,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// the dimensions and dofs of the element matrix and dof mappings match.
         /// </summary>
         /// <param name="subMatrix">The element submatrix, entries of which will be added to the global DOK. It must be 
-        ///     symmetric and its <see cref="IIndexable2D.NumColumns"/> = <see cref="IIndexable2D.NumRows"/> must be equal to
+        ///     symmetric and its <see cref="IBounded2D.NumColumns"/> = <see cref="IBounded2D.NumRows"/> must be equal to
         ///     elemenDofs.Length = globalDofs.Length.</param>
         /// <param name="subDofs">The entries in the element matrix to be added to the global matrix. Specificaly, pairs of 
         ///     (elementDofs[i], elementDofs[j]) will be added to (globalDofs[i], globalDofs[j]).</param>

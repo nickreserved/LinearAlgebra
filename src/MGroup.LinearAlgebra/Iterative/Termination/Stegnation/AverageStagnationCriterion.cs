@@ -24,7 +24,7 @@ namespace MGroup.LinearAlgebra.Iterative.Termination.Stegnation
 		{
 			var errorReductions = CalcRelativeErrorReductions();
 			if (errorReductions == null) return false; // Not enough Values yet
-			var relativeImprovement = Vector.CreateFromArray(errorReductions).Average();//Γκέσος Παύλος
+			var relativeImprovement = new Vector(errorReductions).Average();
 			if (relativeImprovementTolerance == -1)
 			{
 				relativeImprovementTolerance = 1E-3 * CalcInitialErrorReduction();

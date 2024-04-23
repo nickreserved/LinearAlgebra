@@ -1,4 +1,5 @@
 using MGroup.LinearAlgebra.Commons;
+using MGroup.LinearAlgebra.Exceptions;
 using MGroup.LinearAlgebra.Vectors;
 
 namespace MGroup.LinearAlgebra.Matrices.Operators
@@ -69,10 +70,10 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
         /// result[i] = <paramref name="vector"/>[permutation[i]]. Otherwise it is old-to-new:
         /// result[permutation[i]] = <paramref name="vector"/>[i]
         /// </summary>
-        /// <param name="vector">A vector with <see cref="IIndexable1D.Length"/> being equal to the <see cref="NumColumns"/>
+        /// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the <see cref="NumColumns"/>
         ///     of oper(this).</param>
         /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IIndexable1D.Length"/> of
+        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
         ///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
         public Vector MultiplyRight(Vector vector, bool transposeThis)
         {
@@ -86,7 +87,7 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
             {
                 for (int i = 0; i < order; ++i) result[data[i]] = vector[i];
             }
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
     }

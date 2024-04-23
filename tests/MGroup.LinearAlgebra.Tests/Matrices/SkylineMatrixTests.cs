@@ -142,8 +142,8 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
             var A = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order,
                 SparsePosDef10by10.SkylineValues, SparsePosDef10by10.SkylineDiagOffsets, true, true);
-            var x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-            var bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+            var x = new Vector(SparsePosDef10by10.Lhs);
+            var bExpected = new Vector(SparsePosDef10by10.Rhs);
             IExtendedVector bComputed = A.Multiply(x, false);
             comparer.AssertEqual(bExpected, bComputed);
 
@@ -161,12 +161,13 @@ namespace MGroup.LinearAlgebra.Tests.Matrices
 
             var A = SkylineMatrix.CreateFromArrays(SparsePosDef10by10.Order,
                 SparsePosDef10by10.SkylineValues, SparsePosDef10by10.SkylineDiagOffsets, true, true);
-            var x = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
-            var bExpected = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
+            var x = new Vector(SparsePosDef10by10.Lhs);
+            var bExpected = new Vector(SparsePosDef10by10.Rhs);
 
-            // The result vectors will first be set to some non zero values to make sure that the result overwrites 
-            // them instead of being added to them.
-            Vector bComputed = Vector.CreateWithValue(A.NumRows, 1.0);
+			// The result vectors will first be set to some non zero values to make sure that the result overwrites 
+			// them instead of being added to them.
+			Vector bComputed = new Vector(A.NumRows);
+			bComputed.SetAll(1);
             A.MultiplyIntoResult(x, bComputed, false);
             comparer.AssertEqual(bExpected, bComputed);
 

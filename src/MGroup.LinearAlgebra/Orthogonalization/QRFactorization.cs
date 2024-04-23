@@ -168,9 +168,9 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// Warning: the columns of the original matrix A must be independent for this to work.
         /// </summary>
         /// <param name="rhsVector">The right hand side vector b. It may lie outside the column space of the original matrix. Its 
-        ///     <see cref="IIndexable1D.Length"/> must be equal to this.<see cref="NumRows"/>.</param>
+        ///     <see cref="IMinimalReadOnlyVector.Length"/> must be equal to this.<see cref="NumRows"/>.</param>
         /// <exception cref="Exceptions.LapackException">Thrown if the call to LAPACK fails due to <paramref name="rhsVector"/> 
-        ///     having a different <see cref="IIndexable1D.Length"/> than this.<see cref="NumRows"/>.</exception>
+        ///     having a different <see cref="IMinimalReadOnlyVector.Length"/> than this.<see cref="NumRows"/>.</exception>
         public Vector SolveLeastSquares(Vector rhsVector) //TODO: perhaps I should use the driver routines of LAPACKE
         {
             if (NumRows < NumColumns)
@@ -203,7 +203,7 @@ namespace MGroup.LinearAlgebra.Orthogonalization
             Blas.Dtrsv(StoredTriangle.Upper, TransposeMatrix.NoTranspose, DiagonalValues.NonUnit,
                 n, reflectorsAndR, 0, ldR, c, 0, incC);
             // TODO: Check output of BLAS somehow. E.g. Zero diagonal entries will result in NaN in the result vector.
-            return Vector.CreateFromArray(c, false);
+            return new Vector(c);
         }
     }
 }

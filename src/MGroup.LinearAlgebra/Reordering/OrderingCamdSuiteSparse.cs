@@ -92,8 +92,8 @@ namespace MGroup.LinearAlgebra.Reordering
         ///		mapping).</param>
         /// <returns>permutation: An array containing the new-to-old fill reducing permutation. 
         ///     stats: Measuments taken by SuiteSparse during the execution of AMD.</returns>
-        /// <exception cref="ArgumentException">If <paramref name="order"/>, <paramref name="cscRowIndices"/> or 
-        ///     <paramref name="cscColOffsets"/> do not describe a valid symmetric matrix.</exception>
+        /// <exception cref="ArgumentException">If order, cscRowIndices or 
+        ///     cscColOffsets do not describe a valid symmetric matrix.</exception>
         /// <exception cref="SuiteSparseException">Thrown if SuiteSparse dlls cannot be loaded, or if there is not enough memory 
         ///     to allocate during CAMD.</exception>
         public (int[] permutation, ReorderingStatistics stats) FindPermutation(SparsityPatternSymmetric pattern, 

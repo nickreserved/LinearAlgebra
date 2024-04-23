@@ -18,8 +18,8 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			double[] eigenvectorsLeft, double[] eigenvectorsRight)
 		{
 			this.Order = order;
-			this.EigenvaluesReal = Vector.CreateFromArray(eigenvaluesReal);
-			this.EigenvaluesImaginary = Vector.CreateFromArray(eigenvaluesImaginary);
+			this.EigenvaluesReal = new Vector(eigenvaluesReal);
+			this.EigenvaluesImaginary = new Vector(eigenvaluesImaginary);
 
 			if (eigenvectorsLeft == null)
 			{

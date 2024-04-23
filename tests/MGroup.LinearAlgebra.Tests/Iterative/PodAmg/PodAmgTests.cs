@@ -26,8 +26,8 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 		{
 			var matrix = Matrix.CreateFromArray(DataSet2.Matrix);
 			var csr = CsrMatrix.CreateFromDense(matrix);
-			var rhs = Vector.CreateFromArray(DataSet2.Rhs);
-			var solutionExpected = Vector.CreateFromArray(DataSet2.Solution);
+			var rhs = new Vector(DataSet2.Rhs);
+			var solutionExpected = new Vector(DataSet2.Solution);
 			var samples = Matrix.CreateFromArray(DataSet2.Samples);
 			int numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
 			int numPodAmgCyclesExpected = DataSet2.NumPodAmgCycles;
@@ -40,7 +40,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 				new GaussSeidelIterationCsrSerial.Builder(), GaussSeidelSweepDirection.Symmetric, numIterations: 1);
 
 			using PodAmgAlgorithm solver = solverBuilder.Create(samples, numPrincipalComponents);
-			var solutionComputed = Vector.CreateZero(rhs.Length);
+			var solutionComputed = new Vector(rhs.Length);
 			solver.Initialize(csr);
 			IterativeStatistics stats = solver.Solve(rhs, solutionComputed);
 
@@ -55,8 +55,8 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			// Input and expected output
 			var matrix = Matrix.CreateFromArray(DataSet2.Matrix);
 			var csr = CsrMatrix.CreateFromDense(matrix);
-			var rhs = Vector.CreateFromArray(DataSet2.Rhs);
-			var solutionExpected = Vector.CreateFromArray(DataSet2.Solution);
+			var rhs = new Vector(DataSet2.Rhs);
+			var solutionExpected = new Vector(DataSet2.Solution);
 			int n = matrix.NumRows;
 			var samples = Matrix.CreateFromArray(DataSet2.Samples);
 			int numPrincipalComponents = DataSet2.PrincipalComponents.GetLength(1);
@@ -79,7 +79,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 			var pcg = solverBuilder.Build();
 
 			// Solve
-			var solutionComputed = Vector.CreateZero(n);
+			var solutionComputed = new Vector(n);
 			IterativeStatistics stats = pcg.Solve(matrix, preconditioner, rhs, solutionComputed, true);
 
 			var comparer = new MatrixComparer(1E-6);
