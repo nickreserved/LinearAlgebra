@@ -7,18 +7,8 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// matrix and vector types, such as distributed matrices and vectors.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-	public interface ILinearTransformation
+	public interface ILinearTransformation : IBounded2D
 	{
-		/// <summary>
-		/// The number of rows of transformation matrix.
-		/// </summary>
-		int NumRows { get; }
-
-		/// <summary>
-		/// The number of columns of transformation matrix.
-		/// </summary>
-		int NumColumns { get; }
-
 		/// <summary>
 		/// Performs the matrix-vector multiplication (with the matrix represented by this 
 		/// <see cref="ILinearTransformation"/>): <paramref name="lhsVector"/> = thisLinearTransformation * <paramref name="rhsVector"/>.
@@ -27,9 +17,9 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">The vector that will be overwritten by the result of the multiplication.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
-		/// than this linear transformation <see cref="ILinearTransformation.NumColumns"/>, or
+		/// than this linear transformation <see cref="IBounded2D.NumColumns"/>, or
 		/// if <paramref name="lhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
-		/// than this linear transformation <see cref="ILinearTransformation.NumRows"/>.</exception>
+		/// than this linear transformation <see cref="IBounded2D.NumRows"/>.</exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if the storage format of <paramref name="lhsVector"/> does not support overwritting the entries that this method will try to.</exception>
 		void MultiplyIntoResult(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector);

@@ -6,6 +6,10 @@ namespace MGroup.LinearAlgebra.Vectors
 
 	using static MGroup.LinearAlgebra.LibrarySettings;
 
+	/// <summary>A fully populated with elements vector, with its elements stored contiguously in memory.</summary>
+	/// <remarks>Contiguously stored elements in memory, give much better performance in almost any operations.</remarks>
+
+	[Serializable]
 	public abstract class AbstractContiguousFullyPopulatedVector : AbstractFullyPopulatedVector
 	{
 		public abstract double[] Values { get; }

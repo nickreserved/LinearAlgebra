@@ -26,16 +26,16 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
             TestSettings.RunMultiproviderTest(providers, delegate ()
             {
                 var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
-                var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
-                var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
+                var b = new Vector(SymmPosDef10by10.Rhs);
+                var xExpected = new Vector(SymmPosDef10by10.Lhs);
 
                 var builder = new PcgAlgorithm.Builder();
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var pcg = builder.Build();
-                var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
-                Vector xComputed = Vector.CreateZero(A.NumRows);
-                IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+                var M = new JacobiPreconditioner(A.GetDiagonal());
+                Vector xComputed = new Vector(A.NumRows);
+                IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
                 comparer.AssertEqual(xExpected, xComputed);
             });
         }
@@ -47,16 +47,16 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
             TestSettings.RunMultiproviderTest(providers, delegate ()
             {
                 var A = Matrix.CreateFromArray(SparsePosDef10by10.Matrix);
-                var b = Vector.CreateFromArray(SparsePosDef10by10.Rhs);
-                var xExpected = Vector.CreateFromArray(SparsePosDef10by10.Lhs);
+                var b = new Vector(SparsePosDef10by10.Rhs);
+                var xExpected = new Vector(SparsePosDef10by10.Lhs);
 
                 var builder = new PcgAlgorithm.Builder();
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var pcg = builder.Build();
-                var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
-                Vector xComputed = Vector.CreateZero(A.NumRows);
-                IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+                var M = new JacobiPreconditioner(A.GetDiagonal());
+                Vector xComputed = new Vector(A.NumRows);
+                IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
                 comparer.AssertEqual(xExpected, xComputed);
             });
         }
@@ -72,7 +72,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 builder.ResidualTolerance = 1E-6;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var cg = builder.Build();
-                Vector xComputed = Vector.CreateZero(A.NumRows);
+                Vector xComputed = new Vector(A.NumRows);
                 IterativeStatistics stats = cg.Solve(A, b, xComputed, true);
                 Assert.False(comparer.AreEqual(xExpected, xComputed));
             });

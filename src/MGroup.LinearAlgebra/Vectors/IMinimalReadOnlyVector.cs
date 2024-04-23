@@ -181,7 +181,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <returns>Return value of <see cref="Copy()"/></returns>
 		protected static IMinimalVector Copy(IMinimalVector thisVector)
 		{
-			var result = thisVector.CreateZero();
+			var result = thisVector.CreateZeroWithSameFormat();
 			result.CopyFrom(thisVector);
 			return result;
 		}
@@ -191,7 +191,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// For sparse vectors it returns an empty vector (with 0 stored non-zero elements).
 		/// <returns>A new zero otherVector with the same number of Values with this otherVector</returns>
-		IMinimalVector CreateZero();
+		IMinimalVector CreateZeroWithSameFormat();
 
 		/// <summary>
 		/// Check if this vector and <paramref name="otherVector"/> are almost equal.

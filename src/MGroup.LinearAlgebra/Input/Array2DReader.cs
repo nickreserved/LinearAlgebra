@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.IO;
 
 namespace MGroup.LinearAlgebra.Input
@@ -84,13 +85,17 @@ namespace MGroup.LinearAlgebra.Input
 
         private double[,] ReadArrayWithDimensions(StreamReader reader, int numRows, int numCols)
         {
-            var array = new double[numRows, numCols];
+			// Decimal separator pinned as "."
+			var nfi = new NumberFormatInfo();
+			nfi.NumberDecimalSeparator = ".";
+			
+			var array = new double[numRows, numCols];
             for (int i = 0; i < numRows; ++i)
             {
                 string[] colStrings = reader.ReadLine().Split(colSeparators, StringSplitOptions.RemoveEmptyEntries);
                 if (colStrings.Length != numCols) throw new IOException(
                     $"There must be {numCols} rows, but {colStrings.Length} were found.");
-                for (int j = 0; j < numCols; ++j) array[i, j] = Double.Parse(colStrings[j]);
+                for (int j = 0; j < numCols; ++j) array[i, j] = Double.Parse(colStrings[j], nfi);
             }
             return array;
         }

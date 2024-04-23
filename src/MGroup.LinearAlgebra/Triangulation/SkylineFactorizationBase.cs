@@ -79,10 +79,10 @@ namespace MGroup.LinearAlgebra.Triangulation
         public IEnumerable<(int row, int col, double value)> EnumerateNonZeros()
             => SkylineMatrix.CreateFromArrays(Order, values, diagOffsets, false, false).EnumerateNonZeros();
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1E-13) //TODO: what are the semantics of this? It cannot be compared to matrices. Perhaps IIndexable2D should not have Equals()
+		/// <summary>
+		/// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
+		/// </summary>
+		public bool Equals(IMinimalReadOnlyMatrix other, double tolerance = 1E-13) //TODO: what are the semantics of this? It cannot be compared to matrices. Perhaps IIndexable2D should not have Equals()
             => SkylineMatrix.CreateFromArrays(Order, values, diagOffsets, false, false).Equals(other, tolerance);
 
         /// <summary>

@@ -11,6 +11,7 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// A otherVector with 3 entries. Optimized version of <see cref="Vector"/>.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
+	[Serializable]
 	public class Vector3 : Vector
     {
 		/// <summary>

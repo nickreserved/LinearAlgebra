@@ -23,7 +23,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             //TODO: perhaps this should be done in an Initialize() method
             if (numIterationsBeforeCorrection == int.MinValue)
             {
-                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(cg.Rhs.Length()));
+                numIterationsBeforeCorrection = (int)Math.Floor(Math.Sqrt(cg.Rhs.Length));
             }
 
             if ((cg.Iteration % numIterationsBeforeCorrection == 0) && (cg.Iteration != 0)) //The first iteration uses the correct residual.

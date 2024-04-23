@@ -14,6 +14,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Distributed", "src\MGroup.LinearAlgebra.Distributed\MGroup.LinearAlgebra.Distributed.csproj", "{65C1B9BB-D10A-4F3B-BEDC-7642735491BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MGroup.LinearAlgebra.Distributed.Tests", "tests\MGroup.LinearAlgebra.Distributed.Tests\MGroup.LinearAlgebra.Distributed.Tests.csproj", "{0C609D6B-D2CC-4EF9-B1AF-734ABCC2DD4D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CB28CCAA-76FE-4036-9A11-006F17F5242B} = {CB28CCAA-76FE-4036-9A11-006F17F5242B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

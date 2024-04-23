@@ -110,9 +110,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 			// Initialize vectors 
 			//TODO: Pehaps I can just clear them from previous iterations 
-			precondResidual = Rhs.CreateZero();
-			direction = Rhs.CreateZero();
-			matrixTimesDirection = Rhs.CreateZero();
+			precondResidual = Rhs.CreateZeroWithSameFormat();
+			direction = Rhs.CreateZeroWithSameFormat();
+			matrixTimesDirection = Rhs.CreateZeroWithSameFormat();
 
 			int maxIterations = MaxIterationsProvider.GetMaxIterations(matrix.NumColumns);
 			return SolveInternal(maxIterations);

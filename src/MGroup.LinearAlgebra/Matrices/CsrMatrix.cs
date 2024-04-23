@@ -85,7 +85,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <summary>
 		/// The internal array that stores the index into the arrays <see cref="RawValues"/> and <see cref="RawColIndices"/> of  
-		/// the first entry of each row. Its length is equal to <see cref="ILinearTransformation.NumRows"/> + 1. The last entry is the number of 
+		/// the first entry of each row. Its length is equal to <see cref="IBounded2D.NumRows"/> + 1. The last entry is the number of 
 		/// non-zero entries, which must be equal to <see cref="RawValues"/>.Length == <see cref="RawColIndices"/>.Length.
 		/// It should only be used for passing the raw array to linear algebra libraries.
 		/// </summary>
@@ -157,7 +157,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Creates a CSR matrix with the non-zero entries of <paramref name="denseMatrix"/>. An entry must be exactly == 0, to be considered zero.
 		/// </summary>
 		/// <param name="denseMatrix"></param>
-		public static CsrMatrix CreateFromDense(IMatrixView denseMatrix)
+		public static CsrMatrix CreateFromDense(IIndexable2D denseMatrix)
 		{
 			// Unoptimized: 1 pass to find the number of non zero entries, then allocate arrays, then another pass to copy the non zero entries
 			int m = denseMatrix.NumRows;
@@ -236,7 +236,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, 1.0, (IMatrixView) otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, 1.0, (IIndexable2D) otherMatrix, otherCoefficient);
         }
 
         /// <summary>
@@ -356,12 +356,10 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         public int CountNonZeros() => values.Length;
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public IMatrix DoEntrywise(IMatrixView other, Func<double, double, double> binaryOperation)
+        /// <inheritdoc/>
+        public IMatrix DoEntrywise(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
         {
-            if (other is CsrMatrix otherCSR) // In case both matrices have the exact same index arrays
+            if (otherMatrix is CsrMatrix otherCSR) // In case both matrices have the exact same index arrays
             {
 				if (otherCSR.values.Length == 0)
 				{
@@ -383,7 +381,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.DoEntrywise(this, other, binaryOperation);
+            return DenseStrategies.DoEntrywise(this, (IIndexable2D)otherMatrix, binaryOperation);
         }
 
         /// <inheritdoc/>
@@ -478,9 +476,9 @@ namespace MGroup.LinearAlgebra.Matrices
                     int col = colIndices[k];
                     for (int j = previousCol; j < col; ++j) // zero entries between the stored ones
                     {
-                        if (!comparer.AreEqual(0.0, ((IMatrixView) otherMatrix)[i, j])) return false;
+                        if (!comparer.AreEqual(0.0, ((IIndexable2D) otherMatrix)[i, j])) return false;
                     }
-                    if (!comparer.AreEqual(values[k], ((IMatrixView)otherMatrix)[i, col])) return false; // Non zero entry
+                    if (!comparer.AreEqual(values[k], ((IIndexable2D)otherMatrix)[i, col])) return false; // Non zero entry
                     previousCol = col + 1;
                 }
             }
@@ -581,7 +579,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, thisCoefficient, (IIndexable2D)otherMatrix, otherCoefficient);
         }
 
         /// <inheritdoc/>
@@ -717,13 +715,13 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Performs the matrix-matrix multiplication: oper(this) * <paramref name="otherMatrix"/>.
 		/// </summary>
 		/// <param name="otherMatrix">
-		/// A matrix such that the <see cref="ILinearTransformation.NumRows"/> of <paramref name="otherMatrix"/> are equal to the 
-		/// <see cref="ILinearTransformation.NumColumns"/> of oper(this).
+		/// A matrix such that the <see cref="IBounded2D.NumRows"/> of <paramref name="otherMatrix"/> are equal to the 
+		/// <see cref="IBounded2D.NumColumns"/> of oper(this).
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="ILinearTransformation.NumRows"/> than the 
-		/// <see cref="ILinearTransformation.NumColumns"/> of oper(this).
+		/// Thrown if <paramref name="otherMatrix"/> has different <see cref="IBounded2D.NumRows"/> than the 
+		/// <see cref="IBounded2D.NumColumns"/> of oper(this).
 		/// </exception>
 		public Matrix MultiplyRight(Matrix otherMatrix, bool transposeThis)
         {
@@ -772,14 +770,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
 		/// </summary>
 		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
-		///     <see cref="ILinearTransformation.NumColumns"/> of oper(this).</param>
+		///     <see cref="IBounded2D.NumColumns"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
 		///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
 		public Vector Multiply(Vector vector, bool transposeThis = false)
         {
             //TODO: this performs redundant dimension checks, including checking the transposeThis flag.
-            var result = new Vector(new double[transposeThis ? NumColumns : NumRows]);
+            var result = new Vector(transposeThis ? NumColumns : NumRows);
             MultiplyIntoResult(vector, result, transposeThis);
             return result;
         }
@@ -824,12 +822,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
 		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumColumns"/>.
+		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
 		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumRows"/>.
+		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">

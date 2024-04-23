@@ -116,7 +116,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// entries defined by the provided pattern.
         /// </summary>
         /// <param name="numRows">The number of rows of the matrix to build.</param>
-        /// <param name="numCols">The number of columns of the matrix to build.</param>
+        /// <param name="numColumns">The number of columns of the matrix to build.</param>
         /// <param name="nonZeroEntries">The non-zero entries of the matrix to build.</param>
         public static DokColMajor CreateFromSparsePattern(int numRows, int numColumns, 
             IEnumerable<(int row, int col, double value)> nonZeroEntries)
@@ -359,9 +359,9 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// <summary>
         /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
         /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1e-13)
+        public bool Equals(IMinimalReadOnlyMatrix other, double tolerance = 1e-13)
         {
-            return DenseStrategies.AreEqual(this, other, tolerance);
+            return DenseStrategies.AreEqual(this, (IIndexable2D) other, tolerance);
         }
 
         /// <summary>
@@ -495,5 +495,5 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
                 }
             }
         }
-    }
+	}
 }

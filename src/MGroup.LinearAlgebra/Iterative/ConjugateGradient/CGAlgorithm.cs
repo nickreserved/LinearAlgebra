@@ -191,7 +191,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             direction = residual.Copy();
 
             // Allocate memory for other vectors, which will be reused during each iteration
-            matrixTimesDirection = Rhs.CreateZero();
+            matrixTimesDirection = Rhs.CreateZeroWithSameFormat();
 
             for (Iteration = 0; Iteration < maxIterations; ++Iteration)
             {

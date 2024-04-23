@@ -75,7 +75,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
             return true;
         }
 
-        internal bool AreEqual(IIndexable1D a, IIndexable1D b)
+        internal bool AreEqual(IExtendedReadOnlyVector a, IExtendedReadOnlyVector b)
         {
             int n = a.Length;
 			if (b.Length != n)
@@ -92,7 +92,9 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
             return true;
         }
 
-        internal bool AreEqual(IIndexable2D a, IIndexable2D b)
+		internal bool AreEqual(IMinimalReadOnlyVector a, IMinimalReadOnlyVector b) => a.Equals(b, valueComparer.tolerance);
+
+		internal bool AreEqual(IIndexable2D a, IIndexable2D b)
         {
             int m = a.NumRows;
             int n = a.NumColumns;
@@ -117,7 +119,7 @@ namespace MGroup.LinearAlgebra.Tests.Utilities
         internal void AssertEqual(int[] a, int[] b) => Assert.True(AreEqual(a, b));
         internal void AssertEqual(double[] a, double[] b) => Assert.True(AreEqual(a, b));
         internal void AssertEqual(double[,] a, double[,] b) => Assert.True(AreEqual(a, b));
-        internal void AssertEqual(IIndexable1D a, IIndexable1D b) => Assert.True(AreEqual(a, b));
+        internal void AssertEqual(IMinimalReadOnlyVector a, IMinimalReadOnlyVector b) => Assert.True(AreEqual(a, b));
         internal void AssertEqual(IIndexable2D a, IIndexable2D b) => Assert.True(AreEqual(a, b));
     }
 }

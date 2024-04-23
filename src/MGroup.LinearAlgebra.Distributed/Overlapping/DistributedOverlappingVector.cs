@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MGroup.LinearAlgebra.Vectors;
 using MGroup.Environments;
 using System.Collections.Concurrent;
+using MGroup.LinearAlgebra.Reduction;
 
 //TODOMPI: this class will be mainly used for iterative methods. Taking that into account, make optimizations. E.g. work arrays
 //      used as buffers for MPI communication can be reused across vectors, instead of each vector allocating/freeing identical 
@@ -33,7 +34,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 		}
 
 		public DistributedOverlappingVector(DistributedOverlappingIndexer indexer)
-		: this(indexer, indexer.Environment.CalcNodeData(node => new Vector(new double[indexer.GetLocalComponent(node).NumEntries])))
+		: this(indexer, indexer.Environment.CalcNodeData(node => new Vector(indexer.GetLocalComponent(node).NumEntries)))
 		{}
 
 		public DistributedOverlappingVector(DistributedOverlappingIndexer indexer, Func<int, Vector> createLocalVector)
@@ -92,7 +93,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			return result;
 		}
 		
-		IMinimalVector IMinimalReadOnlyVector.CreateZero() => CreateZero();
+		IMinimalVector IMinimalReadOnlyVector.CreateZeroWithSameFormat() => CreateZero();
 
 
 		/// <summary>

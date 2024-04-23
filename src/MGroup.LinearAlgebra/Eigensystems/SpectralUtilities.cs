@@ -18,11 +18,11 @@ namespace MGroup.LinearAlgebra.Eigensystems
 			int[] mapNewToOld = Enumerable.Range(0, values.Length).ToArray();
 			if (descending)
 			{
-				Array.Sort(valuesSorted.RawData, mapNewToOld, new DescendingComparer());
+				Array.Sort(valuesSorted.Values, mapNewToOld, new DescendingComparer());
 			}
 			else
 			{
-				Array.Sort(valuesSorted.RawData, mapNewToOld);
+				Array.Sort(valuesSorted.Values, mapNewToOld);
 			}
 
 			Matrix vectorsSorted = vectors.ReorderColumns(mapNewToOld, oldToNew: false);

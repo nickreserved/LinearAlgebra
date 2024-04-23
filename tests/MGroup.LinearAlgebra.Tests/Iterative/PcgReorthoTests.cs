@@ -59,16 +59,16 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			Vector x0Expected = x0.Copy();
 			Vector b0 = A * x0Expected;
 
-			Vector xA = Vector.CreateZero(A.NumRows);
-			IterativeStatistics statsA = pcg.Solve(A, M, b0, xA, true, () => Vector.CreateZero(order));
+			Vector xA = new Vector(A.NumRows);
+			IterativeStatistics statsA = pcg.Solve(A, M, b0, xA, true);
 			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
 
-			Vector xB = Vector.CreateZero(A.NumRows);
-			IterativeStatistics statsB = pcgReorthoRestart.Solve(A, M, b0, xB, true, () => Vector.CreateZero(order));
+			Vector xB = new Vector(A.NumRows);
+			IterativeStatistics statsB = pcgReorthoRestart.Solve(A, M, b0, xB, true);
 			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
 
-			Vector xC = Vector.CreateZero(A.NumRows);
-			IterativeStatistics statsC = pcgReortho.Solve(A, M, b0, xC, true, () => Vector.CreateZero(order));
+			Vector xC = new Vector(A.NumRows);
+			IterativeStatistics statsC = pcgReortho.Solve(A, M, b0, xC, true);
 			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
 
 			// Perturbed rhs
@@ -79,16 +79,16 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			Vector b1 = A * x1Expected;
 
 			xA = Vector.CreateZero(A.NumRows);
-			statsA = pcg.Solve(A, M, b1, xA, true, () => Vector.CreateZero(order));
+			statsA = pcg.Solve(A, M, b1, xA, true);
 			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method A: iterations = {statsA.NumIterationsRequired}");
 
 			xB = Vector.CreateZero(A.NumRows);
 			pcgReorthoRestart.ReorthoCache.Clear();
-			statsB = pcgReorthoRestart.Solve(A, M, b1, xB, true, () => Vector.CreateZero(order));
+			statsB = pcgReorthoRestart.Solve(A, M, b1, xB, true);
 			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method B iterations = {statsB.NumIterationsRequired}");
 
 			xC = Vector.CreateZero(A.NumRows);
-			statsC = pcgReortho.Solve(A, M, b1, xC, true, () => Vector.CreateZero(order));
+			statsC = pcgReortho.Solve(A, M, b1, xC, true);
 			Debug.WriteLine($"2nd run, noise = {noiseWidth} - method C: iterations = {statsC.NumIterationsRequired}");
 		}
 
@@ -122,17 +122,17 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			var xExpected = Vector.CreateFromArray(PFetiDPCoarseProblem2D.SolutionVectors[0]);
 
 			Vector xA = Vector.CreateZero(A.NumRows);
-			IterativeStatistics statsA = pcg.Solve(A, M, b, xA, true, () => Vector.CreateZero(order));
+			IterativeStatistics statsA = pcg.Solve(A, M, b, xA, true);
 			Assert.True(xExpected.Equals(xA, 1E-10));
 			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
 
 			Vector xB = Vector.CreateZero(A.NumRows);
-			IterativeStatistics statsB = pcgReorthoRestart.Solve(A, M, b, xB, true, () => Vector.CreateZero(order));
+			IterativeStatistics statsB = pcgReorthoRestart.Solve(A, M, b, xB, true);
 			Assert.True(xExpected.Equals(xB, 1E-10));
 			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
 
 			Vector xC = Vector.CreateZero(A.NumRows);
-			IterativeStatistics statsC = pcgReortho.Solve(A, M, b, xC, true, () => Vector.CreateZero(order));
+			IterativeStatistics statsC = pcgReortho.Solve(A, M, b, xC, true);
 			Assert.True(xExpected.Equals(xC, 1E-10));
 			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
 
@@ -141,18 +141,18 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			xExpected = Vector.CreateFromArray(PFetiDPCoarseProblem2D.SolutionVectors[1]);
 
 			xA = Vector.CreateZero(A.NumRows);
-			statsA = pcg.Solve(A, M, b, xA, true, () => Vector.CreateZero(order));
+			statsA = pcg.Solve(A, M, b, xA, true);
 			Assert.True(xExpected.Equals(xA, 1E-10));
 			Debug.WriteLine($"Initial run - method A: iterations = {statsA.NumIterationsRequired}");
 
 			xB = Vector.CreateZero(A.NumRows);
 			pcgReorthoRestart.ReorthoCache.Clear();
-			statsB = pcgReorthoRestart.Solve(A, M, b, xB, true, () => Vector.CreateZero(order));
+			statsB = pcgReorthoRestart.Solve(A, M, b, xB, true);
 			Assert.True(xExpected.Equals(xB, 1E-10));
 			Debug.WriteLine($"Initial run - method B iterations = {statsB.NumIterationsRequired}");
 
 			xC = Vector.CreateZero(A.NumRows);
-			statsC = pcgReortho.Solve(A, M, b, xC, true, () => Vector.CreateZero(order));
+			statsC = pcgReortho.Solve(A, M, b, xC, true);
 			Assert.True(xExpected.Equals(xC, 1E-10));
 			Debug.WriteLine($"Initial run - method C: iterations = {statsC.NumIterationsRequired}");
 		}
@@ -169,14 +169,14 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			builder.Convergence = new RhsNormalizedConvergence();
 			var pcg = builder.Build();
-			var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
+			var M = new JacobiPreconditioner(A.GetDiagonal());
 
 			// Initial run
 			Vector x0 = Vector.CreateWithValue(order, 1);
 			Vector x0Expected = x0.Copy();
 			Vector b0 = A * x0Expected;
 			Vector x0Computed = Vector.CreateZero(A.NumRows);
-			IterativeStatistics stats0 = pcg.Solve(A, M, b0, x0Computed, true, () => Vector.CreateZero(order));
+			IterativeStatistics stats0 = pcg.Solve(A, M, b0, x0Computed, true);
 			 Debug.WriteLine($"Initial run: iterations = {stats0.NumIterationsRequired}");
 			comparer.AssertEqual(x0Expected, x0Computed);
 
@@ -192,7 +192,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 				//pcg.ReorthoCache.Clear();
 
 				Vector xComputed = Vector.CreateZero(A.NumRows);
-				IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+				IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
 				Debug.WriteLine($"Subsequent run: iterations = {stats.NumIterationsRequired}");
 				comparer.AssertEqual(xExpected, xComputed);
 				Assert.InRange(stats.NumIterationsRequired, 1, maxIterations);
@@ -210,9 +210,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.ResidualTolerance = 1E-7;
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();
-			var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
+			var M = new JacobiPreconditioner(A.GetDiagonal());
 			Vector xComputed = Vector.CreateZero(A.NumRows);
-			IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+			IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
 
@@ -227,9 +227,9 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
 			builder.ResidualTolerance = 1E-7;
 			builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
 			var pcg = builder.Build();
-			var M = new JacobiPreconditionerDeprecated(A.GetDiagonalAsArray());
+			var M = new JacobiPreconditioner(A.GetDiagonal());
 			Vector xComputed = Vector.CreateZero(A.NumRows);
-			IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true, () => Vector.CreateZero(b.Length));
+			IterativeStatistics stats = pcg.Solve(A, M, b, xComputed, true);
 			comparer.AssertEqual(xExpected, xComputed);
 		}
 	}

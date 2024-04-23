@@ -329,7 +329,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 				Debug.Assert(nodeID == 5);
 				Ax = new double[] { 2959, 1536, 331 };
 			}
-			return Vector.CreateFromArray(Ax);
+			return new Vector(Ax);
 		}
 
 		private static Matrix GetMatrixA(int nodeID)
@@ -395,7 +395,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 
 		private static Vector GetX(int nodeID)
 		{
-			var x = Vector.CreateZero(3);
+			var x = new Vector(3);
 			for (int i = 0; i < x.Length; ++i)
 			{
 				x[i] = 2 * nodeID + i;
@@ -418,7 +418,7 @@ namespace MGroup.LinearAlgebra.Distributed.Tests
 
 		private static Vector GetWBeforeSumOverlapping(int nodeID)
 		{
-			var w = Vector.CreateZero(3);
+			var w = new Vector(3);
 			for (int i = 0; i < w.Length; ++i)
 			{
 				w[i] = 3 * nodeID + i;

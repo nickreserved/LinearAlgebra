@@ -21,12 +21,12 @@ namespace MGroup.LinearAlgebra.Iterative
         public ExplicitMatrixTransformation(IMatrixView matrix) => this.matrix = matrix;
 
         /// <summary>
-        /// See <see cref="ILinearTransformation.NumColumns"/>
+        /// See <see cref="IBounded2D.NumColumns"/>
         /// </summary>
         public int NumColumns => matrix.NumColumns;
 
         /// <summary>
-        /// See <see cref="ILinearTransformation.NumRows"/>
+        /// See <see cref="IBounded2D.NumRows"/>
         /// </summary>
         public int NumRows => matrix.NumRows;
 

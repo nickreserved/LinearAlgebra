@@ -175,11 +175,11 @@ namespace MGroup.LinearAlgebra.Matrices
 					return new SymmetricCscMatrix(NumRows, NumNonZerosUpper, resultValues, this.rowIndices, this.colOffsets);
 				}
 
-				return DoEntrywise((IMatrixView)otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
+				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
 			}
 			else
 			{
-				return DoEntrywise((IMatrixView)otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
+				return DoEntrywise(otherMatrix, (thisEntry, otherEntry) => thisEntry + otherCoefficient * otherEntry);
 			}
 		}
 
@@ -287,7 +287,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			{
 				for (int i = 0; i < this.NumRows; ++i)
 				{
-					result[i, j] = binaryOperation(this[i, j], ((IMatrixView)other)[i, j]);
+					result[i, j] = binaryOperation(this[i, j], ((IIndexable2D)other)[i, j]);
 				}
 			}
 
@@ -352,7 +352,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		/// <inheritdoc/>
 		public bool Equals(IMinimalReadOnlyMatrix other, double tolerance = 1e-13)
-			=> DenseStrategies.AreEqual(this, (IMatrixView)other, tolerance);
+			=> DenseStrategies.AreEqual(this, (IIndexable2D)other, tolerance);
 
 		/// <summary>
 		/// See <see cref="ISliceable2D.GetColumn(int)"/>.
@@ -458,7 +458,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <inheritdoc/>
 		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
 		{
-			var result = new Vector(new double[NumRows]);
+			var result = new Vector(NumRows);
 			CsrMultiplications.SymmetricCsrTimesVector(NumRows, values, colOffsets, rowIndices, (IExtendedReadOnlyVector) vector, result.Values);
 			return result;
 		}
@@ -474,7 +474,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 			else
 			{
-				var temp = new Vector(new double[NumRows]);
+				var temp = new Vector(NumRows);
 				CsrMultiplications.SymmetricCsrTimesVector(NumRows, values, colOffsets, rowIndices, (IExtendedReadOnlyVector) lhsVector, temp.Values);
 				rhsVector.CopyFrom(temp);
 			}
@@ -490,7 +490,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <returns></returns>
 		public Vector MultiplyRight(Vector vector, bool transposeThis = false)
 		{
-			var result = new Vector(new double[NumRows]);
+			var result = new Vector(NumRows);
 			CsrMultiplications.SymmetricCsrTimesVector(NumRows, values, colOffsets, rowIndices, vector.Values, result.Values);
 			return result;
 		}

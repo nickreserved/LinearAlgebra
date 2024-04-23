@@ -9,7 +9,6 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// <summary>
 		/// Creates a Jacobi preconditioner.
 		/// </summary>
-		/// </param>
 		/// <param name="diagonal">
 		/// A vector that contains the entries of matrix's main diagonal (or the inverse).
 		/// If vector is overlapping on distributed environment, it contains the diagonal entries of each local matrix that corresponds to a 
@@ -26,7 +25,7 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 
 		public void Apply(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector)
 		{
-			lhsVector = rhsVector.DoEntrywise(Diagonal, (x, y) => x * y);
+			lhsVector.CopyFrom(rhsVector.DoEntrywise(Diagonal, (x, y) => x * y));
 		}
 
 
@@ -36,11 +35,12 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
 		/// </summary>
 		public class Factory : IPreconditionerFactory
 		{
+			public bool PreInvert = false;
 			/// <summary>
 			/// See <see cref="IPreconditionerFactory.CreatePreconditionerFor(ILinearTransformation)"/>.
 			/// </summary>
 			public IPreconditioner CreatePreconditionerFor(ILinearTransformation matrix)
-				=> new JacobiPreconditioner(((IMatrixView) matrix).GetDiagonal(), false);
+				=> new JacobiPreconditioner(((IMatrixView) matrix).GetDiagonal(), PreInvert);
 		}
 
 	}

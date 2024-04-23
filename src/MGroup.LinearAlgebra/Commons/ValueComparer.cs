@@ -4,7 +4,7 @@ namespace MGroup.LinearAlgebra.Commons
 {
     public class ValueComparer
     {
-        private readonly double tolerance;
+        public readonly double tolerance;
 
         public ValueComparer(double tolerance)
         {

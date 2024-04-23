@@ -155,7 +155,7 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
 		[Fact]
 		private static void TestSerialization()
 		{
-			var originalVector = Vector.CreateFromArray(TestVectors.Vector1);
+			var originalVector = new Vector(TestVectors.Vector1);
 			var formatter = new BinaryFormatter();
 			using (var stream = new MemoryStream())
 			{

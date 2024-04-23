@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MGroup.LinearAlgebra.Iterative.Preconditioning;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Vectors;
@@ -35,16 +35,17 @@ namespace MGroup.LinearAlgebra.Tests.TestData
             for (int i = 0; i < n / 2; ++i) A[n / 2 + i, n / 2 + i] = -1 - i;
 
             // x = [1, 1, ... 1]
-            var x = Vector.CreateWithValue(n, 1.0);
+            var x = new Vector(n);
+			x.SetAll(1);
 
             // b[i] = A[i, i] 
-            var b = Vector.CreateZero(n);
+            var b = new Vector(n);
             for (int i = 0; i < n; ++i) b[i] = A[i, i];
 
             // The usual Jacobi preconditioner worsens convergence. Modifications are needed.
             var positiveDiagonal = new double[n];
             for (int i = 0; i < n; ++i) positiveDiagonal[i] = Math.Abs(A[i, i]);
-            var M = new JacobiPreconditionerDeprecated(positiveDiagonal);
+            var M = new JacobiPreconditioner(new Vector(positiveDiagonal));
             return (A, b, x, M);
         }
     }

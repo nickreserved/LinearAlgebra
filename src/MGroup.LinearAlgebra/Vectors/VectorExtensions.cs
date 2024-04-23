@@ -126,7 +126,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// The resulting vector overwrites the entries of this vector.
 		/// </summary>
 		[Obsolete("Use thisVector.DoToAllEntriesIntoThis(x => Math.Sqrt(x))")]
-		public static IMinimalVector SqrtIntoThis(this IMinimalVector vector) => vector.DoToAllEntriesIntoThis(x => Math.Sqrt(x));
+		public static void SqrtIntoThis(this IMinimalVector vector) => vector.DoToAllEntriesIntoThis(x => Math.Sqrt(x));
 
 		/// <summary>
 		/// Performs the operation: result[i] = this[i] ^ 2 for all valid i. 
@@ -140,7 +140,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// The resulting vector overwrites the entries of this vector.
 		/// </summary>
 		[Obsolete("Use thisVector.DoToAllEntriesIntoThis(x => x * x)")]
-		public static IMinimalVector SquareIntoThis(this IMinimalVector vector) => vector.DoToAllEntriesIntoThis(x => x * x);
+		public static void SquareIntoThis(this IMinimalVector vector) => vector.DoToAllEntriesIntoThis(x => x * x);
 
 
 		

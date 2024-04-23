@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
         private double relativeTolerance;
         private int maximumIterations;
         private IMaxIterationsProvider innerIterationsProvider;
-        protected IMinimalVector residual;
+        protected Vector residual;
 
         public GmresAlgorithm(double absoluteTolerance, double relativeTolerance, int maximumIterations,
             IMaxIterationsProvider innerIterationsProvider)
@@ -31,7 +31,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
             this.innerIterationsProvider = innerIterationsProvider;
         }
 
-        public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, IMinimalReadOnlyVector rhs, IMinimalVector solution,
+        public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, AbstractFullyPopulatedVector rhs, AbstractFullyPopulatedVector solution,
             bool initialGuessIsZero, Func<IMinimalVector> zeroVectorInitializer)
         {
             return Solve(new ExplicitMatrixTransformation(matrix), preconditioner,rhs, solution, initialGuessIsZero,
@@ -39,23 +39,23 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
         }
 
 
-        public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalReadOnlyVector rhs, IMinimalVector solution,
+        public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, AbstractFullyPopulatedVector rhs, AbstractFullyPopulatedVector solution,
             bool initialGuessIsZero, Func<IMinimalVector> zeroVectorInitializer)
         {
             Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
             Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);
 
             var innerIterations = innerIterationsProvider.GetMaxIterations(matrix.NumRows);
-			IMinimalVector[] v =new Vector[innerIterations+1];
-            var y = Vector.CreateZero(innerIterations + 1);
-            var c= Vector.CreateZero(innerIterations + 1);
-            var s = Vector.CreateZero(innerIterations + 1);
+			Vector[] v = new Vector[innerIterations+1];
+            var y = new Vector(innerIterations + 1);
+            var c = new Vector(innerIterations + 1);
+            var s = new Vector(innerIterations + 1);
             var delta = 0.001;
             double residualNorm = double.MaxValue;
             var usedIterations = 0;
 
             if (initialGuessIsZero) residual = rhs.Copy();
-            else residual = ExactResidual.Calculate(matrix, rhs, solution);
+            else residual = (Vector) ExactResidual.Calculate(matrix, rhs, solution);
 
             for ( var iteration = 0; iteration < maximumIterations; iteration++)
             {
@@ -70,7 +70,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 
                 v[0] = residual.Scale(1 / residualNorm);
 
-                var g = Vector.CreateZero(innerIterations+1);
+                var g = new Vector(innerIterations+1);
                 g[0] = residualNorm;
                 var hessenbergMatrix = Matrix.CreateZero(innerIterations + 1, innerIterations);
 
@@ -78,7 +78,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
                 for (int innerIteration = 0; innerIteration < innerIterations; innerIteration++)
                 {
                     indexIteration = innerIteration;
-                    v[innerIteration + 1] = Vector.CreateZero(v[innerIteration].Length);
+                    v[innerIteration + 1] = v[innerIteration].CreateZeroWithTheSameFormat();
 
                     matrix.MultiplyIntoResult(v[innerIteration], v[innerIteration + 1]);
                     preconditioner.Apply(v[innerIteration + 1], v[innerIteration + 1]);
@@ -111,7 +111,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 
                     if (innerIteration > 0)
                     {
-                        y = hessenbergMatrix.GetColumn(innerIteration).GetSubvector(0,innerIteration+2);
+                        y = hessenbergMatrix.GetColumn(innerIteration).Copy(0, innerIteration + 2);
 
                         for (int i = 0; i <= innerIteration-1; i++)
                         {
@@ -146,20 +146,20 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
                 y[indexIteration + 1] =g[indexIteration + 1] / hessenbergMatrix[indexIteration + 1, indexIteration + 1];
                 for (int i = indexIteration; i >= 0; i--)
                 {
-                    y[i] = (g[i] - (hessenbergMatrix.GetRow(i).GetSubvector(i+1, indexIteration + 2)
-                                        .DotProduct(y.GetSubvector(i + 1, indexIteration + 2)) ))/ hessenbergMatrix[i, i];
+                    y[i] = (g[i] - (hessenbergMatrix.GetRow(i).View(i + 1, indexIteration + 2)
+                                        .DotProduct(y.View(i + 1, indexIteration + 2)) )) / hessenbergMatrix[i, i];
                 }
 
 
                 for (int i = 0; i < matrix.NumRows; i++)
                 {
-                    var subV = Vector.CreateZero(indexIteration + 2);
+                    var subV = new Vector(indexIteration + 2);
                     for (int j = 0; j < indexIteration + 2; j++)
                     {
                         subV[j] = v[j][i];
                     }
                     
-                    solution.Set(i,solution[i]+ subV.DotProduct(y.GetSubvector(0,indexIteration+2)));
+                    solution[i] += subV.DotProduct(y.View(0, indexIteration + 2));
                 }
 
                 if (residualNorm <= relativeTolerance && residualNorm <= absoluteTolerance)
@@ -179,8 +179,8 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
             var g1 = c * g[k] - s * g[k + 1];
             var g2 = s * g[k] + c * g[k + 1];
 
-            g.Set(k, g1);
-            g.Set(k+1, g2);
+			g[k] = g1;
+            g[k + 1] = g2;
 
             return g;
         }

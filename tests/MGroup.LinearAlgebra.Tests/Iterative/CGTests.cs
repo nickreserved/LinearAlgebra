@@ -24,14 +24,14 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
             TestSettings.RunMultiproviderTest(providers, delegate ()
             {
                 var A = Matrix.CreateFromArray(SymmPosDef10by10.Matrix);
-                var b = Vector.CreateFromArray(SymmPosDef10by10.Rhs);
-                var xExpected = Vector.CreateFromArray(SymmPosDef10by10.Lhs);
+                var b = new Vector(SymmPosDef10by10.Rhs);
+                var xExpected = new Vector(SymmPosDef10by10.Lhs);
 
                 var builder = new CGAlgorithm.Builder();
                 builder.ResidualTolerance = 1E-7;
                 builder.MaxIterationsProvider = new PercentageMaxIterationsProvider(1.0);
                 var cg = builder.Build();
-                var xComputed = Vector.CreateZero(A.NumRows);
+                var xComputed = new Vector(A.NumRows);
                 IterativeStatistics stats = cg.Solve(A, b, xComputed, true);
                 comparer.AssertEqual(xExpected, xComputed);
             });

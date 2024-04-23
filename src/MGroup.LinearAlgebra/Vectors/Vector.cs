@@ -24,6 +24,11 @@ namespace MGroup.LinearAlgebra.Vectors
 	public class Vector : AbstractContiguousFullyPopulatedVector
 	{
 		/// <summary>
+		/// Construct a zero vector with <paramref name="length"/>.
+		/// </summary>
+		public Vector(int length) => Values = new double[length];
+
+		/// <summary>
 		/// Construct a vector from an array of elements.
 		/// </summary>
 		/// <param name="elements">Array of elements provided as is in vector.
@@ -150,10 +155,10 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// </summary>
 		/// <param name="length">The number of entries of the new <see cref="Vector"/> instance.</param>
 		/// <param name="value">The value that all entries of the new vector will be initialized to.</param>
-		[Obsolete("Use v = new Vector(new double[length]); v.SetAll(value);")]
+		[Obsolete("Use v = new Vector(length); v.SetAll(value);")]
 		public static Vector CreateWithValue(int length, double value)
 		{
-			var result = new Vector(new double[length]);
+			var result = new Vector(length);
 			result.SetAll(value);
 			return result;
 		}
@@ -162,8 +167,8 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Initializes a new instance of <see cref="Vector"/> with all entries being equal to 0.
 		/// </summary>
 		/// <param name="length">The number of entries of the new <see cref="Vector"/> instance.</param>
-		[Obsolete("Use new Vector(new double[length])")]
-		public static Vector CreateZero(int length) => new Vector(new double[length]);
+		[Obsolete("Use new Vector(length)")]
+		public static Vector CreateZero(int length) => new Vector(length);
 
 
 
@@ -254,7 +259,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		[Obsolete("Use View with some lines more")]
 		public Vector Append(Vector last)
 		{
-			var result = new Vector(new double[Length + last.Length]);
+			var result = new Vector(Length + last.Length);
 			result.View(0, Length).CopyFrom(this);
 			result.View(Length, result.Length).CopyFrom(last);
 			return result;
@@ -277,32 +282,13 @@ namespace MGroup.LinearAlgebra.Vectors
 				indices[i] = permutation[i];
 			if (oldToNew)
 			{
-				var result = new Vector(new double[Length]);
+				var result = new Vector(Length);
 				result.View(indices).CopyFrom(this);
 				return result;
 			}
 			else return Copy(indices);
 		}
 
-
-
-		// ----------- REMAININGS FROM IVECTORVIEW
-
-
-		[Obsolete("Use this.CreateZeroWithSameFormat()")]
-		public Vector CreateZeroVectorWithSameFormat() => CreateZeroWithTheSameFormat();
-
-		//TODO: I must include this in IMinimalReadOnlyVector
-		/// <summary>
-		/// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
-		/// </summary>
-		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
-		{
-			double accumulator = identityValue;
-			for (int i = 0; i < Values.Length; ++i) accumulator = processEntry(Values[i], accumulator);
-			// no zeros implied
-			return finalize(accumulator);
-		}
 
 
 		// -------------- REMAININGS FROM VECTOR
@@ -392,13 +378,13 @@ namespace MGroup.LinearAlgebra.Vectors
 			}
 			Vector[] singlesMultiplicityVectors = new Vector[2];
 
-			singlesMultiplicityVectors[0] = new Vector(new double[Values.Length - numberOfZeros]);
+			singlesMultiplicityVectors[0] = new Vector(Values.Length - numberOfZeros);
 			for (int i = 0; i < Values.Length - numberOfZeros; i++)
 			{
 				singlesMultiplicityVectors[0][i] = singles[i];
 			}
 
-			singlesMultiplicityVectors[1] = new Vector(new double[Values.Length - numberOfZeros]);
+			singlesMultiplicityVectors[1] = new Vector(Values.Length - numberOfZeros);
 			for (int i = 0; i < Values.Length - numberOfZeros; i++)
 			{
 				singlesMultiplicityVectors[1][i] = multiplicity[i];

@@ -84,7 +84,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			kernel[0].CopyFrom(vector);
 			for (int i = 1; i < kernel.Length; ++i)
 			{
-				var v1 = vector.CreateZero();
+				var v1 = vector.CreateZeroWithSameFormat();
 				Preconditioner.Apply(kernel[i - 1], v1);
 				Matrix.MultiplyIntoResult(v1, kernel[i]);
 			}
@@ -103,7 +103,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
   		/// </remarks>
 		private void EvaluateSandwich(IMinimalVector[] kernel1, IMinimalVector[] kernel2, double[] sandwich)
 		{
-			var v = kernel1[0].CreateZero();
+			var v = kernel1[0].CreateZeroWithSameFormat();
 			Preconditioner.Apply(kernel1[0], v);
 			for (int i = 0; i < kernel2.Length; ++i)
 				sandwich[i] = v.DotProduct(kernel2[i]);
@@ -152,7 +152,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <param name="solutionCoefficients">The block vector linear combination coefficients to be used for the calculation of the solution vector.</param>
   		private IMinimalVector EvaluateSolutionVector(BlockVectorOperator solutionCoefficients)
 		{
-			var x = residualKernels[0].CreateZero();
+			var x = residualKernels[0].CreateZeroWithSameFormat();
 			Preconditioner.Apply(solutionCoefficients.EvaluateVector(residualKernels, directionKernels), x);
 			return x;
 		}
@@ -166,9 +166,9 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			//precondResidual = zeroVectorInitializer();
 
 			for (int i = 0; i < residualKernels.Length; i++)
-				residualKernels[i] = Rhs.CreateZero();
+				residualKernels[i] = Rhs.CreateZeroWithSameFormat();
 			for (int i = 0; i < directionKernels.Length; i++)
-				directionKernels[i] = Rhs.CreateZero();
+				directionKernels[i] = Rhs.CreateZeroWithSameFormat();
 
 			InitializeBlockInfo();
 			resDotPrecondRes = residualSandwiches[0]; // rr = r * M * r
@@ -270,7 +270,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		private void CalculateAndPrintExactResidual()
 		{
-			var res = precondResidual.CreateZero();
+			var res = precondResidual.CreateZeroWithSameFormat();
 			Matrix.MultiplyIntoResult(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();

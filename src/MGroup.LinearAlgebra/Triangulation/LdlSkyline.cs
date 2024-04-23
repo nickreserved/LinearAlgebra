@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MGroup.LinearAlgebra.Commons;
 using MGroup.LinearAlgebra.Exceptions;
@@ -88,30 +88,30 @@ namespace MGroup.LinearAlgebra.Triangulation
         {
             Preconditions.CheckSystemSolutionDimensions(this, rhs);
             Preconditions.CheckMultiplicationDimensions(Order, solution.Length);
-            Solve(Order, values, diagOffsets, rhs.RawData, solution.RawData);
+            Solve(Order, values, diagOffsets, rhs.Values, solution.Values);
         }
 
-        /// <summary>
-        /// Solves the linear systems A * X = B, where A is the original matrix (before the factorization), 
-        /// B = <paramref name="rhsVectors"/> and X is the matrix containing the solution vectors, which will overwrite the 
-        /// provided <paramref name="solutionVectors"/>.
-        /// </summary>
-        /// <param name="rhsVectors">
-        /// A matrix that contains the right hand side vectors as its columns. Constraints: 
-        /// a) Its <see cref="IIndexable2D.NumRows"/> must be equal to the <see cref="IIndexable2D.NumRows"/> of the original 
-        /// matrix A. b) Its <see cref="IIndexable2D.Order"/> must be equal to the <see cref="IIndexable2D.Order"/> of
-        /// <paramref name="solutionVectors"/>.
-        /// </param>
-        /// <param name="solutionVectors">
-        /// Output matrix that will be overwritten with the solutions of the linear system as its columns. Constraints:
-        /// a) Its <see cref="IIndexable2D.NumRows"/> must be equal to the <see cref="IIndexable2D.NumRows"/> of the original 
-        /// matrix A. b) Its <see cref="IIndexable2D.Order"/> must be equal to the <see cref="IIndexable2D.Order"/> of
-        /// <paramref name="rhsVectors"/>.
-        /// </param>
-        /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if <paramref name="rhsVectors"/> or <paramref name="solutionVectors"/> violate the described constraints.
-        /// </exception>
-        public void SolveLinearSystems(Matrix rhsVectors, Matrix solutionVectors)
+		/// <summary>
+		/// Solves the linear systems A * X = B, where A is the original matrix (before the factorization), 
+		/// B = <paramref name="rhsVectors"/> and X is the matrix containing the solution vectors, which will overwrite the 
+		/// provided <paramref name="solutionVectors"/>.
+		/// </summary>
+		/// <param name="rhsVectors">
+		/// A matrix that contains the right hand side vectors as its columns. Constraints: 
+		/// a) Its <see cref="IBounded2D.NumRows"/> must be equal to the <see cref="IBounded2D.NumRows"/> of the original 
+		/// matrix A. b) Its <see cref="IIndexable2D.Order"/> must be equal to the <see cref="IIndexable2D.Order"/> of
+		/// <paramref name="solutionVectors"/>.
+		/// </param>
+		/// <param name="solutionVectors">
+		/// Output matrix that will be overwritten with the solutions of the linear system as its columns. Constraints:
+		/// a) Its <see cref="IBounded2D.NumRows"/> must be equal to the <see cref="IBounded2D.NumRows"/> of the original 
+		/// matrix A. b) Its <see cref="IIndexable2D.Order"/> must be equal to the <see cref="IIndexable2D.Order"/> of
+		/// <paramref name="rhsVectors"/>.
+		/// </param>
+		/// <exception cref="NonMatchingDimensionsException">
+		/// Thrown if <paramref name="rhsVectors"/> or <paramref name="solutionVectors"/> violate the described constraints.
+		/// </exception>
+		public void SolveLinearSystems(Matrix rhsVectors, Matrix solutionVectors)
         {
             Preconditions.CheckSystemSolutionDimensions(this.NumRows, rhsVectors.NumRows);
             Preconditions.CheckMultiplicationDimensions(this.Order, solutionVectors.NumRows);

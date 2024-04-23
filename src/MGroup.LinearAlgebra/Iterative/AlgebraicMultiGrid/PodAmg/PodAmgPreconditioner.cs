@@ -123,7 +123,7 @@ namespace MGroup.LinearAlgebra.Iterative.AlgebraicMultiGrid.PodAmg
 			}
 			
 
-			private CsrMatrix CheckMatrixFormat(IMatrixView matrix)
+			private CsrMatrix CheckMatrixFormat(ILinearTransformation matrix)
 			{
 				if (matrix is CsrMatrix csrMatrix)
 				{

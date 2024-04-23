@@ -7,7 +7,7 @@ namespace MGroup.LinearAlgebra.Iterative
 	{
 		public static IMinimalVector Calculate(ILinearTransformation matrix, IMinimalReadOnlyVector rhs, IMinimalReadOnlyVector solution)
 		{
-			IMinimalVector residual = rhs.CreateZero();
+			IMinimalVector residual = rhs.CreateZeroWithSameFormat();
 			Calculate(matrix, rhs, solution, residual);
 			return residual;
 		}

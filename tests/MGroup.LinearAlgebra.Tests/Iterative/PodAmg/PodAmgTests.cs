@@ -80,7 +80,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative.PodAmg
 
 			// Solve
 			var solutionComputed = Vector.CreateZero(n);
-			IterativeStatistics stats = pcg.Solve(matrix, preconditioner, rhs, solutionComputed, true, () => Vector.CreateZero(n));
+			IterativeStatistics stats = pcg.Solve(matrix, preconditioner, rhs, solutionComputed, true);
 
 			var comparer = new MatrixComparer(1E-6);
 			comparer.AssertEqual(solutionExpected, solutionComputed);

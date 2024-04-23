@@ -13,11 +13,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <see cref="LinearCombinationIntoThis(double, IMinimalReadOnlyMatrix, double)"/>. Named after BLAS axpy (y = a*x plus y). 
 		/// The resulting matrix overwrites the entries of this.
 		/// </summary>
-		/// <param name="otherMatrix">A matrix with the same <see cref="ILinearTransformation.NumRows"/> and 
-		///     <see cref="ILinearTransformation.NumColumns"/> as this.</param>
+		/// <param name="otherMatrix">A matrix with the same <see cref="IBounded2D.NumRows"/> and 
+		///     <see cref="IBounded2D.NumColumns"/> as this.</param>
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-		///     <see cref="ILinearTransformation.NumRows"/> or <see cref="ILinearTransformation.NumColumns"/> than this.</exception>
+		///     <see cref="IBounded2D.NumRows"/> or <see cref="IBounded2D.NumColumns"/> than this.</exception>
 		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
 		///     is not permitted by the matrix storage format.</exception>
 		void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
@@ -41,11 +41,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The resulting matrix overwrites the entries of this.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar that multiplies each entry of this.</param>
-		/// <param name="otherMatrix">A matrix with the same <see cref="ILinearTransformation.NumRows"/> and 
-		///     <see cref="ILinearTransformation.NumColumns"/> as this.</param>
+		/// <param name="otherMatrix">A matrix with the same <see cref="IBounded2D.NumRows"/> and 
+		///     <see cref="IBounded2D.NumColumns"/> as this.</param>
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-		///     <see cref="ILinearTransformation.NumRows"/> or <see cref="ILinearTransformation.NumColumns"/> than this.</exception>
+		///     <see cref="IBounded2D.NumRows"/> or <see cref="IBounded2D.NumColumns"/> than this.</exception>
 		/// <exception cref="Exceptions.PatternModifiedException">Thrown if an entry this[i, j] needs to be overwritten, but that 
 		///     is not permitted by the matrix storage format.</exception>
 		void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);

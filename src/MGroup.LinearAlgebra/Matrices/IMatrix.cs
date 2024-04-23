@@ -15,8 +15,8 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// For symmetric matrices, this will set both (<paramref name="rowIdx"/>, <paramref name="colIdx"/>) and 
 		/// (<paramref name="colIdx"/>, <paramref name="rowIdx"/>).
 		/// </summary>
-		/// <param name="rowIdx">The row index: 0 &lt;= rowIdx &lt; <see cref="ILinearTransformation.NumRows"/></param>
-		/// <param name="colIdx">The column index: 0 &lt;= colIdx &lt; <see cref="ILinearTransformation.NumColumns"/></param>
+		/// <param name="rowIdx">The row index: 0 &lt;= rowIdx &lt; <see cref="IBounded2D.NumRows"/></param>
+		/// <param name="colIdx">The column index: 0 &lt;= colIdx &lt; <see cref="IBounded2D.NumColumns"/></param>
 		/// <param name="value">The new value of this[<paramref name="rowIdx"/>, <paramref name="colIdx"/>].</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> or <paramref name="colIdx"/> violate 
 		///     the described constraints.</exception>

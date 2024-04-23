@@ -34,12 +34,12 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		{
 			// In contrast to the source algorithm, we initialize s here. At each iteration it will be overwritten, 
 			// thus avoiding allocating & deallocating a new vector.
-			precondResidual = Rhs.CreateZero();
+			precondResidual = Rhs.CreateZeroWithSameFormat();
 
 			//CalculateAndPrintExactResidual();	// must be after init of precondResidual
 
 			// d = inv(M) * r
-			direction = Rhs.CreateZero();
+			direction = Rhs.CreateZeroWithSameFormat();
 			Preconditioner.Apply(residual, direction);
 
 			// δnew = δ0 = r * d
@@ -53,7 +53,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 			double residualNormRatio = double.NaN;
 
 			// Allocate memory for other vectors, which will be reused during each iteration
-			matrixTimesDirection = Rhs.CreateZero();
+			matrixTimesDirection = Rhs.CreateZeroWithSameFormat();
 
 			for (iteration = 0; iteration < maxIterations; ++iteration)
 			{
@@ -116,7 +116,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 
 		private void CalculateAndPrintExactResidual()
 		{
-			var res = Rhs.CreateZero();
+			var res = Rhs.CreateZeroWithSameFormat();
 			Matrix.MultiplyIntoResult(solution, res);
 			res.SubtractIntoThis(Rhs);
 			double norm = res.Norm2();

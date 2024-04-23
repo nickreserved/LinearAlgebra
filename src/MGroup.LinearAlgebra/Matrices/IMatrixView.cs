@@ -22,11 +22,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <see cref="LinearCombination(double, IMinimalReadOnlyMatrix, double)"/>. Named after BLAS axpy (y = a * x plus y).
 		/// The resulting otherMatrix is written in a new object and then returned.
 		/// </summary>
-		/// <param name="otherMatrix">A otherMatrix with the same <see cref="ILinearTransformation.NumRows"/> and 
-		///     <see cref="ILinearTransformation.NumColumns"/> as this.</param>
+		/// <param name="otherMatrix">A otherMatrix with the same <see cref="IBounded2D.NumRows"/> and 
+		///     <see cref="IBounded2D.NumColumns"/> as this.</param>
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-		///     <see cref="ILinearTransformation.NumRows"/> or <see cref="ILinearTransformation.NumColumns"/> than this.</exception>
+		///     <see cref="IBounded2D.NumRows"/> or <see cref="IBounded2D.NumColumns"/> than this.</exception>
 		new IMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 		IMinimalMatrix IMinimalReadOnlyMatrix.Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient) => Axpy(otherMatrix, otherCoefficient);
 
@@ -52,37 +52,37 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The resulting otherMatrix is written in a new object and then returned.
 		/// </summary>
 		/// <param name="thisCoefficient">A scalar that multiplies each entry of this.</param>
-		/// <param name="otherMatrix">A otherMatrix with the same <see cref="ILinearTransformation.NumRows"/> and 
-		///     <see cref="ILinearTransformation.NumColumns"/> as this.</param>
+		/// <param name="otherMatrix">A otherMatrix with the same <see cref="IBounded2D.NumRows"/> and 
+		///     <see cref="IBounded2D.NumColumns"/> as this.</param>
 		/// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-		///     <see cref="ILinearTransformation.NumRows"/> or <see cref="ILinearTransformation.NumColumns"/> than this.</exception>
+		///     <see cref="IBounded2D.NumRows"/> or <see cref="IBounded2D.NumColumns"/> than this.</exception>
 		new IMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient);
 		IMinimalMatrix IMinimalReadOnlyMatrix.LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient) => LinearCombination(thisCoefficient, otherMatrix, otherCoefficient);
 
 		/// <summary>
 		/// Performs the otherMatrix-otherMatrix multiplication: oper(<paramref name="otherMatrix"/>) * oper(this).
 		/// </summary>
-		/// <param name="otherMatrix">A otherMatrix such that the <see cref="ILinearTransformation.NumColumns"/> of oper(<paramref name="otherMatrix"/>) 
-		///     are equal to the <see cref="ILinearTransformation.NumRows"/> of oper(this).</param>
+		/// <param name="otherMatrix">A otherMatrix such that the <see cref="IBounded2D.NumColumns"/> of oper(<paramref name="otherMatrix"/>) 
+		///     are equal to the <see cref="IBounded2D.NumRows"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <param name="transposeOther">If true, oper(<paramref name="otherMatrix"/>) = transpose(<paramref name="otherMatrix"/>). 
 		///     Otherwise oper(<paramref name="otherMatrix"/>) = <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
-		///     different <see cref="ILinearTransformation.NumColumns"/> than the <see cref="ILinearTransformation.NumRows"/> of 
+		///     different <see cref="IBounded2D.NumColumns"/> than the <see cref="IBounded2D.NumRows"/> of 
 		///     oper(this).</exception>
 		Matrix MultiplyLeft(IMatrixView otherMatrix, bool transposeThis = false, bool transposeOther = false);
 
 		/// <summary>
 		/// Performs the otherMatrix-otherMatrix multiplication: oper(this) * oper(<paramref name="otherMatrix"/>).
 		/// </summary>
-		/// <param name="otherMatrix">A otherMatrix such that the <see cref="ILinearTransformation.NumRows"/> of oper(<paramref name="otherMatrix"/>) 
-		///     are equal to the <see cref="ILinearTransformation.NumColumns"/> of oper(this).</param>
+		/// <param name="otherMatrix">A otherMatrix such that the <see cref="IBounded2D.NumRows"/> of oper(<paramref name="otherMatrix"/>) 
+		///     are equal to the <see cref="IBounded2D.NumColumns"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <param name="transposeOther">If true, oper(<paramref name="otherMatrix"/>) = transpose(<paramref name="otherMatrix"/>). 
 		///     Otherwise oper(<paramref name="otherMatrix"/>) = <paramref name="otherMatrix"/>.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if oper(<paramref name="otherMatrix"/>) has 
-		///     different <see cref="ILinearTransformation.NumRows"/> than the <see cref="ILinearTransformation.NumColumns"/> of 
+		///     different <see cref="IBounded2D.NumRows"/> than the <see cref="IBounded2D.NumColumns"/> of 
 		///     oper(this).</exception>
 		Matrix MultiplyRight(IMatrixView otherMatrix, bool transposeThis = false, bool transposeOther = false);
 
@@ -93,13 +93,13 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The resulting vector will be written in a new vector and returned.
 		/// </summary>
 		/// <param name="vector">
-		/// A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the <see cref="ILinearTransformation.NumColumns"/> of 
+		/// A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the <see cref="IBounded2D.NumColumns"/> of 
 		/// oper(this).
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
 		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="vector"/> is different than the 
-		/// <see cref="ILinearTransformation.NumColumns"/> of oper(this).
+		/// <see cref="IBounded2D.NumColumns"/> of oper(this).
 		/// </exception>
 		Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false);
 
@@ -112,12 +112,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this otherMatrix. It sits on the left hand side of the equation y = oper(A) * x.
 		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumColumns"/>.
+		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
 		/// equation y = oper(A) * x. Constraints: <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumRows"/>.
+		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">

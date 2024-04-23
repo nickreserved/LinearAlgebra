@@ -5,6 +5,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Exceptions;
+	using MGroup.LinearAlgebra.Reduction;
 
 	using static MGroup.LinearAlgebra.LibrarySettings;
 
@@ -442,7 +443,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public virtual double DotProduct(AbstractContiguousFullyPopulatedVector otherVector)
 		{
 			Preconditions.CheckVectorDimensions(this, otherVector);
-			return SparseBlas.Ddoti(otherVector.Length, Values, Indices, FromIndex, otherVector.Values, otherVector.FromIndex);
+			return SparseBlas.Ddoti(ToIndex - FromIndex, Values, Indices, FromIndex, otherVector.Values, otherVector.FromIndex);
 		}
 		public virtual double DotProduct(AbstractFullyPopulatedVector otherVector)
 		{
@@ -579,8 +580,16 @@ namespace MGroup.LinearAlgebra.Vectors
 		internal static AbstractFullyPopulatedVector AxpyIntoDenseVector(AbstractContiguousFullyPopulatedVector thisVector, AbstractSparseVector otherVector, double otherCoefficient)
 		{
 			Preconditions.CheckVectorDimensions(thisVector, otherVector);
-			SparseBlas.Daxpyi(thisVector.Length, otherCoefficient, otherVector.Values, otherVector.Indices, otherVector.FromIndex, thisVector.Values, thisVector.FromIndex);
+			SparseBlas.Daxpyi(otherVector.ToIndex - otherVector.FromIndex, otherCoefficient, otherVector.Values, otherVector.Indices, otherVector.FromIndex, thisVector.Values, thisVector.FromIndex);
 			return thisVector;
+		}
+
+		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		{
+			for (int i = FromIndex; i < ToIndex; ++i)
+				identityValue = processEntry(Values[i], identityValue);
+			identityValue = processZeros(Length - (ToIndex - FromIndex), identityValue);
+			return finalize(identityValue);
 		}
 	}
 }

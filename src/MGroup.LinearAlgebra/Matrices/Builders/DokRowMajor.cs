@@ -117,7 +117,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// entries defined by the provided pattern.
         /// </summary>
         /// <param name="numRows">The number of rows of the matrix to build.</param>
-        /// <param name="numCols">The number of columns of the matrix to build.</param>
+        /// <param name="numColumns">The number of columns of the matrix to build.</param>
         /// <param name="nonZeroEntries">The non-zero entries of the matrix to build.</param>
         public static DokRowMajor CreateFromSparsePattern(int numRows, int numColumns,
             IEnumerable<(int row, int col, double value)> nonZeroEntries)

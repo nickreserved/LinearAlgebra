@@ -234,7 +234,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				{
 					for (int i = 0; i <= j; ++i)
 					{
-						this.data[Find1DIndex(i, j)] += otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
+						this.data[Find1DIndex(i, j)] += otherCoefficient * ((IIndexable2D)otherMatrix)[i, j];
 					}
 				}
 			}
@@ -323,7 +323,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public IMatrix DoEntrywise(IMinimalReadOnlyMatrix other, Func<double, double, double> binaryOperation)
 		{
 			if (other is SymmetricMatrix casted) return DoEntrywise(casted, binaryOperation);
-			else return DenseStrategies.DoEntrywise(this, (IMatrixView) other, binaryOperation); //TODO: optimize this
+			else return DenseStrategies.DoEntrywise(this, (IIndexable2D) other, binaryOperation); //TODO: optimize this
 		}
 
 		/// <summary>
@@ -349,7 +349,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i <= j; ++i)
 					{
 						int index1D = Find1DIndex(i, j);
-						this.data[index1D] = binaryOperation(this.data[index1D], ((IMatrixView) other)[i, j]);
+						this.data[index1D] = binaryOperation(this.data[index1D], ((IIndexable2D) other)[i, j]);
 					}
 				}
 			}
@@ -399,7 +399,7 @@ namespace MGroup.LinearAlgebra.Matrices
 
 		public bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-13)
 		{
-			return DenseStrategies.AreEqual(this, (IMatrixView)otherMatrix, tolerance);
+			return DenseStrategies.AreEqual(this, (IIndexable2D)otherMatrix, tolerance);
 		}
 
 		/// <summary>
@@ -519,7 +519,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i <= j; ++i)
 					{
 						int index1D = Find1DIndex(i, j);
-						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
+						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * ((IIndexable2D)otherMatrix)[i, j];
 					}
 				}
 			}
@@ -551,7 +551,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
 		}
 
-		public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
+		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense) return Multiply(dense, transposeThis);
 			else throw new NotImplementedException();
@@ -565,7 +565,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Vector Multiply(Vector vector)
 		{
 			//TODO: this performs redundant dimension checks
-			var result = new Vector(new double[NumRows]);
+			var result = new Vector(NumRows);
 			MultiplyIntoResult(vector, result);
 			return result;
 		}
@@ -588,12 +588,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = A * x.
 		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == this.<see cref="ILinearTransformation.NumColumns"/>.
+		/// == this.<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
 		/// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == this.<see cref="ILinearTransformation.NumRows"/>.
+		/// == this.<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
@@ -668,11 +668,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		internal int Find1DIndex(int i, int j) => i + (j * (j + 1)) / 2;
 
-		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false) => throw new NotImplementedException();
 		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, 1);
 		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, -1);
 		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, 1);
 		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, -1);
-		public IMinimalMatrix CreateZeroWithSameFormat() => new SymmetricMatrix(new double[data.Length], NumRows, Definiteness);
+		
+		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
+		public SymmetricMatrix CreateZeroWithSameFormat() => new SymmetricMatrix(new double[data.Length], NumRows, Definiteness);
 	}
 }

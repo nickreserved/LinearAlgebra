@@ -297,10 +297,10 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// </summary>
         public void ClearValues() => values = new double[numNonZeros];
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1E-13)
+		/// <summary>
+		/// See <see cref="IMinimalReadOnlyMatrix.Equals(IMinimalReadOnlyMatrix, double)"/>.
+		/// </summary>
+		public bool Equals(IMinimalReadOnlyMatrix other, double tolerance = 1E-13)
         {
             return BuildSkylineMatrix().Equals(other, tolerance);
         }

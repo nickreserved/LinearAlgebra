@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using MGroup.LinearAlgebra.Matrices;
 using MGroup.LinearAlgebra.Output.Formatting;
 using MGroup.LinearAlgebra.Vectors;
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Output
         /// Writes the provided vector to Console.
         /// </summary>
         /// <param name="vector">The vector to write.</param>
-        public void WriteToConsole(IIndexable1D vector)
+        public void WriteToConsole(IExtendedReadOnlyVector vector)
         {
             Utilities.WriteToConsole((writer) => WriteFullVector(vector, writer));
         }
@@ -49,7 +49,7 @@ namespace MGroup.LinearAlgebra.Output
         /// <param name="path">The absolute path of the file, where <paramref name="vector"/> will be written.</param>
         /// <param name="append">If true, <paramref name="vector"/> will be written after the current contents of the file at
         ///     <paramref name="path"/>. If false, it will overwrite them.</param>
-        public void WriteToFile(IIndexable1D vector, string path, bool append = false)
+        public void WriteToFile(IExtendedReadOnlyVector vector, string path, bool append = false)
         {
             Utilities.WriteToFile((writer) => WriteFullVector(vector, writer), path, append);
         }
@@ -66,7 +66,7 @@ namespace MGroup.LinearAlgebra.Output
             Utilities.WriteToFile((writer) => WriteSparseMatrix(matrix, writer), path, append);
         }
         
-        private void WriteFullVector(IIndexable1D vector, StreamWriter writer)
+        private void WriteFullVector(IExtendedReadOnlyVector vector, StreamWriter writer)
         {
             string numberFormat = NumericFormat.GetRealNumberFormat();
             for (int i = 0; i < vector.Length - 1; ++i) writer.WriteLine(string.Format(numberFormat, vector[i]));
@@ -81,7 +81,7 @@ namespace MGroup.LinearAlgebra.Output
                 writer.Write($"{row + 1} {col + 1} ");
                 writer.WriteLine(string.Format(numberFormat, val));
             }
-            writer.Write($"{matrix.NumRows} {matrix.NumColumns} 0.0");
+            writer.Write($"{((ILinearTransformation) matrix).NumRows} {((ILinearTransformation)matrix).NumColumns} 0.0");
         }
     }
 }

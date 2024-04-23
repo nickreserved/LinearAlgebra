@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using MGroup.LinearAlgebra.Matrices;
@@ -19,13 +19,13 @@ namespace MGroup.LinearAlgebra.SchurComplements
             double[] valuesB = B.RawValues;
             int[] rowIndicesB = B.RawRowIndices;
             int[] colOffsetsB = B.RawColOffsets;
-            var S = SymmetricMatrix.CreateZero(A.Order);
+            var S = SymmetricMatrix.CreateZero(A.NumRows);
 
             for (int j = 0; j < B.NumColumns; ++j)
             {
                 // column j of (inv(C) * B) = inv(C) * column j of B
                 Vector colB = B.GetColumn(j);
-                double[] colInvCB = inverseC.SolveLinearSystem(colB).RawData;
+                double[] colInvCB = inverseC.SolveLinearSystem(colB).Values;
 
                 // column j of (B^T * inv(C) * B) = B^T * column j of (inv(C) * B)
                 // However we only need the superdiagonal part of this column. 

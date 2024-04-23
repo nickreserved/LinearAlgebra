@@ -81,7 +81,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// See <see cref="IIndexable2D.this[int, int]"/>.
 		/// </summary>
 		/// <remarks>
-		/// Also note that it may be possible to pass in <paramref name="rowIdx"/> &gt;= <see cref="ILinearTransformation.NumRows"/> or
+		/// Also note that it may be possible to pass in <paramref name="rowIdx"/> &gt;= <see cref="IBounded2D.NumRows"/> or
 		/// <paramref name="rowIdx"/> &lt; 0, without throwing <see cref="IndexOutOfRangeException"/>, since the indices are not  
 		/// checked explicitly. The constraints on <paramref name="colIdx"/> described in the interfaces will correctly throw
 		/// <see cref="IndexOutOfRangeException"/> if violated.
@@ -334,7 +334,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				{
 					for (int i = 0; i < NumRows; ++i)
 					{
-						this.data[j * NumRows + i] += otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
+						this.data[j * NumRows + i] += otherCoefficient * ((IIndexable2D)otherMatrix)[i, j];
 					}
 				}
 			}
@@ -461,7 +461,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i < NumRows; ++i)
 					{
 						int index1D = j * NumRows + i;
-						this.data[index1D] = binaryOperation(this.data[index1D], ((IMatrixView)matrix)[i, j]);
+						this.data[index1D] = binaryOperation(this.data[index1D], ((IIndexable2D)matrix)[i, j]);
 					}
 				}
 			}
@@ -875,7 +875,7 @@ namespace MGroup.LinearAlgebra.Matrices
 					for (int i = 0; i < NumRows; ++i)
 					{
 						int index1D = j * NumRows + i;
-						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * ((IMatrixView)otherMatrix)[i, j];
+						this.data[index1D] = thisCoefficient * this.data[index1D] + otherCoefficient * ((IIndexable2D)otherMatrix)[i, j];
 					}
 				}
 			}
@@ -983,14 +983,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
 		/// </summary>
 		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
-		///     <see cref="ILinearTransformation.NumColumns"/> of oper(this).</param>
+		///     <see cref="IBounded2D.NumColumns"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
 		///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
 		public Vector Multiply(Vector vector, bool transposeThis = false)
 		{
 			//TODO: this performs redundant dimension checks, including checking the transposeThis flag.
-			var result = new Vector(new double[transposeThis ? NumColumns : NumRows]);
+			var result = new Vector(transposeThis ? NumColumns : NumRows);
 			MultiplyIntoResult(vector, result, transposeThis);
 			return result;
 		}
@@ -1016,12 +1016,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
 		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumColumns"/>.
+		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
 		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumRows"/>.
+		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">
@@ -1063,14 +1063,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">
 		/// The vector x that will be multiplied by this matrix. Constraints: 
 		/// <paramref name="lhsOffset"/> + <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// &lt;= oper(this).<see cref="ILinearTransformation.NumColumns"/>.
+		/// &lt;= oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="lhsOffset">The index into <paramref name="lhsVector"/> from which to start the operations.</param>
 		/// <param name="lhsScale">The scalar alpha that will multiply <paramref name="lhsVector"/>.</param>
 		/// <param name="rhsVector">
 		/// The vector y that will be overwritten by the result of the operation. Constraints: 
 		/// <paramref name="rhsOffset"/> + <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// &lt;= oper(this).<see cref="ILinearTransformation.NumRows"/>.
+		/// &lt;= oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="rhsOffset">The index into <paramref name="rhsVector"/> from which to start the operations.</param>
 		/// <param name="rhsScale">The scalar beta that will multiply <paramref name="rhsVector"/>.</param>

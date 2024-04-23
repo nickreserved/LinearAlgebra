@@ -115,7 +115,7 @@ namespace MGroup.LinearAlgebra.Commons
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			Preconditions.CheckVectorDimensions(vector1, vector2);
-			var result = new Vector(new double[vector1.Length]);
+			var result = new Vector(vector1.Length);
 			for (int i = 0; i < vector1.Length; ++i)
 				result[i] = binaryOperation(vector1[i], vector2[i]);
 			return result;
@@ -238,13 +238,13 @@ namespace MGroup.LinearAlgebra.Commons
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			Preconditions.CheckVectorDimensions(vector1, vector2);
-			var result = new Vector(new double[vector1.Length]);
+			var result = new Vector(vector1.Length);
 			for (int i = 0; i < vector1.Length; ++i)
 				result[i] = coefficient1 * vector1[i] + coefficient2 * vector2[i];
 			return result;
 		}
 
-		public static Matrix LinearCombination(IMatrixView matrix1, double coefficient1, IMatrixView matrix2,
+		public static Matrix LinearCombination(IIndexable2D matrix1, double coefficient1, IIndexable2D matrix2,
 			double coefficient2)
 		{
 			WarnAboutPerformanceBottlenecks();
@@ -262,7 +262,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return result;
 		}
 
-		public static Matrix Transpose(IMatrixView matrix)
+		public static Matrix Transpose(IIndexable2D matrix)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -278,7 +278,7 @@ namespace MGroup.LinearAlgebra.Commons
 			return result;
 		}
 
-		public static Matrix Multiply(IMatrixView matrix1, IMatrixView matrix2, bool transpose1, bool transpose2)
+		public static Matrix Multiply(IIndexable2D matrix1, IIndexable2D matrix2, bool transpose1, bool transpose2)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
@@ -358,14 +358,14 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static Vector Multiply(IMatrixView matrix, IExtendedReadOnlyVector vector, bool transposeMatrix)
+		public static Vector Multiply(IIndexable2D matrix, IExtendedReadOnlyVector vector, bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();
 			ProhibitPerformanceBottlenecks();
 			if (transposeMatrix)
 			{
 				Preconditions.CheckMultiplicationDimensions(matrix.NumRows, vector.Length);
-				var result = Vector.CreateZero(matrix.NumColumns);
+				var result = new Vector(matrix.NumColumns);
 				for (int i = 0; i < result.Length; ++i)
 				{
 					for (int j = 0; j < vector.Length; ++j)
@@ -379,7 +379,7 @@ namespace MGroup.LinearAlgebra.Commons
 			else
 			{
 				Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, vector.Length);
-				var result = Vector.CreateZero(matrix.NumRows);
+				var result = new Vector(matrix.NumRows);
 				for (int i = 0; i < result.Length; ++i)
 				{
 					for (int j = 0; j < vector.Length; ++j)
@@ -392,7 +392,7 @@ namespace MGroup.LinearAlgebra.Commons
 			}
 		}
 
-		public static void MultiplyIntoResult(IMatrixView matrix, IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector,
+		public static void MultiplyIntoResult(IIndexable2D matrix, IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector,
 			bool transposeMatrix)
 		{
 			WarnAboutPerformanceBottlenecks();

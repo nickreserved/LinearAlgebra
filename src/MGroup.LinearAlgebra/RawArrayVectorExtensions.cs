@@ -211,7 +211,12 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="scalar">A scalar that multiplies each entry of this vector.</param>
         public static double[] ScaleIntoThis(this double[] thisVector, double scalar)
-            => ((Vector) new Vector(thisVector).ScaleIntoThis(scalar)).Values;
+		{
+			Vector vector = new Vector(thisVector);
+			vector.ScaleIntoThis(scalar);
+			return vector.Values;
+		}
+
 
         /// <summary>
         /// Performs the following operation for all i:

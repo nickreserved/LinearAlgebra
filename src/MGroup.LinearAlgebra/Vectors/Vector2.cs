@@ -11,7 +11,8 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// A otherVector with 2 entries. Optimized version of <see cref="Vector"/>.
 	/// Authors: Serafeim Bakalakos
 	/// </summary>
-    public class Vector2 : Vector
+	[Serializable]
+	public class Vector2 : Vector
     {
 		public Vector2() : base(new double[2]) {}
 		

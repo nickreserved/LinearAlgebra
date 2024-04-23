@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace MGroup.LinearAlgebra.Input
@@ -50,13 +51,17 @@ namespace MGroup.LinearAlgebra.Input
                 int length = Int32.Parse(firstLine);
                 var array = new double[length];
 
-                // Read the array entries.
-                string line = reader.ReadToEnd();
+				// Decimal separator pinned as "."
+				var nfi = new NumberFormatInfo();
+				nfi.NumberDecimalSeparator = ".";
+				
+				// Read the array entries.
+				string line = reader.ReadToEnd();
                 string[] subStrings = line.Split(separators, StringSplitOptions.RemoveEmptyEntries);
                 if (subStrings.Length != length) throw new IOException("Mismatch in provided entries and their declared count.");
                 for (int i = 0; i < length; ++i)
                 {
-                    array[i] = Double.Parse(subStrings[i]);
+                    array[i] = Double.Parse(subStrings[i], nfi);
                 }
 
                 return array;
@@ -67,12 +72,16 @@ namespace MGroup.LinearAlgebra.Input
         {
             using (var reader = new StreamReader(path))
             {
-                var array = new List<double>();
+				// Decimal separator pinned as "."
+				var nfi = new NumberFormatInfo();
+				nfi.NumberDecimalSeparator = ".";
+				
+				var array = new List<double>();
                 string line = reader.ReadToEnd();
                 string[] subStrings = line.Split(separators, StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < subStrings.Length; ++i)
                 {
-                    array.Add(Double.Parse(subStrings[i]));
+                    array.Add(Double.Parse(subStrings[i], nfi));
                 }
                 return array.ToArray();
             }

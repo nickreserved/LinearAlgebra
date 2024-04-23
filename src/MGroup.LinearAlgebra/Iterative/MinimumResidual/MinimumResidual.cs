@@ -66,61 +66,61 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
         /// </summary>
         /// <param name="matrix">The matrix of the original linear system. It must be symmetric.</param>
         /// <param name="rhsVector">The right hand side vector of the original linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == 
-        ///     <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.</param>
+        ///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == 
+        ///     <paramref name="matrix"/>.<see cref="IBounded2D.NumRows"/>.</param>
         /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
         public (IMinimalVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IMinimalReadOnlyVector rhsVector, double shift = 0.0)
             => SolveInternal(new ExplicitMatrixTransformation(matrix), rhsVector, null, shift);
 
-        /// <summary>
-        /// Solves the linear system (A - s*I) * x = b preconditioned by the matrix <paramref name="preconditioner"/>, 
-        /// where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/> and s = <paramref name="shift"/>. 
-        /// If the matrix A - s*I is singular, it solves the same linear least squares problem.
-        /// </summary>
-        /// <param name="matrix">The matrix of the original linear system. It must be symmetric.</param>
-        /// <param name="rhsVector">The right hand side vector of the original linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == 
-        ///     <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.</param>
-        /// <param name="preconditioner">A preconditioner matrix that has the same dimensions as A, but must be symmetric 
-        ///     positive definite, contrary to A.</param>
-        /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-        public (IMinimalVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IMinimalReadOnlyVector rhsVector, 
+		/// <summary>
+		/// Solves the linear system (A - s*I) * x = b preconditioned by the matrix <paramref name="preconditioner"/>, 
+		/// where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/> and s = <paramref name="shift"/>. 
+		/// If the matrix A - s*I is singular, it solves the same linear least squares problem.
+		/// </summary>
+		/// <param name="matrix">The matrix of the original linear system. It must be symmetric.</param>
+		/// <param name="rhsVector">The right hand side vector of the original linear system. Constraints:
+		///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == 
+		///     <paramref name="matrix"/>.<see cref="IBounded2D.NumRows"/>.</param>
+		/// <param name="preconditioner">A preconditioner matrix that has the same dimensions as A, but must be symmetric 
+		///     positive definite, contrary to A.</param>
+		/// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
+		public (IMinimalVector solution, MinresStatistics stats) Solve(IMatrixView matrix, IMinimalReadOnlyVector rhsVector, 
             IPreconditioner preconditioner, double shift = 0.0)
             => SolveInternal(new ExplicitMatrixTransformation(matrix), rhsVector, preconditioner, shift);
 
-        /// <summary>
-        /// Solves the linear system (A - s*I) * x = b, where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/> 
-        /// and s = <paramref name="shift"/>. If the matrix A - s*I is singular, it solves the same linear least squares problem.
-        /// </summary>
-        /// <param name="matrix">The matrix of the original linear system. It must be symmetric.</param>
-        /// <param name="rhsVector">The right hand side vector of the original linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == 
-        ///     <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.</param>
-        /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-        public (IMinimalVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhsVector, 
+		/// <summary>
+		/// Solves the linear system (A - s*I) * x = b, where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/> 
+		/// and s = <paramref name="shift"/>. If the matrix A - s*I is singular, it solves the same linear least squares problem.
+		/// </summary>
+		/// <param name="matrix">The matrix of the original linear system. It must be symmetric.</param>
+		/// <param name="rhsVector">The right hand side vector of the original linear system. Constraints:
+		///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == 
+		///     <paramref name="matrix"/>.<see cref="IBounded2D.NumRows"/>.</param>
+		/// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
+		public (IMinimalVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhsVector, 
             double shift = 0.0)
             => SolveInternal(matrix, rhsVector, null, shift);
 
-        /// <summary>
-        /// Solves the linear system (A - s*I) * x = b preconditioned by the matrix <paramref name="preconditioner"/>, 
-        /// where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/> and s = <paramref name="shift"/>. 
-        /// If the matrix A - s*I is singular, it solves the same linear least squares problem.
-        /// </summary>
-        /// <param name="matrix">The matrix of the original linear system. It must be symmetric.</param>
-        /// <param name="rhsVector">The right hand side vector of the original linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IIndexable1D.Length"/> == 
-        ///     <paramref name="matrix"/>.<see cref="IIndexable2D.NumRows"/>.</param>
-        /// <param name="preconditioner">A preconditioner matrix that has the same dimensions as A, but must be symmetric 
-        ///     positive definite, contrary to A.</param>
-        /// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
-        public (IMinimalVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhsVector, 
+		/// <summary>
+		/// Solves the linear system (A - s*I) * x = b preconditioned by the matrix <paramref name="preconditioner"/>, 
+		/// where A = <paramref name="matrix"/>, b = <paramref name="rhsVector"/> and s = <paramref name="shift"/>. 
+		/// If the matrix A - s*I is singular, it solves the same linear least squares problem.
+		/// </summary>
+		/// <param name="matrix">The matrix of the original linear system. It must be symmetric.</param>
+		/// <param name="rhsVector">The right hand side vector of the original linear system. Constraints:
+		///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == 
+		///     <paramref name="matrix"/>.<see cref="IBounded2D.NumRows"/>.</param>
+		/// <param name="preconditioner">A preconditioner matrix that has the same dimensions as A, but must be symmetric 
+		///     positive definite, contrary to A.</param>
+		/// <param name="shift">A scalar parameter that controls the deviation of (A - s*I) * x = b from A * x = b.</param>
+		public (IMinimalVector solution, MinresStatistics stats) Solve(ILinearTransformation matrix, IMinimalReadOnlyVector rhsVector, 
             IPreconditioner preconditioner,  double shift = 0.0) 
             => SolveInternal(matrix, rhsVector, preconditioner, shift);
 
         private (IMinimalVector solution, MinresStatistics stats) SolveInternal(ILinearTransformation A, IMinimalReadOnlyVector b, 
             IPreconditioner M, double shift)
         {
-            /// Initialize.
+            // Initialize.
 
             int n = A.NumRows;
             int istop = 0; // TODO: not sure if needed
@@ -129,27 +129,27 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             double Acond = 0.0;
             double rnorm = 0.0;
             double ynorm = 0.0;
-            IMinimalVector x = b.CreateZero();
+            IMinimalVector x = b.CreateZeroWithSameFormat();
             var orthogonalizer = new LocalReorthogonalizer(n, numStoredOrthogonalDirections);
 
-            /// -------------------------------------------------
-            /// Set up y and v for the first Lanczos vector v1.
-            /// y = beta1 P' v1,  where  P = C**(-1).
-            /// v is really P' v1.
-            /// -------------------------------------------------
+            // -------------------------------------------------
+            // Set up y and v for the first Lanczos vector v1.
+            // y = beta1 P' v1,  where  P = C**(-1).
+            // v is really P' v1.
+            // -------------------------------------------------
 
             IMinimalVector y;
             if (M == null) y = b.Copy();
             else
             {
-                y = b.CreateZero();
+                y = b.CreateZeroWithSameFormat();
                 M.Apply(b, y);
             }
                 
             IMinimalVector r1 = b.Copy(); // initial guess x = 0 initial residual
             double beta1 = b.DotProduct(y);
 
-            /// If b = 0 exactly, stop with x = 0.            
+            // If b = 0 exactly, stop with x = 0.            
 
             CheckDefinitePreconditioner(M, beta1);
             if (beta1 == 0.0)
@@ -173,39 +173,39 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 }
             }
 
-            /// ------------------------------------------------- 
-            /// Initialize other quantities.
-            /// -------------------------------------------------
+            // ------------------------------------------------- 
+            // Initialize other quantities.
+            // -------------------------------------------------
 
             double oldb = 0.0, beta = beta1, dbar = 0.0, epsln = 0.0;
             double qrnorm = beta1, phibar = beta1, rhs1 = beta1, rhs2 = 0.0;
             double tnorm2 = 0.0, gmax = 0.0, gmin = double.MaxValue;
             double cs = -1.0, sn = 0.0;
-            IMinimalVector w = b.CreateZero();
-            IMinimalVector w2 = b.CreateZero();
+            IMinimalVector w = b.CreateZeroWithSameFormat();
+            IMinimalVector w2 = b.CreateZeroWithSameFormat();
             IMinimalVector r2 = r1.Copy();
 
 
-            /// ------------------------------------------------- 
-            /// Main iteration loop.
-            /// -------------------------------------------------
+            // ------------------------------------------------- 
+            // Main iteration loop.
+            // -------------------------------------------------
             while (itn < maxIterations) // k = itn = 1 first time through
             {
                 ++itn;
 
-                /// -----------------------------------------------------------------
-                /// Obtain quantities for the next Lanczos vector vk + 1, k = 1, 2,...
-                ///The general iteration is similar to the case k = 1 with v0 = 0:
-                ///
-                /// p1 = Operator * v1 - beta1 * v0,
-                /// alpha1 = v1'p1,
-                /// q2 = p2 - alpha1 * v1,   // I think this comment was corrected to q2 = p1 - alpha1 * v1 in a later script
-                /// beta2 ^ 2 = q2'q2,
-                /// v2 = (1 / beta2) q2.
-                ///
-                /// Again, y = betak P vk, where  P = C * *(-1).
-                /// ....more description needed.
-                /// -----------------------------------------------------------------
+                // -----------------------------------------------------------------
+                // Obtain quantities for the next Lanczos vector vk + 1, k = 1, 2,...
+                //The general iteration is similar to the case k = 1 with v0 = 0:
+                //
+                // p1 = Operator * v1 - beta1 * v0,
+                // alpha1 = v1'p1,
+                // q2 = p2 - alpha1 * v1,   // I think this comment was corrected to q2 = p1 - alpha1 * v1 in a later script
+                // beta2 ^ 2 = q2'q2,
+                // v2 = (1 / beta2) q2.
+                //
+                // Again, y = betak P vk, where  P = C * *(-1).
+                // ....more description needed.
+                // -----------------------------------------------------------------
 
                 double s = 1.0 / beta;    // Normalize previous vector(in y).
                 IMinimalVector v = y.Copy();
@@ -249,9 +249,9 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                     }
                 }
 
-                /// Apply previous rotation Qk-1 to get
-                ///   [deltak epslnk + 1] = [cs  sn][dbark    0]
-                ///   [gbar k dbar k + 1]   [sn - cs][alfak betak + 1].
+                // Apply previous rotation Qk-1 to get
+                //   [deltak epslnk + 1] = [cs  sn][dbark    0]
+                //   [gbar k dbar k + 1]   [sn - cs][alfak betak + 1].
 
                 double oldeps = epsln;
                 double delta = cs * dbar + sn * alfa; // delta1 = 0         deltak
@@ -262,7 +262,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 double root = Math.Sqrt(gbarSquared + dbar * dbar);
                 double Arnorm = phibar * root;        // || Ar{ k - 1}||
 
-                /// Compute the next plane rotation Qk
+                // Compute the next plane rotation Qk
 
                 double gamma = Math.Sqrt(gbarSquared + beta * beta); // gammak
                 if (gamma < eps) gamma = eps;
@@ -271,7 +271,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 double phi = cs * phibar;                                   // phik
                 phibar = sn * phibar;                                // phibark + 1
 
-                /// Update  x.
+                // Update  x.
 
                 double denom = 1.0 / gamma;
                 IMinimalVector w1 = w2.Copy();
@@ -282,7 +282,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 w.ScaleIntoThis(denom);
                 x.AxpyIntoThis(w, phi);
 
-                /// Go round again.
+                // Go round again.
 
                 if (gmax < gamma) gmax = gamma;
                 if (gmin > gamma) gmin = gamma;
@@ -290,7 +290,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 rhs1 = rhs2 - delta * z;
                 rhs2 = -epsln * z;
 
-                /// Estimate various norms.
+                // Estimate various norms.
 
                 Anorm = Math.Sqrt(tnorm2);
                 ynorm = x.Norm2();
@@ -306,16 +306,16 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                 double test2 = root / Anorm;               // || Ar{ k - 1}|| / (|| A || || r_{ k - 1}||)
 
 
-                /// Estimate  cond(A).
-                /// In this version we look at the diagonals of R  in the
-                /// factorization of the lower Hessenberg matrix,  Q* H = R,
-                /// where H is the tridiagonal matrix from Lanczos with one
-                /// extra row, beta(k + 1) e_k ^ T.
+                // Estimate  cond(A).
+                // In this version we look at the diagonals of R  in the
+                // factorization of the lower Hessenberg matrix,  Q* H = R,
+                // where H is the tridiagonal matrix from Lanczos with one
+                // extra row, beta(k + 1) e_k ^ T.
 
                 Acond = gmax / gmin;
 
-                /// See if any of the stopping criteria are satisfied.
-                /// In rare cases, istop is already - 1 from above (Abar = const* I).
+                // See if any of the stopping criteria are satisfied.
+                // In rare cases, istop is already - 1 from above (Abar = const* I).
 
                 if (istop == 0)
                 {
@@ -365,9 +365,9 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
 
         private static void CheckSymmetricMatrix(ILinearTransformation A, IMinimalReadOnlyVector y, IMinimalReadOnlyVector r1)
         {
-            IMinimalVector w = y.CreateZero();
+            IMinimalVector w = y.CreateZeroWithSameFormat();
             A.MultiplyIntoResult(y, w);
-            IMinimalVector r2 = y.CreateZero();
+            IMinimalVector r2 = y.CreateZeroWithSameFormat();
             A.MultiplyIntoResult(w, r2);
             double s = w.DotProduct(w);
             double t = y.DotProduct(r2);
@@ -378,7 +378,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
 
         private void CheckSymmetricPreconditioner(IPreconditioner M, IMinimalReadOnlyVector y, IMinimalReadOnlyVector r1)
         {
-            IMinimalVector r2 = y.CreateZero();
+            IMinimalVector r2 = y.CreateZeroWithSameFormat();
             M.Apply(y, r2);
             double s = y.DotProduct(y);
             double t = r1.DotProduct(r2);
@@ -406,8 +406,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             int istop, double epsx, double epsr)
         {
             bool printThisOnce = false;
-            if (x is IFinite1D xx)
-				if (xx.Length() < 40) printThisOnce = true;
+			if (x.Length < 40) printThisOnce = true;
             if (iter < 10) printThisOnce = true;
             if (iter >= maxIterations - 11) printThisOnce = true;
             if (iter / 10 == 0) printThisOnce = true;
@@ -420,7 +419,7 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
             {
                 if (iter % 10 == 0) Console.WriteLine();
 				string f = "";
-				if (x is IIndexable1D xxx) f += " x[0] = " + xxx[0] + ",";
+				if (x is AbstractFullyPopulatedVector xxx) f += " x[0] = " + xxx[0] + ",";
                 Console.WriteLine($"Iteration {iter}:{f} Compatible = {test1}, LS = {test2},"
                     + $" |A| = {Anorm}, cond(A) = {Acond}, gbar/|A| = {gbar / Anorm}");
 
@@ -430,12 +429,12 @@ namespace MGroup.LinearAlgebra.Iterative.MinimumResidual
                     // Print true Arnorm. This works only if there is no preconditioning
 
                     // vv = b - (A - shift * I) * x
-                    IMinimalVector vv = b.CreateZero();
+                    IMinimalVector vv = b.CreateZeroWithSameFormat();
                     ShiftedMatrixVectorMult(A, x, vv, shift);
                     vv.SubtractIntoThis(b);
 
                     // ww = (A - shift * I) * vv = "Ar"
-                    IMinimalVector ww = b.CreateZero();
+                    IMinimalVector ww = b.CreateZeroWithSameFormat();
                     ShiftedMatrixVectorMult(A, vv, ww, shift);
                     double trueArnorm = ww.Norm2();
                     Console.WriteLine();

@@ -123,7 +123,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <returns>The result of x = p_coefficients * P + r_coefficients * R</returns>
 		public IMinimalVector EvaluateVector(IMinimalVector[] residualKernels, IMinimalVector[] directionKernels)
 		{
-			var x = residualKernels[0].CreateZero();
+			var x = residualKernels[0].CreateZeroWithSameFormat();
 			for (var i = 0; i < r.Count; ++i)
 			{
 				x.AxpyIntoThis(residualKernels[i], r[i]);

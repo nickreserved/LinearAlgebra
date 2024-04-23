@@ -14,9 +14,9 @@ using static MGroup.LinearAlgebra.LibrarySettings;
 namespace MGroup.LinearAlgebra.Matrices
 {
     /// <summary>
-    /// Upper triangular square matrix in column major Packed storage format (only stores the n*(n+1)/2 non zeros). Uses LAPACK.  
+    /// Upper triangular square otherMatrix in column major Packed storage format (only stores the n*(n+1)/2 non zeros). Uses LAPACK.  
     /// For the more information about the layout, see 
-    /// <see cref="https://software.intel.com/en-us/mkl-developer-reference-c-matrix-storage-schemes-for-lapack-routines."/>
+    /// <see href="https://software.intel.com/en-us/mkl-developer-reference-c-matrix-storage-schemes-for-lapack-routines."/>
     /// Authors: Serafeim Bakalakos
     /// </summary>
     public class TriangularUpper: IMatrix
@@ -30,7 +30,7 @@ namespace MGroup.LinearAlgebra.Matrices
         private TriangularUpper(double[] data, int order)
         {
             this.data = data;
-            this.Order = order;
+            this.NumRows = order;
         }
 
 		/// <summary>
@@ -39,19 +39,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		MatrixSymmetry IIndexable2D.MatrixSymmetry => MatrixSymmetry.Symmetric;
 
 		/// <summary>
-		/// The number of columns of the square matrix.
+		/// The number of columns of the square otherMatrix.
 		/// </summary>
-		public int NumColumns { get { return Order; } }
+		public int NumColumns { get => NumRows; }
 
         /// <summary>
-        /// The number of rows of the square matrix.
+        /// The number of rows of the square otherMatrix.
         /// </summary>
-        public int NumRows { get { return Order; } }
-
-        /// <summary>
-        /// The number of rows/columns of the square matrix.
-        /// </summary>
-        public int Order { get; }
+        public int NumRows { get; }
 
 		/// <summary>
 		/// The internal array that stores the entries of the upper triangle (packed storage format) in column major layout. 
@@ -85,7 +80,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <summary>
         /// Initializes a new instance of <see cref="TriangularUpper"/> by copying the upper triangle of the provided 2D array.
         /// </summary>
-        /// <param name="array2D">A 2-dimensional array containing the Values of the matrix. Constraints: 
+        /// <param name="array2D">A 2-dimensional array containing the Values of the otherMatrix. Constraints: 
         ///     <paramref name="array2D"/>.GetLength(0) == <paramref name="array2D"/>.GetLength(1).</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="array2D"/>.GetLength(0) != 
         ///     <paramref name="array2D"/>.GetLength(1).</exception>
@@ -105,11 +100,11 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Initializes a new instance of <see cref="TriangularUpper"/> with <paramref name="array1D"/> or a clone as its 
         /// internal array.
         /// </summary>
-        /// <param name="order">The number of rows/columns of the new square matrix.</param>
-        /// <param name="array1D">An 1-dimensional array containing the Values of the upper triangle of the matrix in column 
+        /// <param name="order">The number of rows/columns of the new square otherMatrix.</param>
+        /// <param name="array1D">An 1-dimensional array containing the Values of the upper triangle of the otherMatrix in column 
         ///     major order.</param>
         /// <param name="copyArray">If true, <paramref name="array1D"/> will be copied and the new <see cref="TriangularUpper"/>  
-        ///     instance will have a reference to the copy, which is safer. If false, the new matrix will have a reference to 
+        ///     instance will have a reference to the copy, which is safer. If false, the new otherMatrix will have a reference to 
         ///     <paramref name="array1D"/> itself, which is faster.</param>
         public static TriangularUpper CreateFromArray(int order, double[] array1D, bool copyArray = false)
         {
@@ -126,32 +121,30 @@ namespace MGroup.LinearAlgebra.Matrices
         /// Initializes a new instance of <see cref="TriangularUpper"/> with all entries being equal to 0. Only the upper 
         /// triangle zero entries are explictily stored though.
         /// </summary>
-        /// <param name="order">The number of rows/columns of the new square matrix.</param>
+        /// <param name="order">The number of rows/columns of the new square otherMatrix.</param>
         public static TriangularUpper CreateZero(int order)
         {
             var data = new double[(order * (order + 1)) / 2];
             return new TriangularUpper(data, order);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Axpy(IMatrixView, double)"/>.    
-        /// </summary>
-        public IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix Axpy(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is TriangularUpper casted) return Axpy(casted, otherCoefficient);
             else return DoEntrywise(otherMatrix, (x1, x2) => x1 + otherCoefficient * x2); //TODO: optimize this
         }
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= j &lt; <see cref="Order"/>, 0 &lt;= i &lt;= j:
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt;= j:
         /// result[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
-        /// The resulting matrix is written to a new <see cref="TriangularUpper"/> and then returned.
+        /// The resulting otherMatrix is written to a new <see cref="TriangularUpper"/> and then returned.
         /// </summary>
-        /// <param name="otherMatrix">A matrix with the same <see cref="Order"/> as this <see cref="TriangularUpper"/> 
+        /// <param name="otherMatrix">A otherMatrix with the same <see cref="NumRows"/> as this <see cref="TriangularUpper"/> 
         ///     instance.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-        ///     <see cref="Order"/> than this instance.</exception>
+        ///     <see cref="NumRows"/> than this instance.</exception>
         public TriangularUpper Axpy(TriangularUpper otherMatrix, double otherCoefficient)
         {
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
@@ -162,26 +155,24 @@ namespace MGroup.LinearAlgebra.Matrices
             return new TriangularUpper(result, NumColumns);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
-        /// </summary>
-        public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public void AxpyIntoThis(IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is TriangularUpper casted) AxpyIntoThis(casted, otherCoefficient);
             else throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other matrix is also upper triangular.");
+                "This operation is legal only if the otherMatrix otherMatrix is also upper triangular.");
         }
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= j &lt; <see cref="Order"/>, 0 &lt;= i &lt;= j:
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt;= j:
         /// this[i, j] = <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j] + this[i, j]. 
-        /// The resulting matrix overwrites the entries of this <see cref="TriangularUpper"/> instance.
+        /// The resulting otherMatrix overwrites the entries of this <see cref="TriangularUpper"/> instance.
         /// </summary>
-        /// <param name="otherMatrix">A matrix with the same <see cref="Order"/> as this <see cref="TriangularUpper"/> 
+        /// <param name="otherMatrix">A otherMatrix with the same <see cref="NumRows"/> as this <see cref="TriangularUpper"/> 
         ///     instance.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-        ///     <see cref="Order"/> than this instance.</exception>
+        ///     <see cref="NumRows"/> than this instance.</exception>
         public void AxpyIntoThis(TriangularUpper otherMatrix, double otherCoefficient)
         {
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
@@ -189,19 +180,17 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Calculates the determinant of this matrix.
+        /// Calculates the determinant of this otherMatrix.
         /// </summary>
         public double CalcDeterminant()
         {
             // TODO: Find more effienct formulas for the diagonal accesses.
             double det = 1.0;
-            for (int i = 0; i < Order; ++i) det *= data[FindIndex1D(i, i)];
+            for (int i = 0; i < NumRows; ++i) det *= data[FindIndex1D(i, i)];
             return det;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.Clear"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void Clear() => Array.Clear(data, 0, data.Length);
 
         /// <summary>
@@ -210,18 +199,18 @@ namespace MGroup.LinearAlgebra.Matrices
         IMatrix IMatrixView.Copy(bool copyIndexingData) => Copy();
 
         /// <summary>
-        /// Copies the entries of this matrix.
+        /// Copies the entries of this otherMatrix.
         /// </summary>
         public TriangularUpper Copy()
         {
             var clone = new double[this.data.Length];
             Array.Copy(this.data, clone, this.data.Length);
-            return new TriangularUpper(clone, Order);
+            return new TriangularUpper(clone, NumRows);
         }
 
         /// <summary>
-        /// Copies the entries of the matrix into a 2-dimensional array. The returned array has length(0) = length(1) = 
-        /// <see cref="Order"/>. 
+        /// Copies the entries of the otherMatrix into a 2-dimensional array. The returned array has length(0) = length(1) = 
+        /// <see cref="NumRows"/>. 
         /// </summary>
         public double[,] CopyToArray2D() => Conversions.PackedUpperColMajorToArray2D(data);
 
@@ -231,49 +220,43 @@ namespace MGroup.LinearAlgebra.Matrices
         public Matrix CopyToFullMatrix()
         {
             // TODO: This won't work if the implementation of Matrix changes
-            double[] fullArray = Conversions.PackedUpperColMajorToFullColMajor(data, Order);
-            return Matrix.CreateFromArray(fullArray, Order, Order, false);
+            double[] fullArray = Conversions.PackedUpperColMajorToFullColMajor(data, NumRows);
+            return Matrix.CreateFromArray(fullArray, NumRows, NumRows, false);
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoEntrywise(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public IMatrix DoEntrywise(IMatrixView matrix, Func<double, double, double> binaryOperation)
+        /// <inheritdoc/>
+        public IMatrix DoEntrywise(IMinimalReadOnlyMatrix otherMatrix, Func<double, double, double> binaryOperation)
         {
-            return DenseStrategies.DoEntrywise(this, matrix, binaryOperation); //TODO: this can be optimized.
+            return DenseStrategies.DoEntrywise(this, (IIndexable2D) otherMatrix, binaryOperation); //TODO: this can be optimized.
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoEntrywiseIntoThis(TMatrixIn, Func{double, double, double})"/>.
-        /// </summary>
-        public void DoEntrywiseIntoThis(IMatrixView matrix, Func<double, double, double> binaryOperation)
+		/// <inheritdoc/>
+		public void DoEntrywiseIntoThis(IMinimalReadOnlyMatrix matrix, Func<double, double, double> binaryOperation)
         {
             if (matrix is TriangularUpper casted)
             {
-                //TODO: Aren't there any operations that would change the sparsity pattern, even if the matrix matrix is upper triangular?
+                //TODO: Aren't there any operations that would change the sparsity pattern, even if the otherMatrix otherMatrix is upper triangular?
                 Preconditions.CheckSameMatrixDimensions(this, matrix);
                 for (int i = 0; i < data.Length; ++i) this.data[i] = binaryOperation(this.data[i], casted.data[i]);
             }
             else throw new SparsityPatternModifiedException(
-                "This operation is legal only if the matrix matrix is also upper triangular.");
+                "This operation is legal only if the otherMatrix otherMatrix is also upper triangular.");
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperableView2D{TMatrixIn, TMatrixOut}.DoToAllEntries(Func{double, double})"/>.
-        /// </summary>
-        public IMatrix DoToAllEntries(Func<double, double> unaryOperation)
+		/// <inheritdoc/>
+		public IMatrix DoToAllEntries(Func<double, double> unaryOperation)
         {
             if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0)) // The same sparsity pattern can be used.
             {
                 // Only apply the operation on non zero entries
                 double[] newData = new double[data.Length];
                 for (int i = 0; i < data.Length; ++i) newData[i] = unaryOperation(data[i]);
-                return new TriangularUpper(newData, Order);
+                return new TriangularUpper(newData, NumRows);
             }
-            else // The sparsity is destroyed. Revert to a full matrix.
+            else // The sparsity is destroyed. Revert to a full otherMatrix.
             {
-                Matrix fullMatrix = Matrix.CreateZero(Order, Order);
-                for (int j = 0; j < Order; ++j) //Column major order
+                Matrix fullMatrix = Matrix.CreateZero(NumRows, NumRows);
+                for (int j = 0; j < NumRows; ++j) //Column major order
                 {
                     for (int i = 0; i <= j; ++i) fullMatrix[i, j] = unaryOperation(data[FindIndex1D(i, j)]);
                 }
@@ -281,10 +264,8 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IEntrywiseOperable2D{TMatrixIn}.DoToAllEntriesIntoThis(Func{double, double})"/>.
-        /// </summary>
-        public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
+		/// <inheritdoc/>
+		public void DoToAllEntriesIntoThis(Func<double, double> unaryOperation)
         {
             if (new ValueComparer(1e-10).AreEqual(unaryOperation(0.0), 0.0))
             {
@@ -296,10 +277,8 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IIndexable2D.Equals(IIndexable2D, double)"/>.
-        /// </summary>
-        public bool Equals(IIndexable2D other, double tolerance = 1e-13) => DenseStrategies.AreEqual(this, other, tolerance);
+        /// <inheritdoc/>
+        public bool Equals(IMinimalReadOnlyMatrix otherMatrix, double tolerance = 1e-13) => DenseStrategies.AreEqual(this, (IIndexable2D) otherMatrix, tolerance);
 
         /// <summary>
         /// See <see cref="ISliceable2D.GetColumn(int)"/>.
@@ -311,7 +290,7 @@ namespace MGroup.LinearAlgebra.Matrices
             int numNonZerosCol = colIndex + 1;
             int colOffset = (colIndex * (colIndex + 1)) / 2;
             Array.Copy(data, colOffset, columnVector, 0, numNonZerosCol);
-            return Vector.CreateFromArray(columnVector);
+            return new Vector(columnVector);
         }
 
         /// <summary>
@@ -322,7 +301,7 @@ namespace MGroup.LinearAlgebra.Matrices
             Preconditions.CheckIndexRow(this, rowIndex);
             var rowVector = new double[NumColumns];
             for (int j = rowIndex; j < NumRows; ++j) rowVector[j] = data[rowIndex + (j * (j + 1)) / 2];
-            return Vector.CreateFromArray(rowVector);
+            return new Vector(rowVector);
         }
 
         /// <summary>
@@ -337,27 +316,25 @@ namespace MGroup.LinearAlgebra.Matrices
         public IMatrix GetSubmatrix(int rowStartInclusive, int rowEndExclusive, int colStartInclusive, int colEndExclusive)
             => DenseStrategies.GetSubmatrix(this, rowStartInclusive, rowEndExclusive, colStartInclusive, colEndExclusive);
 
-        /// <summary>
-        /// See <see cref="IMatrixView.LinearCombination(double, IMatrixView, double)"/>.
-        /// </summary>
-        public IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public IMatrix LinearCombination(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is TriangularUpper casted) return LinearCombination(thisCoefficient, casted, otherCoefficient);
             else return DoEntrywise(otherMatrix, (x1, x2) => thisCoefficient * x1 + otherCoefficient * x2); //TODO: optimize this
         }
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= j &lt; <see cref="Order"/>, 0 &lt;= i &lt;= j:
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt;= j:
         /// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] 
         ///     + <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j]. 
-        /// The resulting matrix is written to a new <see cref="TriangularUpper"/> and then returned.
+        /// The resulting otherMatrix is written to a new <see cref="TriangularUpper"/> and then returned.
         /// </summary>
         /// <param name="thisCoefficient">A scalar that multiplies each entry of this <see cref="TriangularUpper"/>.</param>
-        /// <param name="otherMatrix">A matrix with the same <see cref="Order"/> as this <see cref="TriangularUpper"/> 
+        /// <param name="otherMatrix">A otherMatrix with the same <see cref="NumRows"/> as this <see cref="TriangularUpper"/> 
         ///     instance.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-        ///     <see cref="Order"/> than this instance.</exception>
+        ///     <see cref="NumRows"/> than this instance.</exception>
         public TriangularUpper LinearCombination(double thisCoefficient, TriangularUpper otherMatrix, double otherCoefficient)
         {
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
@@ -381,28 +358,26 @@ namespace MGroup.LinearAlgebra.Matrices
             return new TriangularUpper(result, NumColumns);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.LinearCombinationIntoThis(double, IMatrixView, double)"/>.
-        /// </summary>
-        public void LinearCombinationIntoThis(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient)
+        /// <inheritdoc/>
+        public void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyMatrix otherMatrix, double otherCoefficient)
         {
             if (otherMatrix is TriangularUpper casted) LinearCombinationIntoThis(thisCoefficient, casted, otherCoefficient);
             else throw new SparsityPatternModifiedException(
-                "This operation is legal only if the other matrix is also upper triangular.");
+                "This operation is legal only if the otherMatrix otherMatrix is also upper triangular.");
         }
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= j &lt; <see cref="Order"/>, 0 &lt;= i &lt;= j:
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt;= j:
         /// this[i, j] = <paramref name="thisCoefficient"/> * this[i, j] 
         ///     + <paramref name="otherCoefficient"/> * <paramref name="otherMatrix"/>[i, j]. 
-        /// The resulting matrix overwrites the entries of this <see cref="TriangularUpper"/> instance.
+        /// The resulting otherMatrix overwrites the entries of this <see cref="TriangularUpper"/> instance.
         /// </summary>
         /// <param name="thisCoefficient">A scalar that multiplies each entry of this <see cref="TriangularUpper"/>.</param>
-        /// <param name="otherMatrix">A matrix with the same <see cref="Order"/> as this <see cref="TriangularUpper"/> 
+        /// <param name="otherMatrix">A otherMatrix with the same <see cref="NumRows"/> as this <see cref="TriangularUpper"/> 
         ///     instance.</param>
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
-        ///     <see cref="Order"/> than this instance.</exception>
+        ///     <see cref="NumRows"/> than this instance.</exception>
         public void LinearCombinationIntoThis(double thisCoefficient, TriangularUpper otherMatrix, double otherCoefficient)
         {
             Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
@@ -416,53 +391,45 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyLeft(IMatrixView, bool, bool)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public Matrix MultiplyLeft(IMatrixView matrix, bool transposeThis = false, bool transposeOther = false)
         {
             return DenseStrategies.Multiply(matrix, this, transposeOther, transposeThis);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyRight(IMatrixView, bool, bool)"/>.
-        /// </summary>
-        public Matrix MultiplyRight(IMatrixView matrix, bool transposeThis = false, bool transposeOther = false)
+		/// <inheritdoc/>
+		public Matrix MultiplyRight(IMatrixView matrix, bool transposeThis = false, bool transposeOther = false)
         {
             return DenseStrategies.Multiply(this, matrix, transposeThis, transposeOther);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Multiply(IExtendedReadOnlyVector, bool)"/>.
-        /// </summary>
-        public IExtendedVector Multiply(IExtendedReadOnlyVector vector, bool transposeThis = false)
+		/// <inheritdoc/>
+		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector dense) return Multiply(dense, transposeThis);
             else throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: oper(this) * <paramref name="vector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// </summary>
-        /// <param name="vector">A vector with <see cref="IIndexable1D.Length"/> being equal to <see cref="Order"/> of this 
-        ///     matrix.</param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IIndexable1D.Length"/> of
-        ///     <paramref name="vector"/> is different than <see cref="Order"/> of this matrix.</exception>
-        public Vector Multiply(Vector vector, bool transposeThis = false)
+		/// <summary>
+		/// Performs the otherMatrix-vector multiplication: oper(this) * <paramref name="vector"/>.
+		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
+		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
+		/// </summary>
+		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to <see cref="NumRows"/> of this 
+		///     otherMatrix.</param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+		///     <paramref name="vector"/> is different than <see cref="NumRows"/> of this otherMatrix.</exception>
+		public Vector Multiply(Vector vector, bool transposeThis = false)
         {
             //TODO: this performs redundant dimension checks
-            var result = Vector.CreateZero(Order);
+            var result = new Vector(NumRows);
             MultiplyIntoResult(vector, result);
             return result;
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.MultiplyIntoResult(IExtendedReadOnlyVector, IExtendedVector, bool)"/>.
-        /// </summary>
-        public void MultiplyIntoResult(IExtendedReadOnlyVector lhsVector, IExtendedVector rhsVector, bool transposeThis = false)
+        /// <inheritdoc/>
+        public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
         {
             if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
             {
@@ -470,36 +437,37 @@ namespace MGroup.LinearAlgebra.Matrices
             }
             else throw new NotImplementedException();
         }
+		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
 
-        /// <summary>
-        /// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="vector"/>.
-        /// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
-        /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
-        /// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
-        /// </summary>
-        /// <param name="lhsVector">
-        /// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
-        /// Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumColumns"/>.
-        /// </param>
-        /// <param name="rhsVector">
-        /// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-        /// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IIndexable1D.Length"/> 
-        /// == oper(this).<see cref="IIndexable2D.NumRows"/>.
-        /// </param>
-        /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IIndexable1D.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
-        /// violate the described contraints.
-        /// </exception>
-        public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
+		/// <summary>
+		/// Performs the otherMatrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
+		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
+		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
+		/// The resulting vector will overwrite the entries of <paramref name="rhsVector"/>.
+		/// </summary>
+		/// <param name="lhsVector">
+		/// The vector that will be multiplied by this otherMatrix. It sits on the left hand side of the equation y = oper(A) * x.
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="NumColumns"/>.
+		/// </param>
+		/// <param name="rhsVector">
+		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
+		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// == oper(this).<see cref="NumRows"/>.
+		/// </param>
+		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
+		/// <exception cref="NonMatchingDimensionsException">
+		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// violate the described contraints.
+		/// </exception>
+		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
         {
             TransposeMatrix transpose = transposeThis ? TransposeMatrix.Transpose : TransposeMatrix.NoTranspose;
-            Preconditions.CheckMultiplicationDimensions(Order, lhsVector.Length);
-            Preconditions.CheckSystemSolutionDimensions(Order, rhsVector.Length);
-            Array.Copy(lhsVector.RawData, rhsVector.RawData, Order);
-            Blas.Dtpmv(StoredTriangle.Upper, transpose, DiagonalValues.NonUnit, Order,
-                this.data, 0, rhsVector.RawData, 0, 1);
+            Preconditions.CheckMultiplicationDimensions(NumRows, lhsVector.Length);
+            Preconditions.CheckSystemSolutionDimensions(NumRows, rhsVector.Length);
+            Array.Copy(lhsVector.Values, rhsVector.Values, NumRows);
+            Blas.Dtpmv(StoredTriangle.Upper, transpose, DiagonalValues.NonUnit, NumRows,
+                this.data, 0, rhsVector.Values, 0, 1);
         }
 
         /// <summary>
@@ -510,33 +478,29 @@ namespace MGroup.LinearAlgebra.Matrices
             double aggregator = identityValue;
             int nnz = data.Length;
             for (int i = 0; i < nnz; ++i) aggregator = processEntry(data[i], aggregator);
-            aggregator = processZeros(Order * Order - nnz, aggregator);
+            aggregator = processZeros(NumRows * NumRows - nnz, aggregator);
             return finalize(aggregator);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrixView.Scale(double)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         IMatrix IMatrixView.Scale(double scalar) => Scale(scalar);
 
         /// <summary>
-        /// Performs the following operation for 0 &lt;= j &lt; <see cref="Order"/>, 0 &lt;= i &lt;= j:
+        /// Performs the following operation for 0 &lt;= j &lt; <see cref="NumRows"/>, 0 &lt;= i &lt;= j:
         /// result[i, j] = <paramref name="scalar"/> * this[i, j]. 
-        /// The resulting matrix is written to a new <see cref="TriangularUpper"/> and then returned.
+        /// The resulting otherMatrix is written to a new <see cref="TriangularUpper"/> and then returned.
         /// </summary>
-        /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
+        /// <param name="scalar">A scalar that multiplies each entry of this otherMatrix.</param>
         public TriangularUpper Scale(double scalar)
         {
             int nnz = this.data.Length;
             double[] result = new double[nnz];
             Array.Copy(this.data, result, nnz);
             Blas.Dscal(nnz, scalar, result, 0, 1);
-            return new TriangularUpper(result, this.Order);
+            return new TriangularUpper(result, this.NumRows);
         }
 
-        /// <summary>
-        /// See <see cref="IMatrix.ScaleIntoThis(double)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public void ScaleIntoThis(double scalar) => Blas.Dscal(data.Length, scalar, data, 0, 1);
 
         /// <summary>
@@ -550,18 +514,18 @@ namespace MGroup.LinearAlgebra.Matrices
 
         /// <summary>
         /// Solves the linear equations system: this * result = <paramref name="rhs"/> by back substitution. WARNING: this
-        /// matrix must be invertible. No exception will be thrown if the matrix is singular.
+        /// otherMatrix must be invertible. No exception will be thrown if the otherMatrix is singular.
         /// </summary>
         /// <param name="rhs">The right hand side vector of the linear system. Constraints: 
-        ///     <paramref name="rhs"/>.<see cref="Vector.Length"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="rhs"/>.<see cref="Vector.Length"/> == this.<see cref="NumRows"/>.</param>
         public Vector SolveLinearSystem(Vector rhs, bool transposeThis = false)
         {
             Preconditions.CheckSystemSolutionDimensions(this, rhs);
             double[] result = rhs.CopyToArray();
             TransposeMatrix transposeBlas = transposeThis ? TransposeMatrix.Transpose : TransposeMatrix.NoTranspose;
-            Blas.Dtpsv(StoredTriangle.Upper, transposeBlas, DiagonalValues.NonUnit, Order,
+            Blas.Dtpsv(StoredTriangle.Upper, transposeBlas, DiagonalValues.NonUnit, NumRows,
                 this.data, 0, result, 0, 1);
-            return Vector.CreateFromArray(result, false);
+            return new Vector(result);
         }
 
         /// <summary>
@@ -570,15 +534,15 @@ namespace MGroup.LinearAlgebra.Matrices
         public IMatrix Transpose() => Transpose(true);
 
         /// <summary>
-        /// Creates a new <see cref="TriangularLower"/> matrix, that is transpose to this: result[i, j] = this[j, i]. The  
-        /// internal array can be copied or shared with this <see cref="TriangularUpper"/> matrix.
+        /// Creates a new <see cref="TriangularLower"/> otherMatrix, that is transpose to this: result[i, j] = this[j, i]. The  
+        /// internal array can be copied or shared with this <see cref="TriangularUpper"/> otherMatrix.
         /// </summary>
         /// <param name="copyInternalArray">If true, the internal array that stores the entries of this 
         ///     <see cref="TriangularUpper"/> instance will be copied and the new <see cref="TriangularLower"/> instance 
-        ///     will have a reference to the copy, which is safer. If false, both the new matrix and this one will have  
+        ///     will have a reference to the copy, which is safer. If false, both the new otherMatrix and this one will have  
         ///     a reference to the same internal array, which is faster.</param>
         public TriangularLower Transpose(bool copyInternalArray)
-            => TriangularLower.CreateFromArray(Order, data, copyInternalArray); // trans(upper col major) = lower row major
+            => TriangularLower.CreateFromArray(NumRows, data, copyInternalArray); // trans(upper col major) = lower row major
         
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -586,5 +550,13 @@ namespace MGroup.LinearAlgebra.Matrices
         {
             return i + ((j + 1) * j) / 2;
         }
-    }
+
+		public void AddIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, 1);
+		public void SubtractIntoThis(IMinimalReadOnlyMatrix otherMatrix) => AxpyIntoThis(otherMatrix, -1);
+		public IMinimalMatrix Add(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, 1);
+		public IMinimalMatrix Subtract(IMinimalReadOnlyMatrix otherMatrix) => Axpy(otherMatrix, -1);
+
+		IMinimalMatrix IMinimalReadOnlyMatrix.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
+		public TriangularUpper CreateZeroWithSameFormat() => new TriangularUpper(data, NumRows);
+	}
 }

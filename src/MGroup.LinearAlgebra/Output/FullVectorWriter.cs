@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using MGroup.LinearAlgebra.Output.Formatting;
 using MGroup.LinearAlgebra.Vectors;
 
@@ -36,7 +36,7 @@ namespace MGroup.LinearAlgebra.Output
         /// Writes the provided vector to Console.
         /// </summary>
         /// <param name="vector">The vector to write.</param>
-        public void WriteToConsole(IIndexable1D vector)
+        public void WriteToConsole(IExtendedReadOnlyVector vector)
         {
             Utilities.WriteToConsole((writer) => WriteToStream(vector, writer));
         }
@@ -48,12 +48,12 @@ namespace MGroup.LinearAlgebra.Output
         /// <param name="path">The absolute path of the file, where <paramref name="vector"/> will be written.</param>
         /// <param name="append">If true, <paramref name="vector"/> will be written after the current contents of the file at
         ///     <paramref name="path"/>. If false, it will overwrite them.</param>
-        public void WriteToFile(IIndexable1D vector, string path, bool append = false)
+        public void WriteToFile(IExtendedReadOnlyVector vector, string path, bool append = false)
         {
             Utilities.WriteToFile((writer) => WriteToStream(vector, writer), path, append);
         }
 
-        private void WriteToStream(IIndexable1D vector, StreamWriter writer)
+        private void WriteToStream(IExtendedReadOnlyVector vector, StreamWriter writer)
         {
             string numberFormat = NumericFormat.GetRealNumberFormat();
             string separator = ArrayFormat.Separator;

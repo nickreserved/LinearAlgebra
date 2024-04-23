@@ -336,17 +336,6 @@ namespace MGroup.LinearAlgebra.Vectors
 		[Obsolete("use EnumerateStoredEntries() instead")]
 		public IEnumerable<(int index, double value)> EnumerateNonZeros() => EnumerateStoredEntries();
 
-        /// <summary>
-        /// See <see cref="IReducible.Reduce(double, ProcessEntry, ProcessZeros, Reduction.Finalize)"/>.
-        /// </summary>
-        public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
-        {
-            for (int i = FromIndex; i < ToIndex; ++i)
-				identityValue = processEntry(Values[i], identityValue);
-			identityValue = processZeros(Length - (ToIndex - FromIndex), identityValue);
-            return finalize(identityValue);
-        }
-
 		[Obsolete("use this[index] = value")]
         public void Set(int index, double value) => this[index] = value;
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using MGroup.LinearAlgebra.Output;
 using MGroup.LinearAlgebra.Output.Formatting;
@@ -18,15 +18,15 @@ namespace MGroup.LinearAlgebra.Tests.Output
         [Fact]
         private static void TestVector1()
         {
-            var vector = Vector.CreateFromArray(TestVectors.Vector1, true);
+            var vector = new Vector((double[])TestVectors.Vector1.Clone());
             var writer = new FullVectorWriter(false) { ArrayFormat = Array1DFormat.Brackets };
             TestWriteOperation(vector, TestVectors.FilePath, writer);
         }
 
-        private static void TestWriteOperation(IIndexable1D vector, string referenceFile)
+        private static void TestWriteOperation(IExtendedReadOnlyVector vector, string referenceFile)
             => TestWriteOperation(vector, referenceFile, new FullVectorWriter(false));
 
-        private static void TestWriteOperation(IIndexable1D vector, string referenceFile, FullVectorWriter writer)
+        private static void TestWriteOperation(IExtendedReadOnlyVector vector, string referenceFile, FullVectorWriter writer)
         {
             string tempFile = Guid.NewGuid().ToString() + ".txt";
             writer.WriteToFile(vector, tempFile);

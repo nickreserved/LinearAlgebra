@@ -202,19 +202,19 @@ namespace MGroup.LinearAlgebra.Matrices
                 return new Matrix3by3(new double[,]
                 {
                     {
-                        data[0, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 0],
-                        data[0, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 1],
-                        data[0, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 2]
+                        data[0, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 0],
+                        data[0, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 1],
+                        data[0, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 2]
                     },
                     {
-                        data[1, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 0],
-                        data[1, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 1],
-                        data[1, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 2]
+                        data[1, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 0],
+                        data[1, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 1],
+                        data[1, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 2]
                     },
                     {
-                        data[2, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 0],
-                        data[2, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 1],
-                        data[2, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 2]
+                        data[2, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 0],
+                        data[2, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 1],
+                        data[2, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 2]
                     },
                 });
             }
@@ -256,15 +256,15 @@ namespace MGroup.LinearAlgebra.Matrices
             else
             {
                 Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-                data[0, 0] += otherCoefficient * ((IMatrixView)otherMatrix)[0, 0];
-                data[0, 1] += otherCoefficient * ((IMatrixView)otherMatrix)[0, 1];
-                data[0, 2] += otherCoefficient * ((IMatrixView)otherMatrix)[0, 2];
-                data[1, 0] += otherCoefficient * ((IMatrixView)otherMatrix)[1, 0];
-                data[1, 1] += otherCoefficient * ((IMatrixView)otherMatrix)[1, 1];
-                data[1, 2] += otherCoefficient * ((IMatrixView)otherMatrix)[1, 2];
-                data[2, 0] += otherCoefficient * ((IMatrixView)otherMatrix)[2, 0];
-                data[2, 1] += otherCoefficient * ((IMatrixView)otherMatrix)[2, 1];
-                data[2, 2] += otherCoefficient * ((IMatrixView)otherMatrix)[2, 2];
+                data[0, 0] += otherCoefficient * ((IIndexable2D)otherMatrix)[0, 0];
+                data[0, 1] += otherCoefficient * ((IIndexable2D)otherMatrix)[0, 1];
+                data[0, 2] += otherCoefficient * ((IIndexable2D)otherMatrix)[0, 2];
+                data[1, 0] += otherCoefficient * ((IIndexable2D)otherMatrix)[1, 0];
+                data[1, 1] += otherCoefficient * ((IIndexable2D)otherMatrix)[1, 1];
+                data[1, 2] += otherCoefficient * ((IIndexable2D)otherMatrix)[1, 2];
+                data[2, 0] += otherCoefficient * ((IIndexable2D)otherMatrix)[2, 0];
+                data[2, 1] += otherCoefficient * ((IIndexable2D)otherMatrix)[2, 1];
+                data[2, 2] += otherCoefficient * ((IIndexable2D)otherMatrix)[2, 2];
             }
         }
 
@@ -350,19 +350,19 @@ namespace MGroup.LinearAlgebra.Matrices
                 return new Matrix3by3(new double[,]
                 {
                     {
-                        binaryOperation(data[0, 0], ((IMatrixView) matrix)[0, 0]),
-                        binaryOperation(data[0, 1], ((IMatrixView) matrix)[0, 1]),
-                        binaryOperation(data[0, 2], ((IMatrixView) matrix)[0, 2])
+                        binaryOperation(data[0, 0], ((IIndexable2D) matrix)[0, 0]),
+                        binaryOperation(data[0, 1], ((IIndexable2D) matrix)[0, 1]),
+                        binaryOperation(data[0, 2], ((IIndexable2D) matrix)[0, 2])
                     },
                     {
-                        binaryOperation(data[1, 0], ((IMatrixView) matrix)[1, 0]),
-                        binaryOperation(data[1, 1], ((IMatrixView) matrix)[1, 1]),
-                        binaryOperation(data[1, 2], ((IMatrixView) matrix)[1, 2])
+                        binaryOperation(data[1, 0], ((IIndexable2D) matrix)[1, 0]),
+                        binaryOperation(data[1, 1], ((IIndexable2D) matrix)[1, 1]),
+                        binaryOperation(data[1, 2], ((IIndexable2D) matrix)[1, 2])
                     },
                     {
-                        binaryOperation(data[2, 0], ((IMatrixView) matrix)[2, 0]),
-                        binaryOperation(data[2, 1], ((IMatrixView) matrix)[2, 1]),
-                        binaryOperation(data[2, 2], ((IMatrixView) matrix)[2, 2])
+                        binaryOperation(data[2, 0], ((IIndexable2D) matrix)[2, 0]),
+                        binaryOperation(data[2, 1], ((IIndexable2D) matrix)[2, 1]),
+                        binaryOperation(data[2, 2], ((IIndexable2D) matrix)[2, 2])
                     }
                 });
             }
@@ -400,15 +400,15 @@ namespace MGroup.LinearAlgebra.Matrices
             else
             {
                 Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-                data[0, 0] = binaryOperation(data[0, 0], ((IMatrixView)otherMatrix)[0, 0]);
-                data[0, 1] = binaryOperation(data[0, 1], ((IMatrixView)otherMatrix)[0, 1]);
-                data[0, 2] = binaryOperation(data[0, 2], ((IMatrixView)otherMatrix)[0, 2]);
-                data[1, 0] = binaryOperation(data[1, 0], ((IMatrixView)otherMatrix)[1, 0]);
-                data[1, 1] = binaryOperation(data[1, 1], ((IMatrixView)otherMatrix)[1, 1]);
-                data[1, 2] = binaryOperation(data[1, 2], ((IMatrixView)otherMatrix)[1, 2]);
-                data[2, 0] = binaryOperation(data[2, 0], ((IMatrixView)otherMatrix)[2, 0]);
-                data[2, 1] = binaryOperation(data[2, 1], ((IMatrixView)otherMatrix)[2, 1]);
-                data[2, 2] = binaryOperation(data[2, 2], ((IMatrixView)otherMatrix)[2, 2]);
+                data[0, 0] = binaryOperation(data[0, 0], ((IIndexable2D)otherMatrix)[0, 0]);
+                data[0, 1] = binaryOperation(data[0, 1], ((IIndexable2D)otherMatrix)[0, 1]);
+                data[0, 2] = binaryOperation(data[0, 2], ((IIndexable2D)otherMatrix)[0, 2]);
+                data[1, 0] = binaryOperation(data[1, 0], ((IIndexable2D)otherMatrix)[1, 0]);
+                data[1, 1] = binaryOperation(data[1, 1], ((IIndexable2D)otherMatrix)[1, 1]);
+                data[1, 2] = binaryOperation(data[1, 2], ((IIndexable2D)otherMatrix)[1, 2]);
+                data[2, 0] = binaryOperation(data[2, 0], ((IIndexable2D)otherMatrix)[2, 0]);
+                data[2, 1] = binaryOperation(data[2, 1], ((IIndexable2D)otherMatrix)[2, 1]);
+                data[2, 2] = binaryOperation(data[2, 2], ((IIndexable2D)otherMatrix)[2, 2]);
             }
         }
 
@@ -478,15 +478,15 @@ namespace MGroup.LinearAlgebra.Matrices
             }
             else
             {
-                return comparer.AreEqual(this.data[0, 0], ((IMatrixView) otherMatrix)[0, 0])
-                    && comparer.AreEqual(this.data[0, 1], ((IMatrixView)otherMatrix)[0, 1])
-                    && comparer.AreEqual(this.data[0, 2], ((IMatrixView)otherMatrix)[0, 2])
-                    && comparer.AreEqual(this.data[1, 0], ((IMatrixView)otherMatrix)[1, 0])
-                    && comparer.AreEqual(this.data[1, 1], ((IMatrixView)otherMatrix)[1, 1])
-                    && comparer.AreEqual(this.data[1, 2], ((IMatrixView)otherMatrix)[1, 2])
-                    && comparer.AreEqual(this.data[2, 0], ((IMatrixView)otherMatrix)[2, 0])
-                    && comparer.AreEqual(this.data[2, 1], ((IMatrixView)otherMatrix)[2, 1])
-                    && comparer.AreEqual(this.data[2, 2], ((IMatrixView)otherMatrix)[2, 2]);
+                return comparer.AreEqual(this.data[0, 0], ((IIndexable2D) otherMatrix)[0, 0])
+                    && comparer.AreEqual(this.data[0, 1], ((IIndexable2D)otherMatrix)[0, 1])
+                    && comparer.AreEqual(this.data[0, 2], ((IIndexable2D)otherMatrix)[0, 2])
+                    && comparer.AreEqual(this.data[1, 0], ((IIndexable2D)otherMatrix)[1, 0])
+                    && comparer.AreEqual(this.data[1, 1], ((IIndexable2D)otherMatrix)[1, 1])
+                    && comparer.AreEqual(this.data[1, 2], ((IIndexable2D)otherMatrix)[1, 2])
+                    && comparer.AreEqual(this.data[2, 0], ((IIndexable2D)otherMatrix)[2, 0])
+                    && comparer.AreEqual(this.data[2, 1], ((IIndexable2D)otherMatrix)[2, 1])
+                    && comparer.AreEqual(this.data[2, 2], ((IIndexable2D)otherMatrix)[2, 2]);
             }
         }
 
@@ -575,20 +575,20 @@ namespace MGroup.LinearAlgebra.Matrices
                 return new Matrix3by3(new double[,]
                 {
                     {
-                        thisCoefficient * data[0, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 0],
-                        thisCoefficient * data[0, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 1],
-                        thisCoefficient * data[0, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 2]
+                        thisCoefficient * data[0, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 0],
+                        thisCoefficient * data[0, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 1],
+                        thisCoefficient * data[0, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 2]
 
                     },
                     {
-                        thisCoefficient * data[1, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 0],
-                        thisCoefficient * data[1, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 1],
-                        thisCoefficient * data[1, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 2]
+                        thisCoefficient * data[1, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 0],
+                        thisCoefficient * data[1, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 1],
+                        thisCoefficient * data[1, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 2]
                     },
                     {
-                        thisCoefficient * data[2, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 0],
-                        thisCoefficient * data[2, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 1],
-                        thisCoefficient * data[2, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 2]
+                        thisCoefficient * data[2, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 0],
+                        thisCoefficient * data[2, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 1],
+                        thisCoefficient * data[2, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 2]
                     }
                 });
             }
@@ -634,15 +634,15 @@ namespace MGroup.LinearAlgebra.Matrices
             else
             {
                 Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
-                data[0, 0] = thisCoefficient * data[0, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 0];
-                data[0, 1] = thisCoefficient * data[0, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 1];
-                data[0, 2] = thisCoefficient * data[0, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[0, 2];
-                data[1, 0] = thisCoefficient * data[1, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 0];
-                data[1, 1] = thisCoefficient * data[1, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 1];
-                data[1, 2] = thisCoefficient * data[1, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[1, 2];
-                data[2, 0] = thisCoefficient * data[2, 0] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 0];
-                data[2, 1] = thisCoefficient * data[2, 1] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 1];
-                data[2, 2] = thisCoefficient * data[2, 2] + otherCoefficient * ((IMatrixView)otherMatrix)[2, 2];
+                data[0, 0] = thisCoefficient * data[0, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 0];
+                data[0, 1] = thisCoefficient * data[0, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 1];
+                data[0, 2] = thisCoefficient * data[0, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[0, 2];
+                data[1, 0] = thisCoefficient * data[1, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 0];
+                data[1, 1] = thisCoefficient * data[1, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 1];
+                data[1, 2] = thisCoefficient * data[1, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[1, 2];
+                data[2, 0] = thisCoefficient * data[2, 0] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 0];
+                data[2, 1] = thisCoefficient * data[2, 1] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 1];
+                data[2, 2] = thisCoefficient * data[2, 2] + otherCoefficient * ((IIndexable2D)otherMatrix)[2, 2];
             }
         }
 
@@ -850,12 +850,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this otherMatrix. It sits on the left hand side of the equation y = oper(A) * x.
 		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumColumns"/>.
+		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
 		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == oper(this).<see cref="ILinearTransformation.NumRows"/>.
+		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		public void MultiplyIntoResult(Vector3 lhsVector, Vector3 rhsVector, bool transposeThis = false)

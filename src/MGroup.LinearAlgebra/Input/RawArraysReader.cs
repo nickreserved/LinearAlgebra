@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using MGroup.LinearAlgebra.Matrices;
@@ -39,13 +40,17 @@ namespace MGroup.LinearAlgebra.Input
             double[] values;
             using (var reader = new StreamReader(valuesArrayPath))
             {
-                string line = reader.ReadLine();
+				// Decimal separator pinned as "."
+				var nfi = new NumberFormatInfo();
+				nfi.NumberDecimalSeparator = ".";
+
+				string line = reader.ReadLine();
                 int length = int.Parse(line.Trim());
                 values = new double[length];
                 for (int i = 0; i < length; ++i)
                 {
                     line = reader.ReadLine();
-                    values[i] = double.Parse(line.TrimEnd());
+                    values[i] = double.Parse(line.TrimEnd(), nfi);
                 }
             }
 

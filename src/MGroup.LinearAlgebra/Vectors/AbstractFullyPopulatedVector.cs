@@ -4,12 +4,14 @@ namespace MGroup.LinearAlgebra.Vectors
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Matrices;
+	using MGroup.LinearAlgebra.Reduction;
 
 
 	/// <summary>
 	/// A fully populated with elements vector.
 	/// </summary>
-	/// Fully populated does not mean contiguous stored elements.
+	/// <remarks>Fully populated does not mean contiguous stored elements.</remarks>
+	[Serializable]
 	public abstract class AbstractFullyPopulatedVector : IExtendedVector
 	{
 		/// <summary>
@@ -130,7 +132,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector Copy() => new Vector(CopyToArray());
 		IExtendedVector IExtendedReadOnlyVector.Copy() => Copy();
 
-		public Vector CreateZeroWithTheSameFormat() => new Vector(new double[Length]);
+		public Vector CreateZeroWithTheSameFormat() => new Vector(Length);
 		IExtendedVector IExtendedReadOnlyVector.CreateZeroWithSameFormat() => CreateZeroWithTheSameFormat();
 
 
@@ -293,5 +295,14 @@ namespace MGroup.LinearAlgebra.Vectors
 			if (otherVector is AbstractFullyPopulatedVector fullyPopulatedVector) return Equals(fullyPopulatedVector, tolerance);
 			throw new NotImplementedException("DoEntrywiseIntoThis(NotSupportedVector, binaryOperation)");
 		}
+
+		public double Reduce(double identityValue, ProcessEntry processEntry, ProcessZeros processZeros, Finalize finalize)
+		{
+			double accumulator = identityValue;
+			for (int i = 0; i < Length; ++i) accumulator = processEntry(this[i], accumulator);
+			// no zeros implied
+			return finalize(accumulator);
+		}
+
 	}
 }

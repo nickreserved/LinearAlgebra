@@ -1,4 +1,4 @@
-﻿using MGroup.LinearAlgebra.Tests.TestData;
+using MGroup.LinearAlgebra.Tests.TestData;
 using MGroup.LinearAlgebra.Tests.Utilities;
 using MGroup.LinearAlgebra.Vectors;
 using Xunit;
@@ -28,7 +28,7 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
                 comparer.AssertEqual(expected, dense.Axpy(sparse, 3.0));
 
                 // AxpyIntoThis
-                var temp = Vector.CreateFromVector(dense);
+                var temp = new Vector(dense);
                 temp.AxpyIntoThis(sparse, 3.0);
                 comparer.AssertEqual(expected, temp);
             });
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Tests.Vectors
             {
                 var sparse = SparseVector.CreateFromArrays(SparseVector10.Length, SparseVector10.NonZeroValues,
                     SparseVector10.NonZeroIndices, true, false);
-                var dense = Vector.CreateFromArray(SparseVector10.OtherVector);
+                var dense = new Vector(SparseVector10.OtherVector);
 
                 // DotProduct() with dense vector
                 comparer.AssertEqual(SparseVector10.DotThisTimesOther, sparse.DotProduct(dense));

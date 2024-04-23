@@ -2,11 +2,13 @@ namespace MGroup.LinearAlgebra.Vectors
 {
 	using System;
 
+	using MGroup.LinearAlgebra.Reduction;
+
 
 	/// <summary>
 	/// The minimal vector functionality, which not require any modification to vector.
 	/// </summary>
-	public interface IExtendedReadOnlyVector : IMinimalReadOnlyVector
+	public interface IExtendedReadOnlyVector : IMinimalReadOnlyVector, IReducible
 	{
 		[Obsolete("This property is EXTREMELY inefficient on sparce vectors")]
 		double this[int index] { get; }
@@ -86,7 +88,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		IMinimalVector IMinimalReadOnlyVector.Copy() => Copy();
 
 		new IExtendedVector CreateZeroWithSameFormat();
-		IMinimalVector IMinimalReadOnlyVector.CreateZero() => CreateZeroWithSameFormat();
+		IMinimalVector IMinimalReadOnlyVector.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
 
 		new IExtendedVector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation);
 		IMinimalVector IMinimalReadOnlyVector.DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);

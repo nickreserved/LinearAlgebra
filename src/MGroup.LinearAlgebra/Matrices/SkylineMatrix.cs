@@ -287,7 +287,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, 1.0, (IMatrixView) otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, 1.0, (IIndexable2D) otherMatrix, otherCoefficient);
         }
 
         /// <summary>
@@ -473,7 +473,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.DoEntrywise(this, (IMatrixView) otherMatrix, binaryOperation);
+            return DenseStrategies.DoEntrywise(this, (IIndexable2D) otherMatrix, binaryOperation);
         }
 
         /// <inheritdoc/>
@@ -582,14 +582,14 @@ namespace MGroup.LinearAlgebra.Matrices
                 int columnTop = j - diagOffsets[j+1] + colOffset + 1;
                 for (int i = 0; i < columnTop; ++i) // zero entries above stored column
                 {
-                    if (!( comparer.AreEqual(0.0, ((IMatrixView)other)[i, j]) && comparer.AreEqual(0.0, ((IMatrixView)other)[j, i]) )) return false;
+                    if (!( comparer.AreEqual(0.0, ((IIndexable2D)other)[i, j]) && comparer.AreEqual(0.0, ((IIndexable2D)other)[j, i]) )) return false;
                 }
                 for (int i = columnTop; i < j; ++i) // non zero entries of column, excluding diafonal
                 {
                     double value = values[colOffset + j - i];
-                    if (!(comparer.AreEqual(value, ((IMatrixView)other)[i, j]) && comparer.AreEqual(value, ((IMatrixView)other)[j, i]))) return false;
+                    if (!(comparer.AreEqual(value, ((IIndexable2D)other)[i, j]) && comparer.AreEqual(value, ((IIndexable2D)other)[j, i]))) return false;
                 }
-                if (!comparer.AreEqual(values[colOffset], ((IMatrixView)other)[j, j])) return false; // non zero diagonal entry
+                if (!comparer.AreEqual(values[colOffset], ((IIndexable2D)other)[j, j])) return false; // non zero diagonal entry
             }
             return true; // At this point all entries have been checked and are equal
         }
@@ -894,7 +894,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
 
             // All entries must be processed. TODO: optimizations may be possible (e.g. only access the nnz in this matrix)
-            return DenseStrategies.LinearCombination(this, thisCoefficient, (IMatrixView)otherMatrix, otherCoefficient);
+            return DenseStrategies.LinearCombination(this, thisCoefficient, (IIndexable2D)otherMatrix, otherCoefficient);
         }
 
         /// <inheritdoc/>
@@ -995,7 +995,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public Vector Multiply(Vector vector)
         {
             //TODO: this performs redundant dimension checks
-            var result = new Vector(new double[NumColumns]);
+            var result = new Vector(NumColumns);
             MultiplyIntoResult(vector, result);
             return result;
         }
@@ -1023,12 +1023,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = A * x.
 		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == this.<see cref="ILinearTransformation.NumColumns"/>.
+		/// == this.<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
 		/// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
-		/// == this.<see cref="ILinearTransformation.NumRows"/>.
+		/// == this.<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
