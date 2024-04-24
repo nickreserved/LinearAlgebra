@@ -6,23 +6,27 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 	using MGroup.LinearAlgebra.Exceptions;
 
 	/// <summary>
-	/// Represents a sparse matrix with integer entries. Non-zero entries are stored in row-major order using dictionaries.
+	/// Represents a sparse (square or rectangular) matrix with integer entries. Non-zero entries are stored in row-major order
+	/// using an instance of SortedDictionary for each row.
 	/// </summary>
 	public class IntDokRowMajor : IIndexableInt2D
 	{
 		private readonly SortedDictionary<int, int>[] rows;
 
-		public IntDokRowMajor(int numRows, int numColumns, SortedDictionary<int, int>[] columns)
+		private IntDokRowMajor(int numRows, int numColumns, SortedDictionary<int, int>[] columns)
 		{
 			this.rows = columns;
 			this.NumRows = numRows;
 			this.NumColumns = numColumns;
 		}
 
+		/// <inheritdoc/>>
 		public int NumColumns { get; }
 
+		/// <inheritdoc/>>
 		public int NumRows { get; }
 
+		/// <inheritdoc/>>
 		public int this[int rowIdx, int colIdx]
 		{
 			get
@@ -43,6 +47,13 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="IntDokRowMajor"/> with all entries being equal to 0. In essence, no entry is
+		/// explicitly stored yet.
+		/// </summary>
+		/// <param name="numRows">The number of rows of the new matrix.</param>
+		/// <param name="numColumns">The number of columns of the new matrix.</param>
+		/// <returns>An integer matrix with sparse, row-major format, using dictionaries.</returns>
 		public static IntDokRowMajor CreateZero(int numRows, int numColumns)
 		{
 			var rows = new SortedDictionary<int, int>[numRows];
@@ -54,6 +65,20 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			return new IntDokRowMajor(numRows, numColumns, rows);
 		}
 
+		/// <summary>
+		/// Creates the values and indexing arrays in CSR storage format of the current matrix. This method should be
+		/// called after fully defining the matrix in <see cref="IntDokRowMajor"/> format.
+		/// </summary>
+		/// <remarks>
+		/// In the returned arrays "values" and "colIndices", the entries corresponding to the same row are in ascending order.
+		/// </remarks>
+		/// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
+		/// <returns>
+		/// "values": the nonzero entries of the matrix.
+		/// "colIndices": the column indices of the entries in "values".
+		/// "rowOffsets": the start of each row of the matrix inside "values" and "colIndices". There is an additional entry at
+		/// the end of this array that declares how many nonzero entries there are.
+		/// </returns>
 		public (int[] values, int[] colIndices, int[] rowOffsets) BuildCsrArrays()
 		{
 			int[] rowOffsets = new int[NumRows + 1];
@@ -88,6 +113,11 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			return (values, colIndices, rowOffsets);
 		}
 
+		/// <summary>
+		/// Counts the number of entries explicitly stored by this matrix. These are mostly non zeros, but some zero entries
+		/// could end up being stored explicitly too.
+		/// </summary>
+		/// <returns>The number of stored entries.</returns>
 		public int CountNonZeros()
 		{
 			int count = 0;

@@ -7,14 +7,14 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 
 	/// <summary>
 	/// Represents a symmetric sparse matrix with integer entries. The non-zero entries of the diagonal and upper triangle are 
-	/// stored in column-major order using dictionaries.
+	/// stored in column-major order using an instance of SortedDictionary for each column.
 	/// </summary>
 	public class IntDokSymColMajor : IIndexableInt2D
 	{
 		private readonly int order;
 		private readonly SortedDictionary<int, int>[] columns;
 
-		public IntDokSymColMajor(int order, SortedDictionary<int, int>[] columns)
+		private IntDokSymColMajor(int order, SortedDictionary<int, int>[] columns)
 		{
 			this.order = order;
 			this.columns = columns;
@@ -23,10 +23,13 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			this.NumColumns = order;
 		}
 
+		/// <inheritdoc/>>
 		public int NumColumns { get; }
 
+		/// <inheritdoc/>>
 		public int NumRows { get; }
 
+		/// <inheritdoc/>>
 		public int this[int rowIdx, int colIdx]
 		{
 			get
@@ -61,6 +64,13 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of <see cref="IntDokSymColMajor"/> with all entries being equal to 0. In essence, no entry
+		/// is explicitly stored yet.
+		/// </summary>
+		/// <param name="numRows">The number of rows of the new matrix.</param>
+		/// <param name="numColumns">The number of columns of the new matrix.</param>
+		/// <returns>An integer matrix with sparse, col-major format, using dictionaries.</returns>
 		public static IntDokSymColMajor CreateZero(int order)
 		{
 			var columns = new SortedDictionary<int, int>[order];
@@ -72,6 +82,20 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			return new IntDokSymColMajor(order, columns);
 		}
 
+		/// <summary>
+		/// Creates the values and indexing arrays in symmetric CSC storage format of the current matrix. This method should be
+		/// called after fully defining the matrix in <see cref="IntDokSymColMajor"/> format.
+		/// </summary>
+		/// <remarks>
+		/// In the returned arrays "values" and "rowIndices", the entries corresponding to the same column are in ascending order.
+		/// </remarks>
+		/// <exception cref="EmptyMatrixBuilderException">Thrown if no non-zero entries have been defined yet.</exception>
+		/// <returns>
+		/// "values": the nonzero entries of the matrix that lie on or above the diagonal.
+		/// "rowIndices": the row indices of the entries in "values".
+		/// "colOffsets": the start of each column of the matrix inside "values" and "rowIndices". There is an additional entry
+		/// at the end of this array that declares how many explicitly stored nonzero entries there are.
+		/// </returns>
 		public (int[] values, int[] rowIndices, int[] colOffsets) BuildCscArrays()
 		{
 			int[] colOffsets = new int[order + 1];
@@ -106,6 +130,11 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			return (values, rowIndices, colOffsets);
 		}
 
+		/// <summary>
+		/// Counts the number of entries explicitly stored by this matrix. These are mostly non zeros, but some zero entries
+		/// could end up being stored explicitly too. All these entries lies on or above the diagonal of the matrix.
+		/// </summary>
+		/// <returns>The number of stored entries.</returns>
 		public int CountNonZeros()
 		{
 			int count = 0;

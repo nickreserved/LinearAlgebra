@@ -18,15 +18,10 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 			this.NumColumns = numColumns;
 		}
 
-		/// <summary>
-		/// The number of columns of the matrix.
-		/// </summary>
+		/// <inheritdoc/>>
 		public int NumColumns { get; }
 
-
-		/// <summary>
-		/// The number of rows of the matrix.
-		/// </summary>
+		/// <inheritdoc/>>
 		public int NumRows { get; }
 
 		/// <summary>
@@ -35,6 +30,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.IntegerMatrices
 		/// </summary>
 		public int[] RawValues => values;
 
+		/// <inheritdoc/>>
 		public int this[int rowIdx, int colIdx]
 		{
 			get => values[colIdx * NumRows + rowIdx];
