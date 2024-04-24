@@ -6,6 +6,11 @@ namespace MGroup.LinearAlgebra.SchurComplements
 	using MGroup.LinearAlgebra.Triangulation;
 	using MGroup.LinearAlgebra.Vectors;
 
+	/// <summary>
+	/// Calculates the Schur complement, where the original matrix A is partitioned into 4 submatrices A = [A00, A01; A10, A11]
+	/// (in Matlabb notation). Specifically A00 is in full, column-major format (<see cref="Matrix"/>),
+	/// A01 and A10 are in CSR format (<see cref="CsrMatrix"/>) and A11 is provided through some factorization.
+	/// </summary>
 	public static class SchurComplementFullCsrCsrCsc
 	{
 		/// <summary>
