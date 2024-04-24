@@ -1,9 +1,5 @@
 namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text;
-
 	using MGroup.LinearAlgebra.Matrices;
 
 	/// <summary>
@@ -11,6 +7,9 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 	/// columns of the original matrix A that belong to the group "0" or "1", do not have to be contiguous.
 	/// The original matrix A is in CSR format. Submatrices A01, A10 are in CSR format. Submatrix A11 is in CSC format.
 	/// </summary>
+	/// <remarks>
+	/// Base class for square, nonsymmetric submatrix extractors.
+	/// </remarks>
 	public abstract class SubmatrixExtractorCsrBase
 	{
 		protected int[] indicesGroup0;
@@ -53,7 +52,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 		public CscMatrix Submatrix11 { get; protected set; }
 
 		/// <summary>
-		/// Deletes the submatrices and any other data that was stored previously, returning the object to its just-initialized 
+		/// Deletes the submatrices and any other data that was stored previously, returning the object to its just-initialized
 		/// state.
 		/// </summary>
 		public virtual void Clear()

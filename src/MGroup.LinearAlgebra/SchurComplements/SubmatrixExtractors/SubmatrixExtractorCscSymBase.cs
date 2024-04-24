@@ -1,8 +1,6 @@
 namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 {
-	using System;
 	using System.Collections.Generic;
-	using System.Text;
 
 	using MGroup.LinearAlgebra.Commons;
 	using MGroup.LinearAlgebra.Matrices;
@@ -11,9 +9,12 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 	/// Divides a symmetric matrix A into 4 submatrices, such as A = [A00, A01; A10, A11] (in Matlab format). The rows and
 	/// columns of the original matrix A that belong to the group "0" or "1", do not have to be contiguous.
 	/// Submatrices A00 and A11 are symmetric, while A10 is not expicitly stored because it is the transpose of A01.
-	/// The original matrix A is in symmetric CSC format, namely only the diagonal and upper triangle are stored. Submatrix A01 
+	/// The original matrix A is in symmetric CSC format, namely only the diagonal and upper triangle are stored. Submatrix A01
 	/// is in CSR format. Submatrix A11 is in symmetric CSC format (same as A).
 	/// </summary>
+	/// <remarks>
+	/// Base class for symmetric submatrix extractors.
+	/// </remarks>
 	public abstract class SubmatrixExtractorCscSymBase
 	{
 		protected int[] indicesGroup0;
@@ -46,7 +47,7 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 		public SymmetricCscMatrix Submatrix11 { get; protected set; }
 
 		/// <summary>
-		/// Deletes the submatrices and any other data that was stored previously, returning the object to its just-initialized 
+		/// Deletes the submatrices and any other data that was stored previously, returning the object to its just-initialized
 		/// state.
 		/// </summary>
 		public virtual void Clear()
@@ -122,54 +123,37 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 			return BuildCscArrays(rowsColsToKeep.Length, columnsA00);
 		}
 
-		//public (int[] rowIndices, int[] colOffsets) ExtractSparsityPattern(SymmetricCscMatrix originalMatrix, int[] rowsColsToKeep)
-		//{
-		//	// Store which entries of each column are nonzero
-		//	var columnsA00 = new SortedSet<int>[rowsColsToKeep.Length];
-		//	for (int j = 0; j < rowsColsToKeep.Length; ++j)
-		//	{
-		//		columnsA00[j] = new SortedSet<int>();
-		//	}
+		/// <summary>
+		/// Creates an array that maps the indices (rows/columns) of the original matrix to the indices of its 2x2 submatrices.
+		/// Group 0 indices i are stored as: -i-1. Group 1 indices are stored as they are.
+		/// </summary>
+		/// <param name="originalMatrixOrder">The number of rows and columns of the original matrix.</param>
+		/// <param name="indicesGroup0">
+		/// The rows and columns of the original matrix that belong to group 0, namely they will correspond to rows and columns
+		/// of the submatrix A00.
+		/// </param>
+		/// <param name="indicesGroup1">
+		/// The rows and columns of the original matrix that belong to group 1, namely they will correspond to rows and columns
+		/// of the submatrix A11.
+		/// </param>
+		/// <returns>The row/column indices into the submatrices for each row/column index of the original matrix.</returns>
+		internal static int[] MapOriginalToSubmatrixIndices(int originalMatrixOrder, int[] indicesGroup0, int[] indicesGroup1)
+		{
+			var originalToSubIndices = new int[originalMatrixOrder];
+			for (int i0 = 0; i0 < indicesGroup0.Length; ++i0)
+			{
+				originalToSubIndices[indicesGroup0[i0]] = -i0 - 1;
+			}
 
-		//	// Original matrix indices to submatrix indices. Indices not belonging to group 0 will be marked as -1.
-		//	var originalToSubIndices = new int[originalMatrix.NumRows];
-		//	Fill(originalToSubIndices, -1);
-		//	for (int i0 = 0; i0 < rowsColsToKeep.Length; ++i0)
-		//	{
-		//		originalToSubIndices[rowsColsToKeep[i0]] = i0;
-		//	}
+			for (int i1 = 0; i1 < indicesGroup1.Length; ++i1)
+			{
+				originalToSubIndices[indicesGroup1[i1]] = i1;
+			}
 
-		//	// Iterate the non zero values array of the original sparse matrix
-		//	for (int j = 0; j < originalMatrix.NumColumns; ++j)
-		//	{
-		//		int start = originalMatrix.RawColOffsets[j];
-		//		int end = originalMatrix.RawColOffsets[j + 1];
-		//		int subJ = originalToSubIndices[j];
-		//		if (subJ >= 0) // j belongs to group 0 indices
-		//		{
-		//			for (int t = start; t < end; ++t)
-		//			{
-		//				int i = originalMatrix.RawRowIndices[t];
-		//				int subI = originalToSubIndices[i];
-		//				if (subI >= 0) // (i, j) belongs to submatrix A00
-		//				{
-		//					if (subI <= subJ)
-		//					{
-		//						columnsA00[subJ].Add(subI);
-		//					}
-		//					else // ensure that only upper triangular entries are storedr
-		//					{
-		//						columnsA00[subI].Add(subJ);
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
+			return originalToSubIndices;
+		}
 
-		//	return BuildCscArrays(rowsColsToKeep.Length, columnsA00);
-		//}
-
-		protected static (int[] rowIndices, int[] colOffsets) BuildCscArrays(int order, SortedSet<int>[] nonzeroRowsOfEachCol)
+		private static (int[] rowIndices, int[] colOffsets) BuildCscArrays(int order, SortedSet<int>[] nonzeroRowsOfEachCol)
 		{
 			// Create CSC arrays from the dictionary
 			int[] colOffsets = new int[order + 1];
@@ -194,29 +178,6 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 			}
 
 			return (rowIndices, colOffsets);
-		}
-
-		/// <summary>
-		/// Creates an array that maps the indices (rows/columns) of the original matrix to the indices of its 2x2 submatrices.
-		/// Group 0 indices i are stored as: -i-1. Group 1 indices are stored as they are.
-		/// </summary>
-		/// <param name="originalOrder"></param>
-		/// <param name="indicesGroup0"></param>
-		/// <param name="indicesGroup1"></param>
-		internal static int[] MapOriginalToSubmatrixIndices(int originalOrder, int[] indicesGroup0, int[] indicesGroup1)
-		{
-			var originalToSubIndices = new int[originalOrder];
-			for (int i0 = 0; i0 < indicesGroup0.Length; ++i0)
-			{
-				originalToSubIndices[indicesGroup0[i0]] = -i0 - 1;
-			}
-
-			for (int i1 = 0; i1 < indicesGroup1.Length; ++i1)
-			{
-				originalToSubIndices[indicesGroup1[i1]] = i1;
-			}
-
-			return originalToSubIndices;
 		}
 	}
 }

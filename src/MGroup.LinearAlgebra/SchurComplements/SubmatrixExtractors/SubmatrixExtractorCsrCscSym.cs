@@ -7,16 +7,43 @@ namespace MGroup.LinearAlgebra.SchurComplements.SubmatrixExtractors
 	using MGroup.LinearAlgebra.Matrices;
 	using MGroup.LinearAlgebra.SchurComplements.IntegerMatrices;
 
+	/// <summary>
+	/// <inheritdoc path="/summary"/>
+	/// Submatrix A00 is in CSR format.
+	/// </summary>
 	public class SubmatrixExtractorCsrCscSym : SubmatrixExtractorCscSymBase
 	{
+		/// <summary>
+		/// A00 of A = [A00, A01; A10, A11] (using Matlab notation).
+		/// </summary>
 		public CsrMatrix Submatrix00 { get; private set; }
 
+		/// <inheritdoc/>
 		public override void Clear()
 		{
 			base.Clear();
 			Submatrix00 = null;
 		}
 
+		/// <summary>
+		/// Calculates the submatrices of A=<paramref name="originalMatrix"/>, such that A = [A00, A01; A10, A11]
+		/// (in Matlab notation). In this partition, the rows and columns that correspond to groups 0 and 1 are defined in
+		/// <paramref name="indicesGroup0"/> and <paramref name="indicesGroup1"/> respectively. The resulting submatrices are
+		/// stored inside the properties of this object.
+		/// </summary>
+		/// <param name="originalMatrix">The original matrix A that will be partitioned.</param>
+		/// <param name="indicesGroup0">
+		/// The rows and columns of A that will end up as rows and columns of A00.
+		/// They do not need to be contiguous or in any order.
+		/// </param>
+		/// <param name="indicesGroup1">
+		/// The rows and columns of A that will end up as rows and columns of A11.
+		/// They do not need to be contiguous or in any order.
+		/// </param>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown if a different decomposition was performed before (matrix with different sparsity pattern or different
+		/// index groups), without clearing the stored data of this object.
+		/// </exception>
 		public void ExtractSubmatrices(SymmetricCscMatrix originalMatrix, int[] indicesGroup0, int[] indicesGroup1)
 		{
 			if (this.originalMatrix == null)
