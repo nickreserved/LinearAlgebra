@@ -788,11 +788,6 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <summary>
-        /// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal.
-        /// </summary>
-        public Vector GetDiagonal() => Vector.CreateFromArray(GetDiagonalAsArray(), false);
-
-        /// <summary>
         /// Returns an array with the entries of the matrix's main diagonal.
         /// </summary>
         public double[] GetDiagonalAsArray()

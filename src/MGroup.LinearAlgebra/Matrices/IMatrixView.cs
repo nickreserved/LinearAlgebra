@@ -10,10 +10,9 @@ namespace MGroup.LinearAlgebra.Matrices
     /// <summary>
     /// It supports common operations that do not mutate the underlying matrix. If you need to store a matrix and then pass it
     /// around or allow acceess to it, consider using this interface instead of <see cref="Matrix"/> for extra safety.
-    /// Authors: Serafeim Bakalakos
     /// </summary>
     public interface IMatrixView: 
-		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, ΙDiagonalAccessible
+		IIndexable2D, IReducible, IEntrywiseOperableView2D<IMatrixView, IMatrix>, ISliceable2D, IDiagonalAccessible
 	{
         /// <summary>
         /// Performs the following operation for all (i, j):
@@ -27,21 +26,21 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
         ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-        IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient);
+        IMatrix Axpy(IMatrixView otherMatrix, double otherCoefficient) => LinearCombination(1.0, otherMatrix, otherCoefficient);
 
-        /// <summary>
-        /// Copies this <see cref="IMatrixView"/> object. A new matrix of the same type as this object is initialized and 
-        /// returned.
-        /// </summary>
-        /// <param name="copyIndexingData">
-        /// If true, all data of this object will be copied. If false, only the array(s) containing the values of the stored 
-        /// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
-        /// </param>
-        IMatrix Copy(bool copyIndexingData = false);
+		/// <summary>
+		/// Copies this <see cref="IMatrixView"/> object. A new matrix of the same type as this object is initialized and 
+		/// returned.
+		/// </summary>
+		/// <param name="copyIndexingData">
+		/// If true, all data of this object will be copied. If false, only the array(s) containing the values of the stored 
+		/// matrix entries will be copied. The new matrix will reference the same indexing arrays as this one.
+		/// </param>
+		IMatrix Copy(bool copyIndexingData = false) => CopyToFullMatrix();
 
-        /// Copies this <see cref="IMatrixView"/> object. The new matrix will have all its entries explicitly stored.
-        /// </summary>
-        Matrix CopyToFullMatrix();
+		/// Copies this <see cref="IMatrixView"/> object. The new matrix will have all its entries explicitly stored.
+		/// </summary>
+		Matrix CopyToFullMatrix();
 
         /// Performs the following operation for all (i, j):
         /// result[i, j] = <paramref name="thisCoefficient"/> * this[i, j] + <paramref name="otherCoefficient"/> * 
@@ -55,7 +54,8 @@ namespace MGroup.LinearAlgebra.Matrices
         /// <param name="otherCoefficient">A scalar that multiplies each entry of <paramref name="otherMatrix"/>.</param>
         /// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="otherMatrix"/> has different 
         ///     <see cref="IIndexable2D.NumRows"/> or <see cref="IIndexable2D.NumColumns"/> than this.</exception>
-        IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient);
+        IMatrix LinearCombination(double thisCoefficient, IMatrixView otherMatrix, double otherCoefficient) 
+			=> DoEntrywise(otherMatrix, (x, y) => thisCoefficient * x + otherCoefficient * y);
 
         /// <summary>
         /// Performs the matrix-matrix multiplication: oper(<paramref name="other"/>) * oper(this).
@@ -133,15 +133,15 @@ namespace MGroup.LinearAlgebra.Matrices
         /// The resulting matrix is written in a new object and then returned.
         /// </summary>
         /// <param name="scalar">A scalar that multiplies each entry of this matrix.</param>
-        IMatrix Scale(double scalar);
+        IMatrix Scale(double scalar) => DoToAllEntries(x => scalar * x);
 
-        /// <summary>
-        /// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
-        /// implementations of <see cref="IMatrixView"/> may offer more efficient transpositions, that do not copy the entries.
-        /// If the transposed matrix will be used only for multiplications, <see cref="MultiplyLeft(IMatrixView, bool, bool)"/>,
-        /// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IVectorView, bool)"/> are more 
-        /// effient generally.
-        /// </summary>
-        IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.
+		/// <summary>
+		/// Returns a matrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
+		/// implementations of <see cref="IMatrixView"/> may offer more efficient transpositions, that do not copy the entries.
+		/// If the transposed matrix will be used only for multiplications, <see cref="MultiplyLeft(IMatrixView, bool, bool)"/>,
+		/// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IVectorView, bool)"/> are more 
+		/// effient generally.
+		/// </summary>
+		IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.
     }
 }

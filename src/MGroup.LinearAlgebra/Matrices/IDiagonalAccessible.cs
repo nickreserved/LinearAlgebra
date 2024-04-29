@@ -7,10 +7,10 @@ namespace MGroup.LinearAlgebra.Matrices
 	using MGroup.LinearAlgebra.Exceptions;
 	using MGroup.LinearAlgebra.Vectors;
 
-	public interface ΙDiagonalAccessible : IIndexable2D
+	public interface IDiagonalAccessible : IIndexable2D
 	{
 		/// <summary>
-		/// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal.
+		/// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal. The matrix must be square.
 		/// </summary>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
 		public Vector GetDiagonal() => Vector.CreateFromArray(this.GetDiagonalAsArray(), false);

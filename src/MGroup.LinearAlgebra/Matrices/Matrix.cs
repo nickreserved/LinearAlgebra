@@ -229,7 +229,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static Matrix CreateWithValue(int numRows, int numColumns, double value)
 		{
 			double[] data = new double[numRows * numColumns];
-			for (int i = 0; i < data.Length; ++i) data[i] = value;
+			ArrayUtilities.MemSet(data, value);
 			return new Matrix(data, numRows, numColumns);
 		}
 
@@ -388,6 +388,22 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
+		/// Performs: matrix[:, <paramref name="colIdx"/>] = matrix[:,<paramref name="colIdx"/>] +
+		/// <paramref name="colCoeff"/> * <paramref name="wholeColumn"/>[:]
+		/// </summary>
+		/// <param name="colIdx">The index of the column to modify.</param>
+		/// <param name="colCoeff">Scalar coefficient to multiply the vector <paramref name="wholeColumn"/>.</param>
+		/// <param name="wholeColumn">
+		/// Vector with the same <see cref="Vector.Length"/> as <see cref="NumRows"/> of this matrix.
+		/// </param>
+		public void AxpyColumn(int colIdx, double colCoeff, Vector wholeColumn)
+		{
+			Preconditions.CheckSameRowDimension(this, wholeColumn);
+			int colOffset = colIdx * NumRows;
+			Blas.Daxpy(NumRows, colCoeff, wholeColumn.RawData, 0, 1, data, colOffset, 1);
+		}
+
+		/// <summary>
 		/// See <see cref="IMatrix.AxpyIntoThis(IMatrixView, double)"/>.
 		/// </summary>
 		public void AxpyIntoThis(IMatrixView otherMatrix, double otherCoefficient)
@@ -485,6 +501,18 @@ namespace MGroup.LinearAlgebra.Matrices
 			double[] clone = new double[data.Length];
 			Array.Copy(data, clone, data.Length);
 			return new Matrix(clone, NumRows, NumColumns);
+		}
+
+		/// <summary>
+		/// Copies the entries from <paramref name="otherMatrix"/> over the entries of this matrix object.
+		/// </summary>
+		/// <param name="otherMatrix">
+		/// Must have the same <see cref="NumRows"/> and <see cref="NumColumns"/> as this matrix.
+		/// </param>
+		public void CopyFrom(Matrix otherMatrix)
+		{
+			Preconditions.CheckSameMatrixDimensions(this, otherMatrix);
+			Array.Copy(otherMatrix.RawData, data, data.Length);
 		}
 
 		/// <summary>
@@ -707,16 +735,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return Vector.CreateFromArray(columnVector, false);
 		}
 
-		/// <summary>
-		/// Returns a <see cref="Vector"/> with the entries of the matrix's main diagonal. The matrix must be square.
-		/// </summary>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
-		public Vector GetDiagonal() => Vector.CreateFromArray(GetDiagonalAsArray(), false);
-
-		/// <summary>
-		/// Returns an array with the entries of the matrix's main diagonal. The matrix must be square.
-		/// </summary>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the matrix is not square.</exception>
+		/// <inheritdoc/>
 		public double[] GetDiagonalAsArray()
 		{
 			if (isOverwritten) throw new MatrixDataOverwrittenException();
@@ -1116,24 +1135,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </exception>
 		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
 		{   //TODO: this is NOT a specialization of the version with offsets. It is defined only if the vectors have exactly the matching lengths.
-			int leftRows, leftCols;
-			TransposeMatrix transpose;
-			if (transposeThis)
-			{
-				transpose = TransposeMatrix.Transpose;
-				leftRows = this.NumColumns;
-				leftCols = this.NumRows;
-			}
-			else
-			{
-				transpose = TransposeMatrix.NoTranspose;
-				leftRows = this.NumRows;
-				leftCols = this.NumColumns;
-			}
-
-			Preconditions.CheckMultiplicationDimensions(leftCols, lhsVector.Length);
-			Preconditions.CheckSystemSolutionDimensions(leftRows, rhsVector.Length);
-			Blas.Dgemv(transpose, NumRows, NumColumns,
+			(TransposeMatrix transposeA, int lhsLength, int rhsLength) = TransposeUtilities.PrepareBlas(this, transposeThis);
+			Preconditions.CheckMultiplicationDimensions(lhsLength, lhsVector.Length);
+			Preconditions.CheckSystemSolutionDimensions(rhsLength, rhsVector.Length);
+			Blas.Dgemv(transposeA, NumRows, NumColumns,
 				1.0, this.data, 0, NumRows, lhsVector.RawData, 0, 1,
 				0.0, rhsVector.RawData, 0, 1);
 		}
@@ -1276,10 +1281,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Sets all entries of this matrix to be equal to <paramref name="value"/>.
 		/// </summary>
 		/// <param name="value">The value that all entries of the this matrix will be equal to.</param>
-		public void SetAll(double value)
-		{
-			for (int i = 0; i < data.Length; ++i) data[i] = value;
-		}
+		public void SetAll(double value) => ArrayUtilities.MemSet(data, value);
 
 		/// <summary>
 		/// Sets some consecutive entries of the column with index = <paramref name="colIdx"/> to be equal to 

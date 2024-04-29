@@ -11,7 +11,8 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		internal const int NumRows = 10;
 		internal const int NumCols = 5;
 
-		internal static double[,] Matrix => new double[,] {
+		internal static double[,] Matrix => new double[,] 
+		{
 			{ 0.00000,   0.00000,   1.20805,   2.09065,   0.00000 },
 			{ 0.72602,   3.72194,   0.64231,   2.74205,   0.00000 },
 			{ 1.68190,   0.00000,   2.78180,   0.00000,   0.02756 },
@@ -24,7 +25,8 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 			{ 3.19534,   0.00000,   0.00000,   3.80848,   0.00000 }
 		};
 
-		internal static double[] CsrValues => new double[] {
+		internal static double[] CsrValues => new double[] 
+		{
 			1.20805, 2.09065,
 			0.72602, 3.72194, 0.64231, 2.74205,
 			1.68190, 2.78180, 0.02756,
@@ -37,7 +39,8 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 			3.19534, 3.80848
 		};
 
-		internal static int[] CsrColIndices => new int[] {
+		internal static int[] CsrColIndices => new int[] 
+		{
 			2, 3,
 			0, 1, 2, 3,
 			0, 2, 4,
@@ -53,7 +56,8 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		internal static int[] CsrRowOffsets => new int[] { 0, 2, 6, 9, 11, 14, 16, 18, 19, 23, 25 };
 
 
-		internal static double[] CscValues => new double[] {
+		internal static double[] CscValues => new double[] 
+		{
 			0.72602, 1.68190, 2.44372, 0.53085, 0.42069, 3.19534,
 			3.72194, 1.52758,
 			1.20805, 0.64231, 2.78180, 0.83011, 0.77108, 2.65133,
@@ -61,7 +65,8 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 			0.02756, 0.54185, 3.85200, 0.52623
 		};
 
-		internal static int[] CscRowIndices => new int[] {
+		internal static int[] CscRowIndices => new int[] 
+		{
 			1, 2, 4, 6, 8, 9,
 			1, 4,
 			0, 1, 2, 3, 5, 8,
@@ -92,6 +97,49 @@ namespace MGroup.LinearAlgebra.Tests.TestData
 		/// A vector with length = 5, such that <see cref="Matrix"/> * <see cref="Lhs10"/> = <see cref="Rhs5"/>.
 		/// </summary>
 		internal static double[] Rhs5 => new double[] { 38.358004392, 42.386998564, 39.584157392, 117.750301553, 40.799145145 };
+
+		internal static double[,] SubmatrixRows1249Cols042 => new double[,]
+		{
+			{ 0.72602, 0.00000, 0.64231 },
+			{ 1.68190, 0.02756, 2.78180 },
+			{ 2.44372, 0.00000, 0.00000 },
+			{ 3.19534, 0.00000, 0.00000 }
+		};
+
+
+		internal static double[] SubmatrixRows1249Cols042_CscValues => new double[]
+		{
+			0.72602, 1.68190, 2.44372, 3.19534, 0.02756, 0.64231, 2.78180
+		};
+
+		internal static int[] SubmatrixRows1249Cols042_CscRowIndices => new int[]
+		{
+			0, 1, 2, 3, 1, 0, 1
+		};
+
+		internal static int[] SubmatrixRows1249Cols042_CscColOffsets => new int[]
+		{
+			0, 4, 5, 7
+		};
+
+		internal static double[] SubmatrixRows1249Cols042_CsrValues => new double[]
+		{
+			0.72602, 0.64231, 1.68190, 0.02756, 2.78180, 2.44372, 3.19534
+		};
+
+		internal static int[] SubmatrixRows1249Cols042_CsrColIndices => new int[]
+		{
+			0, 2,
+			0, 1, 2,
+			0,
+			0
+		};
+
+		internal static int[] SubmatrixRows1249Cols042_CsrRowOffsets => new int[]
+		{
+			0, 2, 5, 6, 7
+		};
+
 
 		internal static string FullFormatPath =>
 			Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName

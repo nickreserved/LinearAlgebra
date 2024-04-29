@@ -1,4 +1,4 @@
-﻿//TODO: I could also provide a CBLAS like wrapper. However it is not as high a priority, since BLAS is easy to use. If I do so,
+//TODO: I could also provide a CBLAS like wrapper. However it is not as high a priority, since BLAS is easy to use. If I do so,
 //      the enums should be transfered to the wrapper. Here I would need to use strings only.
 namespace MGroup.LinearAlgebra.Providers
 {
@@ -39,18 +39,25 @@ namespace MGroup.LinearAlgebra.Providers
         #region BLAS Level 2
 
         /// <summary>
-        /// y = alpha * op(A) * x + beta * y, where op(A) = A or transpose(A). A is a general matrix, stored in full format. See
+        /// y = alpha * op(A) * x + beta * y, where op(A) = A or transpose(A). A is a general matrix, stored in full column-major 
+		/// format. See
         /// http://www.netlib.org/lapack/explore-html/d7/d15/group__double__blas__level2_gadd421a107a488d524859b4a64c1901a9.html#gadd421a107a488d524859b4a64c1901a9
         /// </summary>
         void Dgemv(TransposeMatrix transA, int m, int n, double alpha, double[] a, int offsetA, int ldA,
             double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY);
 
-        /// <summary>
-        /// y = alpha * op(A) * x + beta * y, where op(A) = A or transpose(A). A is a symmetric matrix, stored in packed format.
-        /// See
-        /// http://www.netlib.org/lapack/explore-html/d7/d15/group__double__blas__level2_gab746575c4f7dd4eec72e8110d42cefe9.html#gab746575c4f7dd4eec72e8110d42cefe9
-        /// </summary>
-        void Dspmv(StoredTriangle uplo, int n, double alpha, double[] a, int offsetA,
+		/// <summary>
+		/// y = op(A) * x, where op(A) = A or transpose(A). A is a general matrix, stored in full row-major 
+		/// format.
+		/// </summary>
+		void DgemvRowMajor(TransposeMatrix transA, int m, int n, double[] a, double[] x, double[] y);
+
+		/// <summary>
+		/// y = alpha * op(A) * x + beta * y, where op(A) = A or transpose(A). A is a symmetric matrix, stored in packed format.
+		/// See
+		/// http://www.netlib.org/lapack/explore-html/d7/d15/group__double__blas__level2_gab746575c4f7dd4eec72e8110d42cefe9.html#gab746575c4f7dd4eec72e8110d42cefe9
+		/// </summary>
+		void Dspmv(StoredTriangle uplo, int n, double alpha, double[] a, int offsetA,
             double[] x, int offsetX, int incX, double beta, double[] y, int offsetY, int incY);
 
         /// <summary>

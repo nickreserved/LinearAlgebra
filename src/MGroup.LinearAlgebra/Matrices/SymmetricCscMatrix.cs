@@ -8,6 +8,7 @@ using MGroup.LinearAlgebra.Reduction;
 using MGroup.LinearAlgebra.Vectors;
 using static MGroup.LinearAlgebra.LibrarySettings;
 using DotNumerics.FortranLibrary;
+using MGroup.LinearAlgebra.Matrices.Builders;
 
 //TODO: Should this be removed? I need it to provide analyzers with a matrix.
 namespace MGroup.LinearAlgebra.Matrices
@@ -242,6 +243,33 @@ namespace MGroup.LinearAlgebra.Matrices
 				Array.Copy(colOffsets, colOffsetsCopy, colOffsets.Length);
 				return new SymmetricCscMatrix(NumColumns, NumNonZerosUpper, valuesCopy, rowIndicesCopy, colOffsetsCopy);
 			}
+		}
+
+		/// <summary>
+		/// Creates a CSR matrix with the same entries as this. The returned CSR matrix is symmetric, but stores both triangles.
+		/// </summary>
+		/// <returns>A CSR matrix with the same entries as this.</returns>
+		public CsrMatrix ConvertToCsr()
+		{
+			var dok = DokRowMajor.CreateEmpty(NumColumns, NumColumns);
+			for (int j = 0; j < NumColumns; ++j)
+			{
+				int colStart = colOffsets[j];
+				int colEnd = colOffsets[j + 1];
+				for (int k = colStart; k < colEnd; ++k)
+				{
+					int i = rowIndices[k];
+					double val = values[k];
+					dok[i, j] = val;
+
+					if (i != j)
+					{
+						dok[j, i] = val;
+					}
+				}
+			}
+
+			return dok.BuildCsrMatrix(true);
 		}
 
 		/// <summary>

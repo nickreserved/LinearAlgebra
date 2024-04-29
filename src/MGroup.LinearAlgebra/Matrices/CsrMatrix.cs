@@ -158,46 +158,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Creates a CSR matrix with the non-zero entries of <paramref name="denseMatrix"/>. An entry must be exactly == 0, to be considered zero.
 		/// </summary>
 		/// <param name="denseMatrix"></param>
-		public static CsrMatrix CreateFromDense(IIndexable2D denseMatrix)
-		{
-			// Unoptimized: 1 pass to find the number of non zero entries, then allocate arrays, then another pass to copy the non zero entries
-			int m = denseMatrix.NumRows;
-			int n = denseMatrix.NumColumns;
-			int nnz = 0;
-			for (int i = 0; i < m; i++)
-			{
-				for (int j = 0; j < n; ++j)
-				{
-					if (denseMatrix[i, j] != 0)
-					{
-						++nnz;
-					}
-				}
-			}
-
-			var values = new double[nnz];
-			var colIndices = new int[nnz];
-			var rowOffsets = new int[m + 1];
-			rowOffsets[m] = nnz;
-
-			int k = 0;
-			for (int i = 0; i < m; i++)
-			{
-				rowOffsets[i] = k;
-				for (int j = 0; j < n; ++j)
-				{
-					double val = denseMatrix[i, j];
-					if (val != 0)
-					{
-						values[k] = val;
-						colIndices[k] = j;
-						++k;
-					}
-				}
-			}
-
-			return CsrMatrix.CreateFromArrays(m, n, values, colIndices, rowOffsets, false);
-		}
+		public static CsrMatrix CreateFromDense(IIndexable2D denseMatrix) => Conversions.GeneralToCsr(denseMatrix, 0.0);
 
 		#region operators (use extension operators when they become available)
 		/// <summary>
@@ -501,6 +462,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <summary>
+		/// Extracts the upper triangle of this matrix, including the diagonal. The original matrix must be square.
+		/// </summary>
+		/// <returns>The upper triangle is column major format.</returns>
+		public TriangularUpper ExtractUpperAndDiagonalToPacked()
+		{
+			Preconditions.CheckSquare(this);
+			double[] pck = Conversions.CsrToPackedUpperColMajor(NumColumns, values, rowOffsets, colIndices);
+			return TriangularUpper.CreateFromArray(NumColumns, pck, false);
+		}
+
+		/// <summary>
 		/// See <see cref="ISliceable2D.GetColumn(int)"/>.
 		/// </summary>
 		public Vector GetColumn(int colIndex)
@@ -515,6 +487,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return Vector.CreateFromArray(colVector, false);
 		}
 
+		/// <inheritdoc/>
 		public double[] GetDiagonalAsArray()
 		{
 			Preconditions.CheckSquare(this);
@@ -1006,7 +979,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			var cscRowIndices = new int[nnz];
 			var cscColOffsets = new int[NumColumns + 1];
 
-			SparseArrays.CsrToCsc(NumRows, NumColumns, this.rowOffsets, this.colIndices, this.values,
+			Conversions.CsrToCsc(NumRows, NumColumns, this.rowOffsets, this.colIndices, this.values,
 				cscColOffsets, cscRowIndices, cscValues);
 
 			return new CsrMatrix(NumColumns, NumRows, cscValues, cscRowIndices, cscColOffsets);

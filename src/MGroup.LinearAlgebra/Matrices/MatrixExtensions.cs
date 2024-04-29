@@ -33,6 +33,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		public static IMatrix Add(this IMatrixView matrix1, IMatrixView matrix2) => matrix1.Axpy(matrix2, 1.0);
 
 		/// <summary>
+		/// Performs: matrix[:, <paramref name="colIdx"/>] = matrix[:,<paramref name="colIdx"/>] +
+		/// <paramref name="wholeColumn"/>[:]
+		/// </summary>
+		/// <param name="colIdx">The index of the column to modify.</param>
+		/// <param name="wholeColumn">
+		/// Vector with the same <see cref="Vector.Length"/> as <see cref="NumRows"/> of this matrix.
+		/// </param>
+		public static void AddColumn(this Matrix matrix, int colIdx, Vector wholeColumn)
+			=> matrix.AxpyColumn(colIdx, +1.0, wholeColumn);
+
+		/// <summary>
 		/// Performs the operation: 
 		/// <paramref name="matrix1"/>[i, j] = <paramref name="matrix1"/>[i, j] + <paramref name="matrix2"/>[i, j], 
 		/// for 0 &lt;= i &lt; <see cref="IIndexable2D.NumRows"/>, 0 &lt;= j &lt; <see cref="IIndexable2D.NumColumns"/>.
@@ -48,6 +59,24 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <exception cref="PatternModifiedException">Thrown if an <paramref name="matrix1"/>[i, j] needs to be 
 		///     overwritten, but that is not permitted by the matrix storage format.</exception>
 		public static void AddIntoThis(this IMatrix matrix1, IMatrixView matrix2) => matrix1.AxpyIntoThis(matrix2, 1.0);
+
+		/// <summary>
+		/// Converts any matrix to CSC format.
+		/// </summary>
+		/// <param name="matrix">Any matrix.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The nonzero entries of the original matrix in CSC format.</returns>
+		public static CscMatrix ConvertToCsc(this IIndexable2D matrix, double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCsc(matrix, zeroEntryTolerance);
+
+		/// <summary>
+		/// Converts any matrix to CSR format.
+		/// </summary>
+		/// <param name="matrix">Any matrix.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The nonzero entries of the original matrix in CSR format.</returns>
+		public static CsrMatrix ConvertToCsr(this IIndexable2D matrix, double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCsr(matrix, zeroEntryTolerance);
 
 		/// <summary>
 		/// Copies the entries of the matrix into a 2-dimensional array. The returned array has length(0) = number of rows 
@@ -95,6 +124,32 @@ namespace MGroup.LinearAlgebra.Matrices
 				}
 			}
 		}
+
+		/// <summary>
+		/// Extracts a submatrix in CSC format, which contains only the rows and columns defined by <paramref name="rowsToKeep"/>
+		/// and <paramref name="colsToKeep"/>.
+		/// </summary>
+		/// <param name="matrix">Any matrix</param>
+		/// <param name="rowsToKeep">The rows of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="colsToKeep">The columns of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The submatrix in CSC format</returns>
+		public static CscMatrix GetSubmatrixAsCsc(this IIndexable2D matrix, int[] rowsToKeep, int[] colsToKeep,
+			double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCscSubmatrix(matrix, rowsToKeep, colsToKeep, zeroEntryTolerance);
+
+		/// <summary>
+		/// Extracts a submatrix in CSR format, which contains only the rows and columns defined by <paramref name="rowsToKeep"/>
+		/// and <paramref name="colsToKeep"/>.
+		/// </summary>
+		/// <param name="matrix">Any matrix</param>
+		/// <param name="rowsToKeep">The rows of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="colsToKeep">The columns of the original matrix that will be retained, albeit partially.</param>
+		/// <param name="zeroEntryTolerance">Only entries x, with abs(x)> tol will be retained.</param>
+		/// <returns>The submatrix in CSR format</returns>
+		public static CsrMatrix GetSubmatrixAsCsr(this IIndexable2D matrix, int[] rowsToKeep, int[] colsToKeep,
+			double zeroEntryTolerance = 0.0)
+			=> Conversions.GeneralToCsrSubmatrix(matrix, rowsToKeep, colsToKeep, zeroEntryTolerance);
 
 		/// <summary>
 		/// Returns true if <paramref name="matrix"/>[i, j] and <paramref name="matrix"/>[j, i] are equal or at least within the 
@@ -403,6 +458,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     have a different number of <see cref="IIndexable2D.NumRows"/> or 
 		///     <see cref="IIndexable2D.NumColumns"/>.</exception>
 		public static IMatrix Subtract(this IMatrixView matrix1, IMatrixView matrix2) => matrix1.Axpy(matrix2, -1.0);
+
+		/// <summary>
+		/// Performs: matrix[:, <paramref name="colIdx"/>] = matrix[:,<paramref name="colIdx"/>] -
+		/// <paramref name="wholeColumn"/>[:]
+		/// </summary>
+		/// <param name="colIdx">The index of the column to modify.</param>
+		/// <param name="wholeColumn">
+		/// Vector with the same <see cref="Vector.Length"/> as <see cref="NumRows"/> of this matrix.
+		/// </param>
+		public static void SubtractColumn(this Matrix matrix, int colIdx, Vector wholeColumn)
+			=> matrix.AxpyColumn(colIdx, -1.0, wholeColumn);
 
 		/// <summary>
 		/// Performs the operation: 

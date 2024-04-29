@@ -1,67 +1,96 @@
-﻿using System;
+using System;
 using DotNumerics.LinearAlgebra.CSLapack;
 
 //TODO: find a managed BLAS that supports the methods DotNumerics doesn't.
 namespace MGroup.LinearAlgebra.Providers.Managed
 {
-    /// <summary>
-    /// Provides managed C# implementations of the linear algebra operations defined by <see cref="IBlasProvider"/>. Uses the 
-    /// library DotNumerics (see http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSBlas/Default.aspx) for the most
-    /// part. For BLAS subroutines not provided by DotNumerics, custom C# implementations are used instead. 
-    /// Authors: Serafeim Bakalakos
-    /// </summary>
-    internal class ManagedBlasProvider : IBlasProvider
-    {
-        //TODO: perhaps these should not be static.
-        private static readonly DAXPY daxpy = new DAXPY();
-        private static readonly DDOT ddot = new DDOT();
-        private static readonly DGEMM dgemm = new DGEMM();
-        private static readonly DGEMV dgemv = new DGEMV();
-        private static readonly DNRM2 dnrm2 = new DNRM2();
-        private static readonly DSCAL dscal = new DSCAL();
-        private static readonly DTRSV dtrsv = new DTRSV();
+	/// <summary>
+	/// Provides managed C# implementations of the linear algebra operations defined by <see cref="IBlasProvider"/>. Uses the 
+	/// library DotNumerics (see http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSBlas/Default.aspx) for the most
+	/// part. For BLAS subroutines not provided by DotNumerics, custom C# implementations are used instead. 
+	/// Authors: Serafeim Bakalakos
+	/// </summary>
+	internal class ManagedBlasProvider : IBlasProvider
+	{
+		//TODO: perhaps these should not be static.
+		private static readonly DAXPY daxpy = new DAXPY();
+		private static readonly DDOT ddot = new DDOT();
+		private static readonly DGEMM dgemm = new DGEMM();
+		private static readonly DGEMV dgemv = new DGEMV();
+		private static readonly DNRM2 dnrm2 = new DNRM2();
+		private static readonly DSCAL dscal = new DSCAL();
+		private static readonly DTRSV dtrsv = new DTRSV();
 
-        internal static ManagedBlasProvider UniqueInstance { get; } = new ManagedBlasProvider();
+		internal static ManagedBlasProvider UniqueInstance { get; } = new ManagedBlasProvider();
 
-        private ManagedBlasProvider() { } // private constructor for singleton pattern
+		private ManagedBlasProvider() { } // private constructor for singleton pattern
 
-        #region BLAS Level 1
-        /// <summary>
-        /// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/daxpy.aspx
-        /// </summary>
-        public void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
-            => daxpy.Run(n, alpha, x, offsetX, incX, ref y, offsetY, incY);
+		#region BLAS Level 1
+		/// <summary>
+		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/daxpy.aspx
+		/// </summary>
+		public void Daxpy(int n, double alpha, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
+			=> daxpy.Run(n, alpha, x, offsetX, incX, ref y, offsetY, incY);
 
-        /// <summary>
-        /// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/ddot.aspx
-        /// </summary>
-        public double Ddot(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
-            => ddot.Run(n, x, offsetX, incX, y, offsetY, incY);
+		/// <summary>
+		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/ddot.aspx
+		/// </summary>
+		public double Ddot(int n, double[] x, int offsetX, int incX, double[] y, int offsetY, int incY)
+			=> ddot.Run(n, x, offsetX, incX, y, offsetY, incY);
 
-        /// <summary>
-        /// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dnrm2.aspx
-        /// </summary>
-        public double Dnrm2(int n, double[] x, int offsetX, int incX)
-            => dnrm2.Run(n, x, offsetX, incX);
+		/// <summary>
+		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dnrm2.aspx
+		/// </summary>
+		public double Dnrm2(int n, double[] x, int offsetX, int incX)
+			=> dnrm2.Run(n, x, offsetX, incX);
 
-        /// <summary>
-        /// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dscal.aspx
-        /// </summary>
-        public void Dscal(int n, double alpha, double[] x, int offsetX, int incX)
-            => dscal.Run(n, alpha, ref x, offsetX, incX);
-        #endregion
+		/// <summary>
+		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dscal.aspx
+		/// </summary>
+		public void Dscal(int n, double alpha, double[] x, int offsetX, int incX)
+			=> dscal.Run(n, alpha, ref x, offsetX, incX);
+		#endregion
 
-        #region BLAS Level 2
+		#region BLAS Level 2
 
-        /// <summary>
-        /// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgemv.aspx
-        /// </summary>
-        public void Dgemv(TransposeMatrix transA, int m, int n,
-            double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
-            double beta, double[] y, int offsetY, int incY)
-            => dgemv.Run(transA.Translate(), m, n, alpha, a, offsetA, ldA, x, offsetX, incX, beta, ref y, offsetY, incY);
+		/// <summary>
+		/// See http://www.dotnumerics.com/NumericalLibraries/LinearAlgebra/CSharpCodeFiles/dgemv.aspx
+		/// </summary>
+		public void Dgemv(TransposeMatrix transA, int m, int n,
+			double alpha, double[] a, int offsetA, int ldA, double[] x, int offsetX, int incX,
+			double beta, double[] y, int offsetY, int incY)
+			=> dgemv.Run(transA.Translate(), m, n, alpha, a, offsetA, ldA, x, offsetX, incX, beta, ref y, offsetY, incY);
 
-        public void Dspmv(StoredTriangle uplo, int n,
+		public void DgemvRowMajor(TransposeMatrix transA, int m, int n, double[] a, double[] x, double[] y)
+		{
+			if (transA == TransposeMatrix.NoTranspose)
+			{
+				for (var i = 0; i < m; ++i)
+				{
+					var rowStart = i * n;
+					double sum = 0;
+					for (var j = 0; j < n; ++j)
+					{
+						sum += a[rowStart + j] * x[j];
+					}
+					y[i] = sum;
+				}
+			}
+			else
+			{
+				for (var j = 0; j < n; ++j)
+				{
+					double sum = 0;
+					for (var i = 0; i < m; ++i)
+					{
+						sum += a[i * n + j] * x[i];
+					}
+					y[j] = sum;
+				}
+			}
+		}
+
+		public void Dspmv(StoredTriangle uplo, int n,
             double alpha, double[] a, int offsetA, double[] x, int offsetX, int incX,
             double beta, double[] y, int offsetY, int incY)
         {

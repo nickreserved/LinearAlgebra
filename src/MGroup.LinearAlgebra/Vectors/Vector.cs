@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		public static Vector CreateWithValue(int length, double value)
 		{
 			double[] data = new double[length];
-			for (int i = 0; i < length; ++i) data[i] = value;
+			ArrayUtilities.MemSet(data, value);
 			return new Vector(data);
 		}
 
@@ -864,10 +864,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Sets all entries of this vector to be equal to <paramref name="value"/>.
 		/// </summary>
 		/// <param name="value">The value that all entries of the this vector will be equal to.</param>
-		public void SetAll(double value)
-		{
-			for (int i = 0; i < Length; ++i) data[i] = value;
-		}
+		public void SetAll(double value) => ArrayUtilities.MemSet(data, value);
 
 		/// <summary>
 		/// See <see cref="IVector.Set(int, double)"/>.

@@ -14,7 +14,7 @@ namespace MGroup.LinearAlgebra.Matrices
 	/// <summary>
 	/// Represents a diagonal (square) matrix.
 	/// </summary>
-	public class DiagonalMatrix : IIndexable2D, ΙDiagonalAccessible
+	public class DiagonalMatrix : IIndexable2D, IDiagonalAccessible
 
 	{
 		private readonly double[] diagonal;
