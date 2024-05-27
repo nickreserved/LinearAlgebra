@@ -71,9 +71,9 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
         /// <summary>
         /// Performs the matrix-vector multiplication: this * <paramref name="otherVector"/>.
         /// </summary>
-        /// <param name="otherVector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to 
+        /// <param name="otherVector">A vector with <see cref="IReadOnlyVector.Length"/> being equal to 
         ///     this.<see cref="NumColumns"/>.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IReadOnlyVector.Length"/> of
         ///     <paramref name="otherVector"/> is different than the this.<see cref="NumColumns"/>.</exception>
         public SparseVector MultiplyRight(Vector otherVector)
         {

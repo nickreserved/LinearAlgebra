@@ -16,12 +16,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// <param name="rhsVector">The vector that will be multiplied by the represented matrix.</param>
 		/// <param name="lhsVector">The vector that will be overwritten by the result of the multiplication.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if <paramref name="rhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
+		/// Thrown if <paramref name="rhsVector"/> has different <see cref="IReadOnlyVector.Length"/>
 		/// than this linear transformation <see cref="IBounded2D.NumColumns"/>, or
-		/// if <paramref name="lhsVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/>
+		/// if <paramref name="lhsVector"/> has different <see cref="IReadOnlyVector.Length"/>
 		/// than this linear transformation <see cref="IBounded2D.NumRows"/>.</exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if the storage format of <paramref name="lhsVector"/> does not support overwritting the entries that this method will try to.</exception>
-		void MultiplyIntoResult(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector);
+		void MultiplyIntoResult(IReadOnlyVector rhsVector, IVector lhsVector);
 	}
 }

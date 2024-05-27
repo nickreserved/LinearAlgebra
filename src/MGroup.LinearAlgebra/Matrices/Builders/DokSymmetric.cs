@@ -683,7 +683,7 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		/// <param name="colIdx">The index of the column to modify. Constraints:
 		///     and 0 &lt;= <paramref name="colIdx"/> &lt; this.<see cref="NumColumns"/>.</param>
 		/// <param name="newColumn">The new values that column <paramref name="colIdx"/> will be set to. Constraints:
-		///     <paramref name="newColumn"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="NumRows"/>.</param>
+		///     <paramref name="newColumn"/>.<see cref="IReadOnlyVector.Length"/> == this.<see cref="NumRows"/>.</param>
 		public void SetColumn(int colIdx, SparseVector newColumn)
         {
             SetColumnToZero(colIdx); // First remove everything

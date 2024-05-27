@@ -18,15 +18,15 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		protected readonly IPcgResidualConvergence convergence;
 		protected readonly IPcgResidualUpdater residualUpdater;
 
-		protected IMinimalVector direction;
+		protected IVector direction;
 		protected int iteration;
-		protected IMinimalVector matrixTimesDirection;
+		protected IVector matrixTimesDirection;
 		protected double paramBeta;
-		protected IMinimalVector precondResidual;
+		protected IVector precondResidual;
 		protected double resDotPrecondRes;
 		protected double resDotPrecondResOld;
-		protected IMinimalVector residual;
-		protected IMinimalVector solution;
+		protected IVector residual;
+		protected IVector solution;
 		protected double stepSize;
 
 		protected PcgAlgorithmBase(double residualTolerance, IMaxIterationsProvider maxIterationsProvider,
@@ -45,7 +45,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The direction vector d, used to update the solution vector: x = x + α * d
 		/// </summary>
-		public IMinimalReadOnlyVector Direction => direction;
+		public IReadOnlyVector Direction => direction;
 
 		/// <summary>
 		/// The current iteration of the algorithm. It belongs to the interval [0, maxIterations).
@@ -60,7 +60,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The vector that results from <see cref="Matrix"/> * <see cref="Direction"/>.
 		/// </summary>
-		public IMinimalReadOnlyVector MatrixTimesDirection => matrixTimesDirection;
+		public IReadOnlyVector MatrixTimesDirection => matrixTimesDirection;
 
 		/// <summary>
 		/// The β parameter of Conjugate Gradient that ensures conjugacy between the direction vectors.
@@ -75,7 +75,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The vector s = inv(M) * r
 		/// </summary>
-		public IMinimalReadOnlyVector PrecondResidual => precondResidual;
+		public IReadOnlyVector PrecondResidual => precondResidual;
 
 		/// <summary>
 		/// The dot product r(t) * (inv(M) * r(t)) of the current iteration t.
@@ -90,17 +90,17 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The residual vector r = b - A * x.
 		/// </summary>
-		public IMinimalReadOnlyVector Residual => residual;
+		public IReadOnlyVector Residual => residual;
 
 		/// <summary>
 		/// The right hand side of the linear system b = A * x.
 		/// </summary>
-		public IMinimalReadOnlyVector Rhs { get; protected set; }
+		public IReadOnlyVector Rhs { get; protected set; }
 
 		/// <summary>
 		/// The current approximation to the solution of the linear system A * x = b
 		/// </summary>
-		public IMinimalReadOnlyVector Solution => solution;
+		public IReadOnlyVector Solution => solution;
 
 		/// <summary>
 		/// The step α taken along <see cref="Direction"/> to update the solution vector: x = x + α * d
@@ -154,8 +154,8 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <exception cref="NonMatchingDimensionsException">
 		/// Thrown if <paramref name="rhs"/> or <paramref name="solution"/> violate the described constraints.
 		/// </exception>
-		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IMinimalReadOnlyVector rhs,
-			IMinimalVector solution, bool initialGuessIsZero)
+		public virtual IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, IReadOnlyVector rhs,
+			IVector solution, bool initialGuessIsZero)
 		{
 			//TODO: find a better way to handle optimizations for the case x0=0, than using an initialGuessIsZero flag
 

@@ -744,7 +744,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <inheritdoc/>
-        public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
+        public Vector Multiply(IReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector casted) return Multiply(casted, transposeThis);
 
@@ -769,10 +769,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
 		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
 		/// </summary>
-		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
+		/// <param name="vector">A vector with <see cref="IReadOnlyVector.Length"/> being equal to the 
 		///     <see cref="IBounded2D.NumColumns"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IReadOnlyVector.Length"/> of
 		///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
 		public Vector Multiply(Vector vector, bool transposeThis = false)
         {
@@ -783,7 +783,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <inheritdoc/>
-        public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
+        public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis)
         {
 			if (this.values.Length == 0)
 			{
@@ -811,7 +811,7 @@ namespace MGroup.LinearAlgebra.Matrices
             }
         }
 		/// <inheritdoc/>
-		public void MultiplyIntoResult(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector) => MultiplyIntoResult(rhsVector, lhsVector, false);
+		public void MultiplyIntoResult(IReadOnlyVector rhsVector, IVector lhsVector) => MultiplyIntoResult(rhsVector, lhsVector, false);
 
 		/// <summary>
 		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
@@ -821,17 +821,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
-		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described contraints.
 		/// </exception>
 		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
@@ -869,11 +869,11 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     the right of the multiplication.</param>
 		/// <param name="vectorStart">The index of the first entry of <paramref name="vectorRight"/> that will be 
 		///     multiplied. Constraints: <paramref name="vectorStart"/> + this.<see cref="NumColumns"/> &lt;= 
-		///     <paramref name="vectorRight"/>.<see cref="IMinimalReadOnlyVector.Length"/></param>
+		///     <paramref name="vectorRight"/>.<see cref="IReadOnlyVector.Length"/></param>
 		/// <param name="result">The vector whose entries will be overwritten with the result of the multiplication.</param>
 		/// <param name="resultStart">The index of the first entry of <paramref name="result"/> that will be overwritten. 
 		///     Constraints: <paramref name="resultStart"/> + this.<see cref="NumRows"/> &lt;= 
-		///     <paramref name="result"/>.<see cref="IMinimalReadOnlyVector.Length"/>.</param>
+		///     <paramref name="result"/>.<see cref="IReadOnlyVector.Length"/>.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if the arguments do not satisfy the described 
 		///     constraints.</exception>
 		public void MultiplyVectorSection(IExtendedReadOnlyVector vectorRight, int vectorStart, Vector result, int resultStart)

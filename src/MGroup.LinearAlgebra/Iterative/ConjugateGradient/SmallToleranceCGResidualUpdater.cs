@@ -27,7 +27,7 @@ namespace MGroup.LinearAlgebra.Iterative.ConjugateGradient
             this.residualTolerance = residualTolerance;
         }
 
-        public void UpdateResidual(CGAlgorithm cg, IMinimalVector residual, out double resDotRes)
+        public void UpdateResidual(CGAlgorithm cg, IVector residual, out double resDotRes)
         {
             // Update the residual vector normally: r = r - α * A*d
             residual.AxpyIntoThis(cg.MatrixTimesDirection, -cg.StepSize);

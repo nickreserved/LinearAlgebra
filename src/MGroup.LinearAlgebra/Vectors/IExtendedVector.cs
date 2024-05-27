@@ -5,13 +5,8 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 	/// The minimal vector functionality for algorithms, which requires modifications to vector elements.
-	public interface IExtendedVector : IExtendedReadOnlyVector, IMinimalVector
+	public interface IExtendedVector : IExtendedReadOnlyVector, IVector
 	{
-		[Obsolete("This property is EXTREMELY inefficient on sparce vectors")]
-		new double this[int index] { get; set; }
-		double IExtendedReadOnlyVector.this[int index] => this[index];
-
-
 		// ------------------- COVARIANT RETURN TYPE FROM IExtendedReadOnlyVector
 
 
@@ -27,18 +22,18 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// -------- OPERATORS FROM IMinimalReadOnlyVector
+		// -------- OPERATORS FROM IReadOnlyVector
 
 		public static IExtendedVector operator -(IExtendedVector x) => x.Negate();
 		public static IExtendedVector operator +(IExtendedVector x, IExtendedVector y) => x.Add(y);
-		public static IExtendedVector operator +(IExtendedVector x, IMinimalReadOnlyVector y) => x.Add(y);
-		public static IExtendedVector operator +(IMinimalReadOnlyVector y, IExtendedVector x) => x.Add(y);
+		public static IExtendedVector operator +(IExtendedVector x, IReadOnlyVector y) => x.Add(y);
+		public static IExtendedVector operator +(IReadOnlyVector y, IExtendedVector x) => x.Add(y);
 		public static IExtendedVector operator -(IExtendedVector x, IExtendedVector y) => x.Subtract(y);
-		public static IExtendedVector operator -(IExtendedVector x, IMinimalReadOnlyVector y) => x.Subtract(y);
-		public static IExtendedVector operator -(IMinimalReadOnlyVector x, IExtendedVector y) => (IExtendedVector) x.Subtract(y);
+		public static IExtendedVector operator -(IExtendedVector x, IReadOnlyVector y) => x.Subtract(y);
+		public static IExtendedVector operator -(IReadOnlyVector x, IExtendedVector y) => (IExtendedVector) x.Subtract(y);
 		public static double operator *(IExtendedVector x, IExtendedVector y) => x.DotProduct(y);
-		public static double operator *(IExtendedVector x, IMinimalReadOnlyVector y) => x.DotProduct(y);
-		public static double operator *(IMinimalReadOnlyVector x, IExtendedVector y) => x.DotProduct(y);
+		public static double operator *(IExtendedVector x, IReadOnlyVector y) => x.DotProduct(y);
+		public static double operator *(IReadOnlyVector x, IExtendedVector y) => x.DotProduct(y);
 		public static IExtendedVector operator *(IExtendedVector x, double y) => x.Scale(y);
 		public static IExtendedVector operator *(double y, IExtendedVector x) => x.Scale(y);
 	}

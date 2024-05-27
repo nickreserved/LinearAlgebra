@@ -19,9 +19,9 @@ namespace MGroup.LinearAlgebra.Iterative.Preconditioning
         /// The left hand side vector of the system M * v = w. It will be overwritten by the solution of the linear system.
         /// </param>
         /// <exception cref="Exceptions.NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="rhsVector"/> or <paramref name="lhsVector"/> 
+        /// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="rhsVector"/> or <paramref name="lhsVector"/> 
         /// is different than the number of rows of this <see cref="IPreconditioner"/>.
         /// </exception>
-        void Apply(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector);
+        void Apply(IReadOnlyVector rhsVector, IVector lhsVector);
     }
 }

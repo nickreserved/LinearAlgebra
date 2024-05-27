@@ -25,7 +25,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 double residualTolerance = 1e-8;
                 (Matrix A, Vector b, Vector xExpected, IPreconditioner M) = DiagonalIndefinite.BuildIndefiniteSystem(20);
                 var minres = new MinRes(A.NumRows, residualTolerance, 0, false, false);
-                (IMinimalVector xComputed, MinresStatistics stats) = minres.Solve(A, b);
+                (IVector xComputed, MinresStatistics stats) = minres.Solve(A, b);
                 comparer.AssertEqual(xExpected, xComputed);
             });
         }
@@ -42,7 +42,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 var b = new Vector(SparsePosDef10by10.Rhs);
                 var xExpected = new Vector(SparsePosDef10by10.Lhs);
                 var minres = new MinRes(n, 1e-10, 0, false, false);
-                (IMinimalVector xComputed, MinresStatistics stats) = minres.Solve(A, b);
+                (IVector xComputed, MinresStatistics stats) = minres.Solve(A, b);
                 comparer.AssertEqual(xExpected, xComputed);
             });
         }
@@ -59,7 +59,7 @@ namespace MGroup.LinearAlgebra.Tests.Iterative
                 var b = new Vector(SparsePosDef10by10.Rhs);
                 var xExpected = new Vector(SparsePosDef10by10.Lhs);
                 var minres = new MinRes(n, 1e-10, 0, false, false);
-                (IMinimalVector xComputed, MinresStatistics stats) = minres.Solve(A, b);
+                (IVector xComputed, MinresStatistics stats) = minres.Solve(A, b);
                 comparer.AssertEqual(xExpected, xComputed);
             });
         }

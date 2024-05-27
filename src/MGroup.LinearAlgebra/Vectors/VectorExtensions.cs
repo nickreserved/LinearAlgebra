@@ -87,13 +87,13 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// valid i. The resulting vector is written in a new object and then returned.
 		/// </summary>
 		/// <param name="thisVector">A vector.</param>
-		/// <param name="otherVector">A vector with the same <see cref="IMinimalReadOnlyVector.Length"/> as this vector.</param>
+		/// <param name="otherVector">A vector with the same <see cref="IReadOnlyVector.Length"/> as this vector.</param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if <paramref name="otherVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/> than this vector.
+		/// Thrown if <paramref name="otherVector"/> has different <see cref="IReadOnlyVector.Length"/> than this vector.
 		/// </exception>
 		[Obsolete("Use thisVector.DoEntrywise(otherVector, (x, y) => x * y)")]
-		public static IMinimalVector MultiplyEntrywise(
-			this IMinimalReadOnlyVector thisVector, IMinimalReadOnlyVector otherVector)
+		public static IVector MultiplyEntrywise(
+			this IReadOnlyVector thisVector, IReadOnlyVector otherVector)
 			=> thisVector.DoEntrywise(otherVector, (x, y) => x * y); //TODO: nice in theory, but passing a lambda to DoEntrywise is less verbose.
 
 		/// <summary>
@@ -102,16 +102,16 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// valid i. The resulting vector overwrites the entries of this vector.
 		/// </summary>
 		/// <param name="thisVector">A vector.</param>
-		/// <param name="otherVector">A vector with the same <see cref="IMinimalReadOnlyVector.Length"/> as this vector.</param>
+		/// <param name="otherVector">A vector with the same <see cref="IReadOnlyVector.Length"/> as this vector.</param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if <paramref name="otherVector"/> has different <see cref="IMinimalReadOnlyVector.Length"/> than this vector.
+		/// Thrown if <paramref name="otherVector"/> has different <see cref="IReadOnlyVector.Length"/> than this vector.
 		/// </exception>
 		/// <exception cref="PatternModifiedException">
 		/// Thrown if an entry this[i] needs to be overwritten, but that is not permitted by the vector storage format.
 		/// </exception>
 		[Obsolete("Use thisVector.DoEntrywiseIntoThis(otherVector, (x, y) => x * y)")]
 		public static void MultiplyEntrywiseIntoThis(
-			this IMinimalVector thisVector, IMinimalReadOnlyVector otherVector)
+			this IVector thisVector, IReadOnlyVector otherVector)
 			=> thisVector.DoEntrywiseIntoThis(otherVector, (x, y) => x * y); //TODO: nice in theory, but passing a lambda to DoEntrywise() is less verbose.
 
 		/// <summary>
@@ -119,28 +119,28 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// The resulting vector is written in a new object and then returned.
 		/// </summary>
 		[Obsolete("Use thisVector.DoToAllEntries(x => Math.Sqrt(x))")]
-		public static IMinimalVector Sqrt(this IMinimalReadOnlyVector vector) => vector.DoToAllEntries(x => Math.Sqrt(x));
+		public static IVector Sqrt(this IReadOnlyVector vector) => vector.DoToAllEntries(x => Math.Sqrt(x));
 
 		/// <summary>
 		/// Performs the operation: this[i] = this[i] ^ 0.5 for all valid i. 
 		/// The resulting vector overwrites the entries of this vector.
 		/// </summary>
 		[Obsolete("Use thisVector.DoToAllEntriesIntoThis(x => Math.Sqrt(x))")]
-		public static void SqrtIntoThis(this IMinimalVector vector) => vector.DoToAllEntriesIntoThis(x => Math.Sqrt(x));
+		public static void SqrtIntoThis(this IVector vector) => vector.DoToAllEntriesIntoThis(x => Math.Sqrt(x));
 
 		/// <summary>
 		/// Performs the operation: result[i] = this[i] ^ 2 for all valid i. 
 		/// The resulting vector is written in a new object and then returned.
 		/// </summary>
 		[Obsolete("Use thisVector.DoToAllEntries(x => x * x)")]
-		public static IMinimalVector Square(this IMinimalReadOnlyVector vector) => vector.DoToAllEntries(x => x * x);
+		public static IVector Square(this IReadOnlyVector vector) => vector.DoToAllEntries(x => x * x);
 
 		/// <summary>
 		/// Performs the operation: this[i] = this[i] ^ 2 for all valid i. 
 		/// The resulting vector overwrites the entries of this vector.
 		/// </summary>
 		[Obsolete("Use thisVector.DoToAllEntriesIntoThis(x => x * x)")]
-		public static void SquareIntoThis(this IMinimalVector vector) => vector.DoToAllEntriesIntoThis(x => x * x);
+		public static void SquareIntoThis(this IVector vector) => vector.DoToAllEntriesIntoThis(x => x * x);
 
 
 		
@@ -151,12 +151,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// indices: this[i] = this[i] + <paramref name="sourceVector"/>[i].
 		/// </summary>
 		/// <param name="destinationIndex">The index into this <see cref="IExtendedVector"/> where to start overwritting. Constraints:
-		///     <paramref name="destinationIndex"/> + <paramref name="length"/> &lt;= this.<see cref="IMinimalReadOnlyVector.Length"/>.
+		///     <paramref name="destinationIndex"/> + <paramref name="length"/> &lt;= this.<see cref="IReadOnlyVector.Length"/>.
 		///     </param>
 		/// <param name="sourceVector">The other vector operand.</param>
 		/// <param name="sourceIndex">The index into <paramref name="sourceVector"/> where to start operating. Constraints: 
 		///     <paramref name="sourceIndex"/> + <paramref name="length"/> &lt;= 
-		///     <paramref name="sourceVector"/>.<see cref="IMinimalReadOnlyVector.Length"/>.</param>
+		///     <paramref name="sourceVector"/>.<see cref="IReadOnlyVector.Length"/>.</param>
 		/// <param name="length">The number of entries to copy.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">Thrown if <paramref name="length"/> and 
 		///     <paramref name="destinationIndex"/> or <paramref name="sourceIndex"/> violate the described constraints.
@@ -173,12 +173,12 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// indices: this[i] = this[i] - <paramref name="sourceVector"/>[i].
 		/// </summary>
 		/// <param name="destinationIndex">The index into this <see cref="IExtendedVector"/> where to start overwritting. Constraints:
-		///     <paramref name="destinationIndex"/> + <paramref name="length"/> &lt;= this.<see cref="IMinimalReadOnlyVector.Length"/>.
+		///     <paramref name="destinationIndex"/> + <paramref name="length"/> &lt;= this.<see cref="IReadOnlyVector.Length"/>.
 		///     </param>
 		/// <param name="sourceVector">The other vector operand.</param>
 		/// <param name="sourceIndex">The index into <paramref name="sourceVector"/> where to start operating. Constraints: 
 		///     <paramref name="sourceIndex"/> + <paramref name="length"/> &lt;= 
-		///     <paramref name="sourceVector"/>.<see cref="IMinimalReadOnlyVector.Length"/>.</param>
+		///     <paramref name="sourceVector"/>.<see cref="IReadOnlyVector.Length"/>.</param>
 		/// <param name="length">The number of entries to copy.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="length"/> and 
 		///     <paramref name="destinationIndex"/> or <paramref name="sourceIndex"/> violate the described constraints.

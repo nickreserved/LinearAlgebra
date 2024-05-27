@@ -456,7 +456,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			=> DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
 
 		/// <inheritdoc/>
-		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
+		public Vector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			var result = new Vector(NumRows);
 			CsrMultiplications.SymmetricCsrTimesVector(NumRows, values, colOffsets, rowIndices, (IExtendedReadOnlyVector) vector, result.Values);
@@ -464,7 +464,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <inheritdoc/>
-		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis)
 		{
 			rhsVector.Clear(); // TODO: add this as an optional flag or convert the method to axpy like.
 			if (rhsVector is Vector denseVector)
@@ -479,7 +479,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				rhsVector.CopyFrom(temp);
 			}
 		}
-		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
 
 		/// <summary>
 		/// Matrix-vector multiplication, with the vector on the right: matrix * vector or transpose(matrix) * vector.

@@ -93,15 +93,15 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// The resulting vector will be written in a new vector and returned.
 		/// </summary>
 		/// <param name="vector">
-		/// A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the <see cref="IBounded2D.NumColumns"/> of 
+		/// A vector with <see cref="IReadOnlyVector.Length"/> being equal to the <see cref="IBounded2D.NumColumns"/> of 
 		/// oper(this).
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="vector"/> is different than the 
+		/// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="vector"/> is different than the 
 		/// <see cref="IBounded2D.NumColumns"/> of oper(this).
 		/// </exception>
-		Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false);
+		Vector Multiply(IReadOnlyVector vector, bool transposeThis = false);
 
 		/// <summary>
 		/// Performs the otherMatrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
@@ -111,24 +111,24 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this otherMatrix. It sits on the left hand side of the equation y = oper(A) * x.
-		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = oper(A) * x. Constraints: <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// equation y = oper(A) * x. Constraints: <paramref name="rhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="Exceptions.NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described constraints.
 		/// </exception>
 		/// <exception cref="Exceptions.PatternModifiedException">
 		/// Thrown if the storage format of <paramref name="rhsVector"/> does not support overwritting the entries that this 
 		/// method will try to.
 		/// </exception>
-		void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis);
+		void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis);
         //TODO: this is NOT a specialization of a version with offsets. It is defined only if the vectors have exactly the matching lengths.
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// Returns a otherMatrix that is transpose to this: result[i, j] = this[j, i]. The entries will be explicitly copied. Some
 		/// implementations of <see cref="IMatrixView"/> may offer more efficient transpositions, that do not copy the entries.
 		/// If the transposed otherMatrix will be used only for multiplications, <see cref="MultiplyLeft(IMatrixView, bool, bool)"/>,
-		/// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IMinimalReadOnlyVector, bool)"/> are more 
+		/// <see cref="MultiplyRight(IMatrixView, bool, bool)"/> and <see cref="Multiply(IReadOnlyVector, bool)"/> are more 
 		/// effient generally.
 		/// </summary>
 		IMatrix Transpose(); //TODO: perhaps this should default to not copying the entries, if possible.

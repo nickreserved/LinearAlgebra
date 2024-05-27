@@ -290,12 +290,12 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
         /// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
         /// </summary>
         /// <param name="vector">
-        /// A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the <see cref="IBounded2D.NumColumns"/> 
+        /// A vector with <see cref="IReadOnlyVector.Length"/> being equal to the <see cref="IBounded2D.NumColumns"/> 
         /// of oper(this).
         /// </param>
         /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
         /// <exception cref="NonMatchingDimensionsException">
-        /// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="vector"/> is different 
+        /// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="vector"/> is different 
         /// than the <see cref="NumColumns"/> of oper(this).
         /// </exception>
         public Vector Multiply(Vector vector, bool transposeThis = false)

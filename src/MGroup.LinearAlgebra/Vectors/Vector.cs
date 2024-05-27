@@ -57,38 +57,38 @@ namespace MGroup.LinearAlgebra.Vectors
 
 		override public Vector View(int fromIndex, int toIndex) => (Vector)base.View(fromIndex, toIndex);
 		override public PermutatedVectorView View(int[] indices) => (PermutatedVectorView)base.View(indices);
-		override public Vector AddIntoThis(IMinimalReadOnlyVector otherVector) => (Vector)base.AddIntoThis(otherVector);
+		override public Vector AddIntoThis(IReadOnlyVector otherVector) => (Vector)base.AddIntoThis(otherVector);
 		override public Vector Clear() => (Vector)base.Clear();
-		override public Vector CopyFrom(IMinimalReadOnlyVector otherVector) => (Vector)base.CopyFrom(otherVector);
+		override public Vector CopyFrom(IReadOnlyVector otherVector) => (Vector)base.CopyFrom(otherVector);
 		override public Vector DoToAllEntriesIntoThis(Func<double, double> unaryOperation) => (Vector)base.DoToAllEntriesIntoThis(unaryOperation);
 		override public Vector LinearCombinationIntoThis(double thisCoefficient, AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
-		override public Vector LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		override public Vector LinearCombinationIntoThis(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient) => (Vector)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
 		override public Vector NegateIntoThis() => (Vector)base.NegateIntoThis();
 		override public Vector SetAll(double value) => (Vector)base.SetAll(value);
-		override public Vector SubtractIntoThis(IMinimalReadOnlyVector otherVector) => (Vector)base.SubtractIntoThis(otherVector);
+		override public Vector SubtractIntoThis(IReadOnlyVector otherVector) => (Vector)base.SubtractIntoThis(otherVector);
 		override public Vector AxpyIntoThis(AbstractContiguousFullyPopulatedVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
 		override public Vector AxpyIntoThis(SparseVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
-		override public Vector AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
+		override public Vector AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient) => (Vector)base.AxpyIntoThis(otherVector, otherCoefficient);
 		override public Vector DoEntrywiseIntoThis(SparseVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
 		override public Vector DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
-		override public Vector DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
+		override public Vector DoEntrywiseIntoThis(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
 		override public Vector ScaleIntoThis(double coefficient) => (Vector)base.ScaleIntoThis(coefficient);
 		*/
 
 
 
-		// -------- OPERATORS FROM IMinimalReadOnlyVector
+		// -------- OPERATORS FROM IReadOnlyVector
 
 		public static Vector operator -(Vector x) => x.Negate();
 		public static Vector operator +(Vector x, Vector y) => x.Add(y);
-		public static Vector operator +(Vector x, IMinimalReadOnlyVector y) => x.Add(y);
-		public static Vector operator +(IMinimalReadOnlyVector y, Vector x) => x.Add(y);
+		public static Vector operator +(Vector x, IReadOnlyVector y) => x.Add(y);
+		public static Vector operator +(IReadOnlyVector y, Vector x) => x.Add(y);
 		public static Vector operator -(Vector x, Vector y) => x.Subtract(y);
-		public static Vector operator -(Vector x, IMinimalReadOnlyVector y) => x.Subtract(y);
-		public static Vector operator -(IMinimalReadOnlyVector x, Vector y) => y.LinearCombination(-1, x, 1);
+		public static Vector operator -(Vector x, IReadOnlyVector y) => x.Subtract(y);
+		public static Vector operator -(IReadOnlyVector x, Vector y) => y.LinearCombination(-1, x, 1);
 		public static double operator *(Vector x, Vector y) => x.DotProduct(y);
-		public static double operator *(Vector x, IMinimalReadOnlyVector y) => x.DotProduct(y);
-		public static double operator *(IMinimalReadOnlyVector x, Vector y) => x.DotProduct(y);
+		public static double operator *(Vector x, IReadOnlyVector y) => x.DotProduct(y);
+		public static double operator *(IReadOnlyVector x, Vector y) => x.DotProduct(y);
 		public static Vector operator *(Vector x, double y) => x.Scale(y);
 		public static Vector operator *(double y, Vector x) => x.Scale(y);
 
@@ -184,7 +184,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			=> View(thisIndices).AddIntoThis(otherVector.View(otherIndices));
 
 		[Obsolete("Use this.View(thisIndices).AddIntoThis(otherVector)")]
-		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IMinimalReadOnlyVector otherVector)
+		public void AddIntoThisNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector)
 			=> View(thisIndices).AddIntoThis(otherVector);
 
 		/// <summary>
@@ -234,7 +234,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// Thrown if <paramref name="thisIndices"/> violates the described constraints.
 		/// </exception>
 		[Obsolete("Use this.View(thisIndices).CopyFrom(otherVector)")]
-		public void CopyNonContiguouslyFrom(int[] thisIndices, IMinimalReadOnlyVector otherVector)
+		public void CopyNonContiguouslyFrom(int[] thisIndices, IReadOnlyVector otherVector)
 			=> View(thisIndices).CopyFrom(otherVector);
 
 		[Obsolete("Use this.CopyFrom(otherVector.View(otherIndices))")]

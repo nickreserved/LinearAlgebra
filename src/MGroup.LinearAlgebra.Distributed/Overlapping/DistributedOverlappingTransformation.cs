@@ -47,7 +47,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 
 		public int NumColumns { get; }
 
-		public void MultiplyIntoResult(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector)
+		public void MultiplyIntoResult(IReadOnlyVector inputVector, IVector outputVector)
 			=> MultiplyIntoResult((DistributedOverlappingVector) inputVector, (DistributedOverlappingVector) outputVector);
 
 		public void MultiplyIntoResult(DistributedOverlappingVector inputVector, DistributedOverlappingVector outputVector)

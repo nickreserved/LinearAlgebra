@@ -580,7 +580,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <inheritdoc/>
-        public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
+        public Vector Multiply(IReadOnlyVector vector, bool transposeThis = false)
         {
             if (vector is Vector2 casted) return Multiply(casted, transposeThis);
 
@@ -626,7 +626,7 @@ namespace MGroup.LinearAlgebra.Matrices
         }
 
         /// <inheritdoc/>
-        public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
+        public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis)
         {
             if ((lhsVector is Vector2 lhsDense) && (rhsVector is Vector2 rhsDense))
             {
@@ -648,7 +648,7 @@ namespace MGroup.LinearAlgebra.Matrices
 				rhsFull[1] = data[1, 1] * lhsFull[0] + data[1, 1] * lhsFull[1];
             }
         }
-		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
 
 		/// <summary>
 		/// Performs the otherMatrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
@@ -658,12 +658,12 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this otherMatrix. It sits on the left hand side of the equation y = oper(A) * x.
-		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>

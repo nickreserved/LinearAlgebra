@@ -971,7 +971,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <inheritdoc/>
-		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
+		public Vector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense) return Multiply(dense, transposeThis);
 			else throw new NotImplementedException();
@@ -982,10 +982,10 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// To multiply this * columnVector, set <paramref name="transposeThis"/> to false.
 		/// To multiply rowVector * this, set <paramref name="transposeThis"/> to true.
 		/// </summary>
-		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
+		/// <param name="vector">A vector with <see cref="IReadOnlyVector.Length"/> being equal to the 
 		///     <see cref="IBounded2D.NumColumns"/> of oper(this).</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+		/// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IReadOnlyVector.Length"/> of
 		///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
 		public Vector Multiply(Vector vector, bool transposeThis = false)
 		{
@@ -996,7 +996,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <inheritdoc/>
-		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
@@ -1005,7 +1005,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			else throw new NotImplementedException();
 		}
 		/// <inheritdoc/>
-		public void MultiplyIntoResult(IMinimalReadOnlyVector rhsVector, IMinimalVector lhsVector) => MultiplyIntoResult(rhsVector, lhsVector, false);
+		public void MultiplyIntoResult(IReadOnlyVector rhsVector, IVector lhsVector) => MultiplyIntoResult(rhsVector, lhsVector, false);
 
 		/// <summary>
 		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = oper(this) * <paramref name="lhsVector"/>.
@@ -1015,17 +1015,17 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = oper(A) * x.
-		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// equation y = oper(A) * x. Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described contraints.
 		/// </exception>
 		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector, bool transposeThis = false)
@@ -1062,21 +1062,21 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector x that will be multiplied by this matrix. Constraints: 
-		/// <paramref name="lhsOffset"/> + <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// <paramref name="lhsOffset"/> + <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// &lt;= oper(this).<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="lhsOffset">The index into <paramref name="lhsVector"/> from which to start the operations.</param>
 		/// <param name="lhsScale">The scalar alpha that will multiply <paramref name="lhsVector"/>.</param>
 		/// <param name="rhsVector">
 		/// The vector y that will be overwritten by the result of the operation. Constraints: 
-		/// <paramref name="rhsOffset"/> + <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// <paramref name="rhsOffset"/> + <paramref name="rhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// &lt;= oper(this).<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <param name="rhsOffset">The index into <paramref name="rhsVector"/> from which to start the operations.</param>
 		/// <param name="rhsScale">The scalar beta that will multiply <paramref name="rhsVector"/>.</param>
 		/// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described contraints.
 		/// </exception>
 		/// <exception cref="PatternModifiedException">
@@ -1201,14 +1201,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     0 &lt;= <paramref name="colIdx"/> &lt; <see cref="NumColumns"/>.</param>
 		/// <param name="rowStart">The first entry of column <paramref name="colIdx"/> to be modified. Constraints: 
 		///     1) 0 &lt;= <paramref name="rowStart"/> &lt; <see cref="NumRows"/>, 
-		///     2) <paramref name="rowStart"/> + <paramref name="colValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= 
+		///     2) <paramref name="rowStart"/> + <paramref name="colValues"/>.<see cref="IReadOnlyVector.Length"/> &lt;= 
 		///        <see cref="NumRows"/>.</param>
 		/// <param name="colValues">The new values of the column entries. Constraints: <paramref name="rowStart"/>
-		///     + <paramref name="colValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= <see cref="NumRows"/>.</param>
+		///     + <paramref name="colValues"/>.<see cref="IReadOnlyVector.Length"/> &lt;= <see cref="NumRows"/>.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="colIdx"/> or <paramref name="rowStart"/> 
 		///     violate the described constraints.</exception>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rowStart"/>
-		///     + <paramref name="colValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &gt; <see cref="NumRows"/>.</exception>
+		///     + <paramref name="colValues"/>.<see cref="IReadOnlyVector.Length"/> &gt; <see cref="NumRows"/>.</exception>
 		public void SetSubcolumn(int colIdx, Vector colValues, int rowStart = 0)
 		{
 			Preconditions.CheckIndexCol(this, colIdx);
@@ -1267,14 +1267,14 @@ namespace MGroup.LinearAlgebra.Matrices
 		///     0 &lt;= <paramref name="rowIdx"/> &lt; <see cref="NumRows"/>.</param>
 		/// <param name="colStart">The first entry of row <paramref name="rowIdx"/> to be modified. Constraints: 
 		///     1) 0 &lt;= <paramref name="colStart"/> &lt; <see cref="NumColumns"/>, 
-		///     2) <paramref name="colStart"/> + <paramref name="rowValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= 
+		///     2) <paramref name="colStart"/> + <paramref name="rowValues"/>.<see cref="IReadOnlyVector.Length"/> &lt;= 
 		///        <see cref="NumColumns"/>.</param>
 		/// <param name="rowValues">The new values of the row entries. Constraints: <paramref name="colStart"/>
-		///     + <paramref name="rowValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &lt;= <see cref="NumColumns"/>.</param>
+		///     + <paramref name="rowValues"/>.<see cref="IReadOnlyVector.Length"/> &lt;= <see cref="NumColumns"/>.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> or <paramref name="colStart"/> 
 		///     violate the described constraints.</exception>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="colStart"/>
-		///     + <paramref name="rowValues"/>.<see cref="IMinimalReadOnlyVector.Length"/> &gt; <see cref="NumColumns"/>.</exception>
+		///     + <paramref name="rowValues"/>.<see cref="IReadOnlyVector.Length"/> &gt; <see cref="NumColumns"/>.</exception>
 		public void SetSubrow(int rowIdx, Vector rowValues, int colStart = 0)
 		{
 			Preconditions.CheckIndexRow(this, rowIdx);

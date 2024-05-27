@@ -8,11 +8,8 @@ namespace MGroup.LinearAlgebra.Vectors
 	/// <summary>
 	/// The minimal vector functionality, which not require any modification to vector.
 	/// </summary>
-	public interface IExtendedReadOnlyVector : IMinimalReadOnlyVector, IReducible
+	public interface IExtendedReadOnlyVector : IReadOnlyVector
 	{
-		[Obsolete("This property is EXTREMELY inefficient on sparce vectors")]
-		double this[int index] { get; }
-
 		/// <summary>
 		/// Provides a vector from a contiguous part of this vector.
 		/// </summary>
@@ -64,52 +61,52 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// ------------------- COVARIANT RETURN TYPE FROM IMinimalReadOnlyVector
+		// ------------------- COVARIANT RETURN TYPE FROM IReadOnlyVector
 
-		new IExtendedVector Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient);
-		IMinimalVector IMinimalReadOnlyVector.Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient);
+		new IExtendedVector Axpy(IReadOnlyVector otherVector, double otherCoefficient);
+		IVector IReadOnlyVector.Axpy(IReadOnlyVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient);
 
-		new IExtendedVector Add(IMinimalReadOnlyVector otherVector);
-		IMinimalVector IMinimalReadOnlyVector.Add(IMinimalReadOnlyVector otherVector) => Add(otherVector);
+		new IExtendedVector Add(IReadOnlyVector otherVector);
+		IVector IReadOnlyVector.Add(IReadOnlyVector otherVector) => Add(otherVector);
 
-		new IExtendedVector Subtract(IMinimalReadOnlyVector otherVector);
-		IMinimalVector IMinimalReadOnlyVector.Subtract(IMinimalReadOnlyVector otherVector) => Subtract(otherVector);
+		new IExtendedVector Subtract(IReadOnlyVector otherVector);
+		IVector IReadOnlyVector.Subtract(IReadOnlyVector otherVector) => Subtract(otherVector);
 
 		new IExtendedVector Negate();
-		IMinimalVector IMinimalReadOnlyVector.Negate() => Negate();
+		IVector IReadOnlyVector.Negate() => Negate();
 
 		new IExtendedVector Scale(double coefficient);
-		IMinimalVector IMinimalReadOnlyVector.Scale(double coefficient) => Scale(coefficient);
+		IVector IReadOnlyVector.Scale(double coefficient) => Scale(coefficient);
 
-		new IExtendedVector LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient);
-		IMinimalVector IMinimalReadOnlyVector.LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient);
+		new IExtendedVector LinearCombination(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient);
+		IVector IReadOnlyVector.LinearCombination(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient);
 
 		new IExtendedVector Copy();
-		IMinimalVector IMinimalReadOnlyVector.Copy() => Copy();
+		IVector IReadOnlyVector.Copy() => Copy();
 
 		new IExtendedVector CreateZeroWithSameFormat();
-		IMinimalVector IMinimalReadOnlyVector.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
+		IVector IReadOnlyVector.CreateZeroWithSameFormat() => CreateZeroWithSameFormat();
 
-		new IExtendedVector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation);
-		IMinimalVector IMinimalReadOnlyVector.DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);
+		new IExtendedVector DoEntrywise(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation);
+		IVector IReadOnlyVector.DoEntrywise(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);
 
 		new IExtendedVector DoToAllEntries(Func<double, double> unaryOperation);
-		IMinimalVector IMinimalReadOnlyVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
+		IVector IReadOnlyVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
 
 
 
-		// -------- OPERATORS FROM IMinimalReadOnlyVector
+		// -------- OPERATORS FROM IReadOnlyVector
 
 		public static IExtendedVector operator -(IExtendedReadOnlyVector x) => x.Negate();
 		public static IExtendedVector operator +(IExtendedReadOnlyVector x, IExtendedReadOnlyVector y) => x.Add(y);
-		public static IExtendedVector operator +(IExtendedReadOnlyVector x, IMinimalReadOnlyVector y) => x.Add(y);
-		public static IExtendedVector operator +(IMinimalReadOnlyVector y, IExtendedReadOnlyVector x) => x.Add(y);
+		public static IExtendedVector operator +(IExtendedReadOnlyVector x, IReadOnlyVector y) => x.Add(y);
+		public static IExtendedVector operator +(IReadOnlyVector y, IExtendedReadOnlyVector x) => x.Add(y);
 		public static IExtendedVector operator -(IExtendedReadOnlyVector x, IExtendedReadOnlyVector y) => x.Subtract(y);
-		public static IExtendedVector operator -(IExtendedReadOnlyVector x, IMinimalReadOnlyVector y) => x.Subtract(y);
-		public static IExtendedVector operator -(IMinimalReadOnlyVector x, IExtendedReadOnlyVector y) => (IExtendedVector) x.Subtract(y);
+		public static IExtendedVector operator -(IExtendedReadOnlyVector x, IReadOnlyVector y) => x.Subtract(y);
+		public static IExtendedVector operator -(IReadOnlyVector x, IExtendedReadOnlyVector y) => (IExtendedVector) x.Subtract(y);
 		public static double operator *(IExtendedReadOnlyVector x, IExtendedReadOnlyVector y) => x.DotProduct(y);
-		public static double operator *(IExtendedReadOnlyVector x, IMinimalReadOnlyVector y) => x.DotProduct(y);
-		public static double operator *(IMinimalReadOnlyVector x, IExtendedReadOnlyVector y) => x.DotProduct(y);
+		public static double operator *(IExtendedReadOnlyVector x, IReadOnlyVector y) => x.DotProduct(y);
+		public static double operator *(IReadOnlyVector x, IExtendedReadOnlyVector y) => x.DotProduct(y);
 		public static IExtendedVector operator *(IExtendedReadOnlyVector x, double y) => x.Scale(y);
 		public static IExtendedVector operator *(double y, IExtendedReadOnlyVector x) => x.Scale(y);
 	}

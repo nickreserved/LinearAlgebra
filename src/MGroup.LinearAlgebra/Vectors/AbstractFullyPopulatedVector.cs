@@ -20,15 +20,14 @@ namespace MGroup.LinearAlgebra.Vectors
 		/// <param name="index">The index of the element to return.</param>
 		/// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="index"/> is lower than 0 or greater or equal to size of the vector</exception>
 		public abstract ref double this[int index] { get; }
-		[Obsolete("This property is EXTREMELY inefficient on sparce vectors")]
-		double IExtendedVector.this[int index]
+		double IVector.this[int index]
 		{
 			get => this[index];
 			set { this[index] = value; }
 		}
 
 		public abstract int Length { get; }
-		int IMinimalReadOnlyVector.Length => Length;
+		int IReadOnlyVector.Length => Length;
 
 		/// <summary>
 		/// Provides a vector from scattered elements of this vector.
@@ -105,28 +104,28 @@ namespace MGroup.LinearAlgebra.Vectors
 		public Vector Copy(int fromIndex, int toIndex) => new Vector(CopyToArray(fromIndex, toIndex));
 		IExtendedVector IExtendedReadOnlyVector.Copy(int fromIndex, int toIndex) => Copy(fromIndex, toIndex);
 
-		public Vector Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.Axpy(this, otherVector, otherCoefficient);
-		IExtendedVector IExtendedReadOnlyVector.Axpy(IMinimalReadOnlyVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient);
+		public Vector Axpy(IReadOnlyVector otherVector, double otherCoefficient) => (Vector)IReadOnlyVector.Axpy(this, otherVector, otherCoefficient);
+		IExtendedVector IExtendedReadOnlyVector.Axpy(IReadOnlyVector otherVector, double otherCoefficient) => Axpy(otherVector, otherCoefficient);
 
-		public Vector Add(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Add(this, otherVector);
-		IExtendedVector IExtendedReadOnlyVector.Add(IMinimalReadOnlyVector otherVector) => Add(otherVector);
+		public Vector Add(IReadOnlyVector otherVector) => (Vector)IReadOnlyVector.Add(this, otherVector);
+		IExtendedVector IExtendedReadOnlyVector.Add(IReadOnlyVector otherVector) => Add(otherVector);
 
-		public Vector Subtract(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Subtract(this, otherVector);
-		IExtendedVector IExtendedReadOnlyVector.Subtract(IMinimalReadOnlyVector otherVector) => (Vector)IMinimalReadOnlyVector.Subtract(this, otherVector);
+		public Vector Subtract(IReadOnlyVector otherVector) => (Vector)IReadOnlyVector.Subtract(this, otherVector);
+		IExtendedVector IExtendedReadOnlyVector.Subtract(IReadOnlyVector otherVector) => (Vector)IReadOnlyVector.Subtract(this, otherVector);
 
-		public Vector Negate() => (Vector)IMinimalReadOnlyVector.Negate(this);
+		public Vector Negate() => (Vector)IReadOnlyVector.Negate(this);
 		IExtendedVector IExtendedReadOnlyVector.Negate() => Negate();
 
-		public Vector Scale(double coefficient) => (Vector)IMinimalReadOnlyVector.Scale(this, coefficient);
+		public Vector Scale(double coefficient) => (Vector)IReadOnlyVector.Scale(this, coefficient);
 		IExtendedVector IExtendedReadOnlyVector.Scale(double coefficient) => Scale(coefficient);
 
-		public Vector LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => (Vector)IMinimalReadOnlyVector.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
-		IExtendedVector IExtendedReadOnlyVector.LinearCombination(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient);
+		public Vector LinearCombination(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient) => (Vector)IReadOnlyVector.LinearCombination(this, thisCoefficient, otherVector, otherCoefficient);
+		IExtendedVector IExtendedReadOnlyVector.LinearCombination(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient) => LinearCombination(thisCoefficient, otherVector, otherCoefficient);
 
-		public Vector DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)IMinimalReadOnlyVector.DoEntrywise(this, otherVector, binaryOperation);
-		IExtendedVector IExtendedReadOnlyVector.DoEntrywise(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);
+		public Vector DoEntrywise(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (Vector)IReadOnlyVector.DoEntrywise(this, otherVector, binaryOperation);
+		IExtendedVector IExtendedReadOnlyVector.DoEntrywise(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => DoEntrywise(otherVector, binaryOperation);
 
-		public Vector DoToAllEntries(Func<double, double> unaryOperation) => (Vector)IMinimalReadOnlyVector.DoToAllEntries(this, unaryOperation);
+		public Vector DoToAllEntries(Func<double, double> unaryOperation) => (Vector)IReadOnlyVector.DoToAllEntries(this, unaryOperation);
 		IExtendedVector IExtendedReadOnlyVector.DoToAllEntries(Func<double, double> unaryOperation) => DoToAllEntries(unaryOperation);
 
 		public Vector Copy() => new Vector(CopyToArray());
@@ -144,7 +143,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// ------------------- COVARIANT RETURN TYPE FROM IMinimalVector
+		// ------------------- COVARIANT RETURN TYPE FROM IVector
 
 		public virtual AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 			=> AbstractSparseVector.AxpyIntoDenseVector(this, otherVector, otherCoefficient);
@@ -162,7 +161,7 @@ namespace MGroup.LinearAlgebra.Vectors
 					this[i] += otherCoefficient * otherVector[i];
 			return this;
 		}
-		public virtual void AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient)
+		public virtual void AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			// Runtime Identification is_a_bad_thing™
 			// Another (better) solution is otherVector.Scale(otherCoefficient).Add(this); because 'this' is already identified
@@ -172,9 +171,9 @@ namespace MGroup.LinearAlgebra.Vectors
 			else throw new NotImplementedException("Axpy(NotSupportedVector, otherCoefficient)");
 		}
 
-		public virtual void AddIntoThis(IMinimalReadOnlyVector otherVector) => IMinimalVector.AddIntoThis(this, otherVector);
+		public virtual void AddIntoThis(IReadOnlyVector otherVector) => IVector.AddIntoThis(this, otherVector);
 
-		public virtual void SubtractIntoThis(IMinimalReadOnlyVector otherVector) => IMinimalVector.SubtractIntoThis(this, otherVector);
+		public virtual void SubtractIntoThis(IReadOnlyVector otherVector) => IVector.SubtractIntoThis(this, otherVector);
 
 		public virtual void NegateIntoThis()
 		{
@@ -188,7 +187,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				this[i] *= coefficient;
 		}
 
-		public virtual void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => IMinimalVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
+		public virtual void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient) => IVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
 
 		public virtual AbstractFullyPopulatedVector CopyFrom(AbstractSparseVector otherVector) => AbstractSparseVector.CopyToDenseVector(this, otherVector);
 		public AbstractFullyPopulatedVector CopyFrom(AbstractFullyPopulatedVector otherVector)
@@ -198,7 +197,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				this[i] = otherVector[i];
 			return this;
 		}
-		public virtual void CopyFrom(IMinimalReadOnlyVector otherVector)
+		public virtual void CopyFrom(IReadOnlyVector otherVector)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractSparseVector sparseVector) CopyFrom(sparseVector);
@@ -206,7 +205,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			else throw new NotImplementedException("CopyFrom(NotSupportedVector)");
 		}
 
-		public virtual void Clear() => IMinimalVector.Clear(this);
+		public virtual void Clear() => IVector.Clear(this);
 
 		public virtual void SetAll(double value)
 		{
@@ -223,7 +222,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				this[i] = binaryOperation(this[i], otherVector[i]);
 			return this;
 		}
-		public virtual void DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
+		public virtual void DoEntrywiseIntoThis(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractSparseVector sparseVector) DoEntrywiseIntoThis(sparseVector, binaryOperation);
@@ -239,7 +238,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// ------------------- COVARIANT RETURN TYPE FROM IMinimalReadOnlyVector
+		// ------------------- COVARIANT RETURN TYPE FROM IReadOnlyVector
 
 		public virtual double DotProduct(AbstractSparseVector otherVector) => otherVector.DotProduct(this);
 		public double DotProduct(AbstractFullyPopulatedVector otherVector)
@@ -250,7 +249,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				result += this[i] * otherVector[i];
 			return result;
 		}
-		public virtual double DotProduct(IMinimalReadOnlyVector otherVector)
+		public virtual double DotProduct(IReadOnlyVector otherVector)
 		{
 			// Runtime Identification is_a_bad_thing™
 			// Another (better) solution is otherVector.DotProduct(this); because 'this' is already identified
@@ -275,9 +274,9 @@ namespace MGroup.LinearAlgebra.Vectors
 			return true;
 		}
 
-		public virtual double Square() => IMinimalReadOnlyVector.Square(this);
+		public virtual double Square() => IReadOnlyVector.Square(this);
 
-		public virtual double Norm2() => IMinimalReadOnlyVector.Norm2(this);
+		public virtual double Norm2() => IReadOnlyVector.Norm2(this);
 
 		public virtual bool Equals(AbstractSparseVector otherVector, double tolerance = 1E-07) => otherVector.Equals(this, tolerance);
 		public bool Equals(AbstractFullyPopulatedVector otherVector, double tolerance = 1E-07)
@@ -288,7 +287,7 @@ namespace MGroup.LinearAlgebra.Vectors
 				if (!cmp.AreEqual(this[i], otherVector[i])) return false;
 			return true;
 		}
-		public virtual bool Equals(IMinimalReadOnlyVector otherVector, double tolerance = 1E-07)
+		public virtual bool Equals(IReadOnlyVector otherVector, double tolerance = 1E-07)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractSparseVector sparseVector) return Equals(sparseVector, tolerance);

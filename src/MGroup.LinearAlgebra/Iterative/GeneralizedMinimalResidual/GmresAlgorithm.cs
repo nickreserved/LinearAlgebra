@@ -32,7 +32,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
         }
 
         public IterativeStatistics Solve(IMatrixView matrix, IPreconditioner preconditioner, AbstractFullyPopulatedVector rhs, AbstractFullyPopulatedVector solution,
-            bool initialGuessIsZero, Func<IMinimalVector> zeroVectorInitializer)
+            bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
         {
             return Solve(new ExplicitMatrixTransformation(matrix), preconditioner,rhs, solution, initialGuessIsZero,
                 zeroVectorInitializer);
@@ -40,7 +40,7 @@ namespace MGroup.LinearAlgebra.Iterative.GeneralizedMinimalResidual
 
 
         public IterativeStatistics Solve(ILinearTransformation matrix, IPreconditioner preconditioner, AbstractFullyPopulatedVector rhs, AbstractFullyPopulatedVector solution,
-            bool initialGuessIsZero, Func<IMinimalVector> zeroVectorInitializer)
+            bool initialGuessIsZero, Func<IVector> zeroVectorInitializer)
         {
             Preconditions.CheckMultiplicationDimensions(matrix.NumColumns, solution.Length);
             Preconditions.CheckSystemSolutionDimensions(matrix.NumRows, rhs.Length);

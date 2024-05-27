@@ -461,13 +461,13 @@ namespace MGroup.LinearAlgebra.Matrices.Builders
 		/// creating a CSR matrix and multiplying it with 1 vector. If more than 1 multiplications are needed, then the CSR 
 		/// matrix should be created.
 		/// </summary>
-		/// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to this.<see cref="NumColumns"/>.
+		/// <param name="vector">A vector with <see cref="IReadOnlyVector.Length"/> being equal to this.<see cref="NumColumns"/>.
 		///     </param>
 		/// <param name="avoidBuilding">If true, no matrices will be built internally. If false, such matrices may be built if 
 		///     the method decides that using them is faster (e.g. fast native library), however that requires memory for 
 		///     building them, which may not be available.</param>
 		/// <exception cref="NonMatchingDimensionsException">Thrown if 
-		///     <paramref name="vector"/>.<see cref="IMinimalReadOnlyVector.Length"/> != this.<see cref="NumColumns"/>.</exception>
+		///     <paramref name="vector"/>.<see cref="IReadOnlyVector.Length"/> != this.<see cref="NumColumns"/>.</exception>
 		public Vector MultiplyRight(Vector vector, bool avoidBuilding = false)
         {
             // SparseBLAS functions are way faster than managed code. Just don't sort the CSR.

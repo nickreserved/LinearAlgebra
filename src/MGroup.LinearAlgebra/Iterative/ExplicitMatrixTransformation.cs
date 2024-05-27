@@ -31,8 +31,8 @@ namespace MGroup.LinearAlgebra.Iterative
         public int NumRows => matrix.NumRows;
 
 		/// <summary>
-		/// See <see cref="ILinearTransformation.MultiplyIntoResult(IMinimalReadOnlyVector, IMinimalVector)"/>
+		/// See <see cref="ILinearTransformation.MultiplyIntoResult(IReadOnlyVector, IVector)"/>
 		/// </summary>
-		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector) => matrix.MultiplyIntoResult(lhsVector, rhsVector, false);
     }
 }

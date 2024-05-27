@@ -104,11 +104,11 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <summary>
         /// Performs the operation: <paramref name="result"/> = generalized_inverse(A) * <paramref name="vector"/>
         /// </summary>
-        /// <param name="vector">The vector that will be multiplied. Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to 
+        /// <param name="vector">The vector that will be multiplied. Its <see cref="IReadOnlyVector.Length"/> must be equal to 
         /// <see cref="IBounded2D.NumRows"/> of the original matrix A.
         /// </param>
         /// <param name="result">
-        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IMinimalReadOnlyVector.Length"/>  
+        /// Output vector that will be overwritten with the solution of the linear system. Its <see cref="IReadOnlyVector.Length"/>  
         /// must be equal to <see cref="IBounded2D.NumColumns"/> of the original matrix A.
         /// </param>
         /// <exception cref="NonMatchingDimensionsException">

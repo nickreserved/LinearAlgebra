@@ -13,7 +13,7 @@ namespace MGroup.LinearAlgebra.Triangulation
 		/// b = <paramref name="rhsVector"/> and x is the solution vector, which will be returned.
 		/// </summary>
 		/// <param name="rhsVector">
-		/// The right hand side vector. Its <see cref="IMinimalReadOnlyVector.Length"/> must be equal to 
+		/// The right hand side vector. Its <see cref="IReadOnlyVector.Length"/> must be equal to 
 		/// <see cref="Matrices.IBounded2D.NumRows"/> of the original matrix A.
 		/// </param>
 		/// <exception cref="IndexOutOfRangeException">

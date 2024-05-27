@@ -551,7 +551,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			return DenseStrategies.Multiply(this, other, transposeThis, transposeOther);
 		}
 
-		public Vector Multiply(IMinimalReadOnlyVector vector, bool transposeThis = false)
+		public Vector Multiply(IReadOnlyVector vector, bool transposeThis = false)
 		{
 			if (vector is Vector dense) return Multiply(dense, transposeThis);
 			else throw new NotImplementedException();
@@ -571,7 +571,7 @@ namespace MGroup.LinearAlgebra.Matrices
 		}
 
 		/// <inheritdoc/>
-		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector, bool transposeThis)
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector, bool transposeThis)
 		{
 			if ((lhsVector is Vector lhsDense) && (rhsVector is Vector rhsDense))
 			{
@@ -579,7 +579,7 @@ namespace MGroup.LinearAlgebra.Matrices
 			}
 			else throw new NotImplementedException();
 		}
-		public void MultiplyIntoResult(IMinimalReadOnlyVector lhsVector, IMinimalVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
+		public void MultiplyIntoResult(IReadOnlyVector lhsVector, IVector rhsVector) => MultiplyIntoResult(lhsVector, rhsVector, false);
 
 		/// <summary>
 		/// Performs the matrix-vector multiplication: <paramref name="rhsVector"/> = this * <paramref name="lhsVector"/>.
@@ -587,16 +587,16 @@ namespace MGroup.LinearAlgebra.Matrices
 		/// </summary>
 		/// <param name="lhsVector">
 		/// The vector that will be multiplied by this matrix. It sits on the left hand side of the equation y = A * x.
-		/// Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == this.<see cref="IBounded2D.NumColumns"/>.
 		/// </param>
 		/// <param name="rhsVector">
 		/// The vector that will be overwritten by the result of the multiplication. It sits on the right hand side of the 
-		/// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+		/// equation y = A * x. Constraints: <paramref name="lhsVector"/>.<see cref="IReadOnlyVector.Length"/> 
 		/// == this.<see cref="IBounded2D.NumRows"/>.
 		/// </param>
 		/// <exception cref="NonMatchingDimensionsException">
-		/// Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
+		/// Thrown if the <see cref="IReadOnlyVector.Length"/> of <paramref name="lhsVector"/> or <paramref name="rhsVector"/> 
 		/// violate the described contraints.
 		/// </exception>
 		public void MultiplyIntoResult(Vector lhsVector, Vector rhsVector)

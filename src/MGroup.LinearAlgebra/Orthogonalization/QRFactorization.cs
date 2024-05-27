@@ -168,9 +168,9 @@ namespace MGroup.LinearAlgebra.Orthogonalization
         /// Warning: the columns of the original matrix A must be independent for this to work.
         /// </summary>
         /// <param name="rhsVector">The right hand side vector b. It may lie outside the column space of the original matrix. Its 
-        ///     <see cref="IMinimalReadOnlyVector.Length"/> must be equal to this.<see cref="NumRows"/>.</param>
+        ///     <see cref="IReadOnlyVector.Length"/> must be equal to this.<see cref="NumRows"/>.</param>
         /// <exception cref="Exceptions.LapackException">Thrown if the call to LAPACK fails due to <paramref name="rhsVector"/> 
-        ///     having a different <see cref="IMinimalReadOnlyVector.Length"/> than this.<see cref="NumRows"/>.</exception>
+        ///     having a different <see cref="IReadOnlyVector.Length"/> than this.<see cref="NumRows"/>.</exception>
         public Vector SolveLeastSquares(Vector rhsVector) //TODO: perhaps I should use the driver routines of LAPACKE
         {
             if (NumRows < NumColumns)

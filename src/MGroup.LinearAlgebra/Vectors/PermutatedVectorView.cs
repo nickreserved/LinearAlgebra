@@ -44,37 +44,37 @@ namespace MGroup.LinearAlgebra.Vectors
 		/* Valid in C#9
 		// ------------------- COVARIANT RETURN TYPE FROM AbstractFullyPopulatedVector
 
-		new public PermutatedVectorView AddIntoThis(IMinimalReadOnlyVector otherVector) => (PermutatedVectorView)base.AddIntoThis(otherVector);
+		new public PermutatedVectorView AddIntoThis(IReadOnlyVector otherVector) => (PermutatedVectorView)base.AddIntoThis(otherVector);
 		new public PermutatedVectorView Clear() => (PermutatedVectorView)base.Clear();
-		new public PermutatedVectorView CopyFrom(IMinimalReadOnlyVector otherVector) => (PermutatedVectorView)base.CopyFrom(otherVector);
+		new public PermutatedVectorView CopyFrom(IReadOnlyVector otherVector) => (PermutatedVectorView)base.CopyFrom(otherVector);
 		new public PermutatedVectorView DoToAllEntriesIntoThis(Func<double, double> unaryOperation) => (PermutatedVectorView)base.DoToAllEntriesIntoThis(unaryOperation);
-		new public PermutatedVectorView LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient) => (PermutatedVectorView)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
+		new public PermutatedVectorView LinearCombinationIntoThis(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient) => (PermutatedVectorView)base.LinearCombinationIntoThis(thisCoefficient, otherVector, otherCoefficient);
 		new public PermutatedVectorView NegateIntoThis() => (PermutatedVectorView)base.NegateIntoThis();
 		new public PermutatedVectorView ScaleIntoThis(double coefficient) => (PermutatedVectorView)base.ScaleIntoThis(coefficient);
 		new public PermutatedVectorView SetAll(double value) => (PermutatedVectorView)base.SetAll(value);
-		new public PermutatedVectorView SubtractIntoThis(IMinimalReadOnlyVector otherVector) => (PermutatedVectorView)base.SubtractIntoThis(otherVector);
+		new public PermutatedVectorView SubtractIntoThis(IReadOnlyVector otherVector) => (PermutatedVectorView)base.SubtractIntoThis(otherVector);
 
 		new public PermutatedVectorView AxpyIntoThis(SparseVector otherVector, double otherCoefficient) => (PermutatedVectorView)base.AxpyIntoThis(otherVector, otherCoefficient);
 		new public PermutatedVectorView AxpyIntoThis(AbstractFullyPopulatedVector otherVector, double otherCoefficient) => (PermutatedVectorView)base.AxpyIntoThis(otherVector, otherCoefficient);
-		new public PermutatedVectorView AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient) => (PermutatedVectorView)base.AxpyIntoThis(otherVector, otherCoefficient);
+		new public PermutatedVectorView AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient) => (PermutatedVectorView)base.AxpyIntoThis(otherVector, otherCoefficient);
 
 		new public PermutatedVectorView DoEntrywiseIntoThis(SparseVector otherVector, Func<double, double, double> binaryOperation) => (PermutatedVectorView)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
 		new public PermutatedVectorView DoEntrywiseIntoThis(AbstractFullyPopulatedVector otherVector, Func<double, double, double> binaryOperation) => (PermutatedVectorView)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
-		new public PermutatedVectorView DoEntrywiseIntoThis(IMinimalReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (PermutatedVectorView)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
+		new public PermutatedVectorView DoEntrywiseIntoThis(IReadOnlyVector otherVector, Func<double, double, double> binaryOperation) => (PermutatedVectorView)base.DoEntrywiseIntoThis(otherVector, binaryOperation);
 		*/
 
-		// -------- OPERATORS FROM IMinimalReadOnlyVector
+		// -------- OPERATORS FROM IReadOnlyVector
 
 		public static Vector operator -(PermutatedVectorView x) => x.Negate();
 		public static Vector operator +(PermutatedVectorView x, PermutatedVectorView y) => x.Add(y);
-		public static Vector operator +(PermutatedVectorView x, IMinimalReadOnlyVector y) => x.Add(y);
-		public static Vector operator +(IMinimalReadOnlyVector y, PermutatedVectorView x) => x.Add(y);
+		public static Vector operator +(PermutatedVectorView x, IReadOnlyVector y) => x.Add(y);
+		public static Vector operator +(IReadOnlyVector y, PermutatedVectorView x) => x.Add(y);
 		public static Vector operator -(PermutatedVectorView x, PermutatedVectorView y) => x.Subtract(y);
-		public static Vector operator -(PermutatedVectorView x, IMinimalReadOnlyVector y) => x.Subtract(y);
-		public static Vector operator -(IMinimalReadOnlyVector x, PermutatedVectorView y) => y.LinearCombination(-1, x, 1);
+		public static Vector operator -(PermutatedVectorView x, IReadOnlyVector y) => x.Subtract(y);
+		public static Vector operator -(IReadOnlyVector x, PermutatedVectorView y) => y.LinearCombination(-1, x, 1);
 		public static double operator *(PermutatedVectorView x, PermutatedVectorView y) => x.DotProduct(y);
-		public static double operator *(PermutatedVectorView x, IMinimalReadOnlyVector y) => x.DotProduct(y);
-		public static double operator *(IMinimalReadOnlyVector x, PermutatedVectorView y) => x.DotProduct(y);
+		public static double operator *(PermutatedVectorView x, IReadOnlyVector y) => x.DotProduct(y);
+		public static double operator *(IReadOnlyVector x, PermutatedVectorView y) => x.DotProduct(y);
 		public static Vector operator *(PermutatedVectorView x, double y) => x.Scale(y);
 		public static Vector operator *(double y, PermutatedVectorView x) => x.Scale(y);
 	}

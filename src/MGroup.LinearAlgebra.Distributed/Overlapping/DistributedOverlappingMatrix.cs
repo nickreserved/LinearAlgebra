@@ -176,7 +176,7 @@ namespace MGroup.LinearAlgebra.Distributed.Overlapping
 			outputVector.SumOverlappingEntries();
 		}
 
-		public void MultiplyIntoResult(IMinimalReadOnlyVector inputVector, IMinimalVector outputVector)
+		public void MultiplyIntoResult(IReadOnlyVector inputVector, IVector outputVector)
 			=> MultiplyIntoResult((DistributedOverlappingVector)inputVector, (DistributedOverlappingVector)outputVector);
 
 

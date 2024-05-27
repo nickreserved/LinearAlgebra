@@ -124,12 +124,12 @@
 //		/// or strictly diagonally dominant for ensured convergence.</param>
 //		/// <param name="rhs">
 //		/// The right hand side vector b of the linear system A * x = b. Constraints:
-//		/// <paramref name="rhs"/>.<see cref="IMinimalReadOnlyVector.Length"/> 
+//		/// <paramref name="rhs"/>.<see cref="IReadOnlyVector.Length"/> 
 //		/// == <paramref name="matrix"/>.<see cref="IBounded2D.NumRows"/>.
 //		/// </param>
 //		/// <param name="solution">
 //		/// The vector from which to start refining the solution vector x. Constraints:
-//		/// <paramref name="solution"/>.<see cref="IMinimalReadOnlyVector.Length"/>
+//		/// <paramref name="solution"/>.<see cref="IReadOnlyVector.Length"/>
 //		/// == <paramref name="matrix"/>.<see cref="IBounded2D.NumColumns"/>.
 //		/// </param>
 //		/// <exception cref="NonMatchingDimensionsException">

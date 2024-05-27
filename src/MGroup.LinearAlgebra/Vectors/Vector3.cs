@@ -149,7 +149,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// --------- IMinimalVector
+		// --------- IVector
 
 		/// <summary>
 		/// Performs the operation: this[i] = this[i] + <paramref name="otherVector"/>[i], 
@@ -216,7 +216,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// --------- IMinimalReadOnlyVector
+		// --------- IReadOnlyVector
 
 		public Vector3 Axpy(Vector3 otherVector, double otherCoefficient) => new Vector3(Values[0] + otherCoefficient * otherVector.Values[0],
 																						Values[1] + otherCoefficient * otherVector.Values[1],

@@ -19,11 +19,11 @@ namespace MGroup.LinearAlgebra.Matrices
         /// To multiply rowVector * <paramref name="matrix"/>, set <paramref name="transposeThis"/> to true.
         /// </summary>
         /// <param name="matrix">The matrix to multiply.</param>
-        /// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the 
+        /// <param name="vector">A vector with <see cref="IReadOnlyVector.Length"/> being equal to the 
         ///     <see cref="IBounded2D.NumColumns"/> of oper(<paramref name="matrix"/>).</param>
         /// <param name="transposeThis">If true, oper(<paramref name="matrix"/>) = transpose(<paramref name="matrix"/>). 
         ///     Otherwise oper(<paramref name="matrix"/>) = <paramref name="matrix"/>.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IReadOnlyVector.Length"/> of
         ///     <paramref name="vector"/> is different than the <see cref="IBounded2D.NumColumns"/> of 
         ///     oper(<paramref name="matrix"/>).</exception>
         public static double[] MultiplyRight(this CscMatrix matrix, double[] vector, bool transposeThis)

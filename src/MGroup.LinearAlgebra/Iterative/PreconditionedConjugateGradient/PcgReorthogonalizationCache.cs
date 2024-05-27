@@ -12,7 +12,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The conjugate direction vectors stored so far.
 		/// </summary>
-		public List<IMinimalReadOnlyVector> Directions { get; } = new List<IMinimalReadOnlyVector>();
+		public List<IReadOnlyVector> Directions { get; } = new List<IReadOnlyVector>();
 
 		/// <summary>
 		/// The products <see cref="Directions"/> * systemMatrix * <see cref="Directions"/> stored so far.
@@ -22,7 +22,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <summary>
 		/// The products systemMatrix * <see cref="Directions"/> stored so far.
 		/// </summary>
-		public List<IMinimalReadOnlyVector> MatrixTimesDirections { get; } = new List<IMinimalReadOnlyVector>();
+		public List<IReadOnlyVector> MatrixTimesDirections { get; } = new List<IReadOnlyVector>();
 
 		public void Clear()
 		{

@@ -171,7 +171,7 @@ namespace MGroup.LinearAlgebra.Matrices
         /// </summary>
         /// <param name="vector">
         /// The vector that will be multiplied. Constraints: 
-        /// <paramref name="vector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="IBounded2D.NumColumns"/>.
+        /// <paramref name="vector"/>.<see cref="IReadOnlyVector.Length"/> == this.<see cref="IBounded2D.NumColumns"/>.
         /// </param>
         /// <exception cref="Exceptions.NonMatchingDimensionsException">
         /// Thrown if <paramref name="vector"/> violates the described constraint.

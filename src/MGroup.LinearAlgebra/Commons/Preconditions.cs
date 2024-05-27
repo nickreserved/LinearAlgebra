@@ -20,7 +20,7 @@ namespace MGroup.LinearAlgebra.Commons
             else return true;
         }
 
-        public static void CheckIndex1D(IMinimalReadOnlyVector vector, int idx)
+        public static void CheckIndex1D(IReadOnlyVector vector, int idx)
         {
             if ((idx < 0) || (idx >= vector.Length))
             {
@@ -81,8 +81,8 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckMultiplicationDimensionsSection(IBounded2D matrixLeft, IMinimalReadOnlyVector vectorRight,
-            int vectorStart, IMinimalReadOnlyVector result, int resultStart)
+        public static void CheckMultiplicationDimensionsSection(IBounded2D matrixLeft, IReadOnlyVector vectorRight,
+            int vectorStart, IReadOnlyVector result, int resultStart)
         {
             if (vectorStart + matrixLeft.NumColumns > vectorRight.Length) throw new NonMatchingDimensionsException(
                 $"The multiplied vector's length = {vectorRight.Length} must be at least as large as the start index =" +
@@ -92,8 +92,8 @@ namespace MGroup.LinearAlgebra.Commons
                 $" {resultStart} + the matrix' rows = {matrixLeft.NumRows}");
         }
 
-        public static void CheckMultiplicationDimensions(IBounded2D matrix, IMinimalReadOnlyVector lhsVector, int lhsOffset,
-			IMinimalReadOnlyVector rhsVector, int rhsOffset, bool transposeMatrix)
+        public static void CheckMultiplicationDimensions(IBounded2D matrix, IReadOnlyVector lhsVector, int lhsOffset,
+			IReadOnlyVector rhsVector, int rhsOffset, bool transposeMatrix)
         {
             int m, n;
             if (transposeMatrix)
@@ -114,7 +114,7 @@ namespace MGroup.LinearAlgebra.Commons
                 + "matrix (or its transpose).");
         }
 
-        public static void CheckSameColDimension(IBounded2D matrix, IMinimalReadOnlyVector vector)
+        public static void CheckSameColDimension(IBounded2D matrix, IReadOnlyVector vector)
         {
             if (matrix.NumColumns != vector.Length)
             {
@@ -147,7 +147,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-        public static void CheckSameRowDimension(IBounded2D matrix, IMinimalReadOnlyVector vector)
+        public static void CheckSameRowDimension(IBounded2D matrix, IReadOnlyVector vector)
         {
             if (matrix.NumRows != vector.Length)
             {
@@ -181,7 +181,7 @@ namespace MGroup.LinearAlgebra.Commons
                 $"The matrix must be square, but was {numRows}-by-{numColumns}");
         }
 
-		public static void CheckSquareLinearSystemDimensions(IBounded2D matrix, IMinimalReadOnlyVector lhsVector, IMinimalReadOnlyVector rhsVector)
+		public static void CheckSquareLinearSystemDimensions(IBounded2D matrix, IReadOnlyVector lhsVector, IReadOnlyVector rhsVector)
 		{
 			CheckSquareLinearSystemDimensions(matrix.NumRows, matrix.NumColumns, lhsVector.Length, rhsVector.Length);
 		}
@@ -195,13 +195,13 @@ namespace MGroup.LinearAlgebra.Commons
 				$"The matrix rows ({numMatrixRows}), matrix columns ({numMatrixColumns}), left-hand-side vector length ({lhsLength}) and right-hand-side vector length ({rhsLength}) must be the same");
 		}
 
-		public static void CheckSubvectorDimensions(IMinimalReadOnlyVector vector, int startIndex, int subvectorLength)
+		public static void CheckSubvectorDimensions(IReadOnlyVector vector, int startIndex, int subvectorLength)
         {
             if (startIndex + subvectorLength > vector.Length) throw new NonMatchingDimensionsException(
                 "The entries to access exceed the vector's length");
         }
 
-        public static void CheckSystemSolutionDimensions(IBounded2D matrix, IMinimalReadOnlyVector rhsVector)
+        public static void CheckSystemSolutionDimensions(IBounded2D matrix, IReadOnlyVector rhsVector)
         {
             if (matrix.NumRows != rhsVector.Length)
             {
@@ -222,7 +222,7 @@ namespace MGroup.LinearAlgebra.Commons
             }
         }
 
-		public static void CheckVectorDimensions(IMinimalReadOnlyVector vector1, IMinimalReadOnlyVector vector2) => CheckVectorDimensions(vector1.Length, vector2.Length);
+		public static void CheckVectorDimensions(IReadOnlyVector vector1, IReadOnlyVector vector2) => CheckVectorDimensions(vector1.Length, vector2.Length);
 		public static void CheckVectorDimensions(double[] vector1, double[] vector2) => CheckVectorDimensions(vector1.Length, vector2.Length);
 		public static void CheckVectorDimensions(int length1, int length2)
 		{

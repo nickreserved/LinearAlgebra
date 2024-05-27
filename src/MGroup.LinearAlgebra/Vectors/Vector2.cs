@@ -122,7 +122,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// --------- IMinimalVector
+		// --------- IVector
 
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace MGroup.LinearAlgebra.Vectors
 
 
 
-		// -----------IMinimalReadOnlyVector
+		// -----------IReadOnlyVector
 
 		public Vector2 DoEntrywise(Vector2 vector, Func<double, double, double> binaryOperation)
 			=> new Vector2(binaryOperation(Values[0], vector.Values[0]), binaryOperation(Values[1], vector.Values[1]));

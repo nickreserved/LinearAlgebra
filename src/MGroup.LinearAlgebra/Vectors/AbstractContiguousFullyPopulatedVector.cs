@@ -44,7 +44,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			otherVector.CopyToArray(otherVector.FromIndex, Values, FromIndex, Length);
 			return this;
 		}
-		public override void CopyFrom(IMinimalReadOnlyVector otherVector)
+		public override void CopyFrom(IReadOnlyVector otherVector)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractContiguousFullyPopulatedVector fullyPopulatedVector) CopyFrom(fullyPopulatedVector);
@@ -57,11 +57,11 @@ namespace MGroup.LinearAlgebra.Vectors
 			BlasExtensions.Daxpby(Length, otherCoefficient, otherVector.Values, otherVector.FromIndex, 1, thisCoefficient, Values, FromIndex, 1);
 			return this;
 		}
-		public override void LinearCombinationIntoThis(double thisCoefficient, IMinimalReadOnlyVector otherVector, double otherCoefficient)
+		public override void LinearCombinationIntoThis(double thisCoefficient, IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractContiguousFullyPopulatedVector contiguousVector) LinearCombinationIntoThis(thisCoefficient, contiguousVector, otherCoefficient);
-			else IMinimalVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
+			else IVector.LinearCombinationIntoThis(this, thisCoefficient, otherVector, otherCoefficient);
 		}
 
 		public override void SetAll(double value) => Array.Fill(Values, value, FromIndex, Length);
@@ -74,7 +74,7 @@ namespace MGroup.LinearAlgebra.Vectors
 		}
 		public override AbstractFullyPopulatedVector AxpyIntoThis(AbstractSparseVector otherVector, double otherCoefficient)
 			=> AbstractSparseVector.AxpyIntoDenseVector(this, otherVector, otherCoefficient);
-		public override void AxpyIntoThis(IMinimalReadOnlyVector otherVector, double otherCoefficient)
+		public override void AxpyIntoThis(IReadOnlyVector otherVector, double otherCoefficient)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractContiguousFullyPopulatedVector contiguousVector) AxpyIntoThis(contiguousVector, otherCoefficient);
@@ -87,7 +87,7 @@ namespace MGroup.LinearAlgebra.Vectors
 			return Blas.Ddot(Length, Values, FromIndex, 1, otherVector.Values, otherVector.FromIndex, 1);
 		}
 		public override double DotProduct(AbstractSparseVector otherVector) => otherVector.DotProduct(this);
-		public override double DotProduct(IMinimalReadOnlyVector otherVector)
+		public override double DotProduct(IReadOnlyVector otherVector)
 		{
 			// Runtime Identification is_a_bad_thing™
 			if (otherVector is AbstractContiguousFullyPopulatedVector contiguousVector) return DotProduct(contiguousVector);

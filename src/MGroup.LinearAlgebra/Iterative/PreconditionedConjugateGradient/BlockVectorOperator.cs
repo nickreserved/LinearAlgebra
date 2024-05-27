@@ -121,7 +121,7 @@ namespace MGroup.LinearAlgebra.Iterative.PreconditionedConjugateGradient
 		/// <param name="residualKernels">The r_coefficients.</param>
 		/// <param name="directionKernels">The p_coefficients.</param>
 		/// <returns>The result of x = p_coefficients * P + r_coefficients * R</returns>
-		public IMinimalVector EvaluateVector(IMinimalVector[] residualKernels, IMinimalVector[] directionKernels)
+		public IVector EvaluateVector(IVector[] residualKernels, IVector[] directionKernels)
 		{
 			var x = residualKernels[0].CreateZeroWithSameFormat();
 			for (var i = 0; i < r.Count; ++i)

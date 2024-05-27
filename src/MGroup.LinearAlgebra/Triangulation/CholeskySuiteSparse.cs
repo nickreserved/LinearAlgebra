@@ -147,7 +147,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// <param name="rowIdx">The index of the row/column to modify. Constraints: 
         ///     0 &lt;= <paramref name="rowIdx"/> &lt; this.<see cref="Order"/>.</param>
         /// <param name="newRow">The entries of the row/column before factorization. Constraints:
-        ///     <paramref name="newRow"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="newRow"/>.<see cref="IReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="IndexOutOfRangeException">Thrown if <paramref name="rowIdx"/> violates the described constraints.
         ///     </exception>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="newRow"/> violates the described 
@@ -183,7 +183,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </summary>
         /// <param name="rhsVector">The right hand side vector b of the linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="rhsVector"/>.<see cref="IReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVector"/> violates the described 
         ///     constraints.</exception>
         /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Values has been 
@@ -264,7 +264,7 @@ namespace MGroup.LinearAlgebra.Triangulation
         /// diagonal factor) of the Cholesky factorization: A = L * L^T (or A = L * D * L^T).
         /// </summary>
         /// <param name="rhsVector">The right hand side vector b of the linear system. Constraints:
-        ///     <paramref name="rhsVector"/>.<see cref="IMinimalReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
+        ///     <paramref name="rhsVector"/>.<see cref="IReadOnlyVector.Length"/> == this.<see cref="Order"/>.</param>
         /// <exception cref="NonMatchingDimensionsException">Thrown if <paramref name="rhsVector"/> violates the described 
         ///     constraints.</exception>
         /// <exception cref="AccessViolationException">Thrown if the unmanaged memory that holds the factorization Values has been 

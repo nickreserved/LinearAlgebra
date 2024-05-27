@@ -70,10 +70,10 @@ namespace MGroup.LinearAlgebra.Matrices.Operators
         /// result[i] = <paramref name="vector"/>[permutation[i]]. Otherwise it is old-to-new:
         /// result[permutation[i]] = <paramref name="vector"/>[i]
         /// </summary>
-        /// <param name="vector">A vector with <see cref="IMinimalReadOnlyVector.Length"/> being equal to the <see cref="NumColumns"/>
+        /// <param name="vector">A vector with <see cref="IReadOnlyVector.Length"/> being equal to the <see cref="NumColumns"/>
         ///     of oper(this).</param>
         /// <param name="transposeThis">If true, oper(this) = transpose(this). Otherwise oper(this) = this.</param>
-        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IMinimalReadOnlyVector.Length"/> of
+        /// <exception cref="NonMatchingDimensionsException">Thrown if the <see cref="IReadOnlyVector.Length"/> of
         ///     <paramref name="vector"/> is different than the <see cref="NumColumns"/> of oper(this).</exception>
         public Vector MultiplyRight(Vector vector, bool transposeThis)
         {
